@@ -1,8 +1,7 @@
-import spacy
 from extractors.freelancer import FreelancerParser
-from extractors.utils import fix_grammar, normalize
+from extractors.utils import fix_grammar, get_nlp, normalize
 
-nlp = spacy.load("en_core_web_lg", exclude=["lemmatizer", "ner"])
+nlp = get_nlp("en_core_web_sm")
 freelancer_parser = FreelancerParser(nlp)
 
 def are_freelancers(texts: list[str]) -> list[bool | None]:
@@ -32,15 +31,15 @@ def describe_FreelancerParser() -> None:
       assert is_freelancer("I'm a freelancer")
       assert is_freelancer("I was a free-lancer")
       assert is_freelancer("I used to be a free lancer")
-      assert not is_freelancer("I'm a student")
-      assert not is_freelancer("I'm a developer")
+      assert None == is_freelancer("I'm a student")
+      assert None == is_freelancer("I'm a developer")
 
     def it_handles_set1() -> None:
       assert is_freelancer("""
         Freelancer Nasim is a Web Application Developer. 
         He knows JavaScript, Python, Django, NodeJS, Laravel, PhP. 
       """)
-      assert not is_freelancer("""
+      assert None == is_freelancer("""
         Opensource enthusiast, Skillbox teacher, Blogger 
       """)
       assert is_freelancer("""
@@ -53,8 +52,8 @@ def describe_FreelancerParser() -> None:
       assert is_freelancer("indie dev • iOS & macOS • freelance")
       assert is_freelancer("Freelancer Jedi Padawan")
       assert is_freelancer("freelance math teacher, freelance front-end developer")
-      assert not is_freelancer("I'm a Software Engineer, Ethical Hacker, and Cyber security enthusiast")
-      assert not is_freelancer("⭐️ Senior Software Developer ⭐️ Blockchain / Backend / Frontend / ETL / RPA")
+      assert None == is_freelancer("I'm a Software Engineer, Ethical Hacker, and Cyber security enthusiast")
+      assert None == is_freelancer("⭐️ Senior Software Developer ⭐️ Blockchain / Backend / Frontend / ETL / RPA")
 
     def it_handles_set3() -> None:
       assert is_freelancer("Freelancer and video editor")
@@ -72,12 +71,15 @@ def describe_FreelancerParser() -> None:
 
   def it_handles_set5() -> None:
       assert is_freelancer("NET Developer with front-end skills, Freelancer, Photographer and Science Lover")
-      assert not is_freelancer("Arman is a full-stack developer who mainly focuses on web development")
+      assert None == is_freelancer("Arman is a full-stack developer who mainly focuses on web development")
       assert is_freelancer("Teenager, freelancer, backend developer (TypeScript, C++17)")
       assert is_freelancer("Oleg Rybnikov - a freelancing web artisan specializing in Vite/Vue3")
       assert is_freelancer("#backend #java #freelancer")
-      assert not is_freelancer("applied artificial intelligence student")
+
+  def it_handles_set6() -> None:
+      assert False == is_freelancer("Full-stack web developer and Zend Certified PHP Engineer. Lead dev @Web3Box and freelancer @toptal")
+      assert None == is_freelancer("applied artificial intelligence student")
       assert is_freelancer("Hi, I am 22 years old freelance full-stack developer from Czech Republic.")
       assert is_freelancer("🇸🇰 Freelancer full-stack developer. #React #ReactNative")
       assert is_freelancer("Full stack software engineer at dextra | Freelancer")
-      # is_freelancer("Self-taught Developer graded in Back-end Development. -Freelancer") -- character "-"
+      assert is_freelancer("Self-taught Developer graded in Back-end Development. -Freelancer")

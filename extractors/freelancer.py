@@ -8,6 +8,10 @@ __all__ = ["FreelancerParser"]
 FREELANCER_NOUNS = {"consulting", "consultant", "freelancer", "freelance", "freelancing"}
 FREELANCER_VERBS = {"consulting", "freelancing"}
 
+NON_FREELANCER_NOUNS = {
+  "lead", "leader", "founder", "cto", "vp"
+}
+
 class FreelancerParser:
   def __init__(self, nlp: Language) -> None:
     self.nlp = nlp
@@ -20,8 +24,6 @@ class FreelancerParser:
 
   def is_freelancer(self, ntext: str | Doc) -> bool | None:
     doc = ntext if type(ntext) is Doc else self.nlp(ntext)
-    # for nc in doc.noun_chunks:
-    #   print(nc)
     for token in doc:
       # if not token.is_space and not token.is_punct:
       #   print(token, token.pos_, token.dep_)
@@ -29,36 +31,24 @@ class FreelancerParser:
         return True
       elif is_freelancer_verb(token):
         return True
+      elif is_non_freelancer_noun(token):
+        return False
     return None
 
 def is_freelancer_noun(token: Token) -> bool:
-  if token.lower_ not in FREELANCER_NOUNS:
-    return False
   return (
-    token.pos_ in {"NOUN", "PROPN", "ADJ"} # and # spacy default models have PROPN false positives and ADJ mistakes
-    # token.dep_ in {
-    #   "ROOT",     # Student
-    #   "conj",     # Freelancer and student
-    #   "amod",     # freelance math teacher
-    #   "attr",     # I am a student
-    #   "appos",    # Freelancer, student
-    #   "compound", # Freelancer Nasim (Spacy mistakenly thinks the first word is PROPN)
-    #   "nmod",     # Freelancer and editor
-    #   "pobj",     # Appears in complex (ill-understood) sentences
-    # }
+    token.lower_.strip("-") in FREELANCER_NOUNS and
+    token.pos_ in {"NOUN", "PROPN", "ADJ"}
   )
 
 def is_freelancer_verb(token: Token) -> bool:
-  if token.lower_ not in FREELANCER_VERBS:
-    return False
-  # Special case if it's the first word (a relatively often case)
-  if not token.i:
-    return True
-  # ...
-  if token.pos_ == "VERB":
-    return True
-    # if token.dep_ == "ROOT":
-    #   return True
-    # elif token.dep_ == "acl":
-    #   return True
-  return False
+  return (
+    token.lower_.strip("-") in FREELANCER_VERBS and
+    (token.pos_ in {"VERB"} or not token.i)
+  )
+
+def is_non_freelancer_noun(token: Token) -> bool:
+  return (
+    token.lower_.strip("-") in NON_FREELANCER_NOUNS and
+    token.pos_ in {"NOUN", "PROPN", "ADJ"}
+  )

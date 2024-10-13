@@ -1,8 +1,22 @@
 import re
 from emoji import replace_emoji
+from pathlib import Path
+import spacy
+from spacy import Language
+from spacy.symbols import LOWER, TAG, POS
 from typing import Any, Generator, cast, Iterable
 
-__all__ = ["normalize", "uniq", "fix_grammar"]
+# RESOURCES
+# - https://stackoverflow.com/questions/15388831/what-are-all-possible-pos-tags-of-nltk
+
+OP = "OP"
+IN = "IN"
+
+__all__ = [
+  "normalize", "uniq", "fix_grammar",
+  "add_nnp_exceptions", "add_jj_exceptions",
+  "get_nlp",
+]
 
 def normalize(text: str) -> str:
   text = text.replace("：", ": ")
@@ -26,7 +40,6 @@ def uniq[T](arr: list[T] | Generator[str, Any, Any]) -> list[T]:
 # --------------------------------------------------------------------------------------------------
 
 GRAMMAR_FIXES: list[tuple[str, str, re.RegexFlag | int]] = [
-  (r"under[-\s]+graduated?", r"undergraduate", re.IGNORECASE),
   (r"free[-\s]+lanc([edring]*)", r"freelanc\1", re.IGNORECASE),
   (r"B\.?[sS]\.?[cC]?\.?|S[cC]?\.?[bB]\.?", r"B.S", 0), # B.S  = Bachelor of Science
   (r"M\.?[sS]\.?[cC]?\.?|S[cC]\.?[mM]\.?", r"M.S", 0),  # M.S  = Master of Science (not handling "SM" forms for now)
@@ -43,3 +56,49 @@ def fix_grammar(text: str) -> str:
   for pattern, replacement, flags in GRAMMAR_FIXES:
     text = re.sub(pattern, replacement, text, 0, flags)
   return text
+
+nnp = {TAG: "NNP", POS: "PROPN"}
+jj = {TAG: "JJ", POS: "ADJ"}
+
+def add_nnp_exceptions(nlp: Language, nnp_items: list[str]) -> None:
+  ruler = nlp.get_pipe("attribute_ruler")
+  for nnp_item in nnp_items:
+    spacecount = nnp_item.count(" ")
+    if spacecount >= 2:
+      raise ValueError("NNP items with >= 2 spaces are not supported yet")
+    elif spacecount == 1:
+      w1, w2 = nnp_item.split(" ")
+      pattern = [
+        {LOWER: w1.lower()}, {LOWER: "-", "OP": "?"}, {LOWER: w2.lower()},
+      ]
+      ruler.add([pattern], nnp, index=0)
+      ruler.add([pattern], nnp, index=1)
+    else:
+      pattern = [
+        {LOWER: nnp_item.lower()}
+      ]
+      ruler.add([pattern], nnp)
+
+def add_jj_exceptions(nlp: Language, nnp_items: list[str]) -> None:
+  ruler = nlp.get_pipe("attribute_ruler")
+  for nnp_item in nnp_items:
+    spacecount = nnp_item.count(" ")
+    if spacecount >= 1:
+      raise ValueError("JJ items with >= 1 spaces are not supported")
+    else:
+      pattern = [
+        {LOWER: nnp_item.lower()}, {TAG: {IN: ["NN", "CD"]}}
+      ]
+      ruler.add([pattern], jj)
+
+def get_nlp(name: str | Path) -> Language:
+  nlp = spacy.load("en_core_web_sm", exclude=["lemmatizer", "ner"])
+  add_nnp_exceptions(nlp, [
+    "deep learning", "machine learning",
+  ])
+  add_jj_exceptions(nlp, [
+    "graduate", "graduated",
+    "undergraduate", "undergraduated",
+    "learning", "aspiring",
+  ])
+  return nlp

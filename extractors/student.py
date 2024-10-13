@@ -31,11 +31,13 @@ STRONG_NON_STUDENT_NOUNS = {
   # Conflicts:
   #   MS - Mississippi State
   #   BC - British Columbia Province
-  "analyst", "architect", "artist", "cto", "dean", "designer", "dev", "devops", "developer", "doctor",
+  "admin", "analyst", "architect", "artist", "cto", "dean", "designer", "dev", "devops", "developer", "doctor",
   "engineer", "engineering", "eng", "entrepreneur",
-  "founder", "generalist", "guru", "lawyer", "lead", "leader", "magician", "mathematician", "mechanic",
-  "mlops", "musician", "ninja", "physicist", "professor", "researcher", "scientist", "specialist", "vp",
-   # hr, recruiter
+  "founder", "generalist", "guru", "lawyer", "lead", "leader", "magician", "manager",
+  "mathematician", "mechanic",
+  "mlops", "musician", "ninja", "physicist", "producer", "professor", "programmer", "researcher",
+  "recruiter", "scientist", "specialist", "vp",
+  # hr
 }
 ASPIRING_SYNONIMS = {"aspiring", "future", "wannabe"}
 ASPIRING_REGEX = words_to_regex(ASPIRING_SYNONIMS)
@@ -77,27 +79,10 @@ class StudentParser:
     return None
 
 def is_student_noun(token: Token) -> bool:
-  if token.lower_ not in STUDENT_NOUNS:
-    return False
-  if (
-    token.pos_ in {"NOUN", "PROPN", "ADJ"} # and # spacy default models have PROPN false positives and ADJ mistakes
-    # token.dep_ not in {"dobj", "pobj"}
-    # token.dep_ in {
-    #   "ROOT",     # Student
-    #   "conj",     # Freelancer and student
-    #   "attr",     # I am a student
-    #   "appos",    # Freelancer, student
-    #   "compound", # Undergraduate engineer
-    #   "nmod",     # Appears in complex, badly formatted sentences
-    # }
-  ):
-    return True
-  # if token.pos_ == "NOUN" and token.dep_ == "dobj":
-  #   # yes, unless certain DET prefixes
-  #   return not any(child for child in token.children if child.pos_ == "DET" and child.lower_ in {"any", "every", "some"})
-  #   # applied artifical intelligence student -> YES -- just invalidly parsed
-  #   # on a mission to help every student -> NO
-  return False
+  return (
+    token.lower_.strip("-") in STUDENT_NOUNS and
+    token.pos_ in {"NOUN", "PROPN", "ADJ"}
+  )
 
 def is_strong_non_student_noun(token: Token) -> bool:
   return (

@@ -1,8 +1,7 @@
-import spacy
 from extractors.nondev import NondevParser
-from extractors.utils import fix_grammar, normalize
+from extractors.utils import fix_grammar, get_nlp, normalize
 
-nlp = spacy.load("en_core_web_lg", exclude=["lemmatizer", "ner"])
+nlp = get_nlp("en_core_web_sm")
 nondev_parser = NondevParser(nlp)
 
 def are_nondevs(texts: list[str]) -> list[bool | None]:
@@ -24,13 +23,43 @@ def describe_NondevParser() -> None:
       ]
       assert are_nondevs(texts) == [
         True,
-        None,
+        False,
       ]
 
   def describe_is_nondev() -> None:
     def it_basically_works() -> None:
       assert is_nondev("I'm a manager")
       assert is_nondev("I used to be an artist like you")
-      assert not is_nondev("I'm a student")
-      assert not is_nondev("I'm a developer")
+      assert None == is_nondev("I'm a student")
+      assert False == is_nondev("I'm a developer")
+      assert is_nondev("I'm an entrepreneur")
       assert is_nondev("I'm a manager and an engineer")
+
+    def it_handles_set1() -> None:
+      assert is_nondev("""
+        My name is Devin and I am a Senior Gameplay Designer at CD Projekt Red working on the next Witcher.
+      """) # designer
+      assert False == is_nondev("""
+        "Striving to become a front-end developer. Formerly climbing gym founder and co-owner"
+      """) # developer
+      assert is_nondev("""
+        Founder, CBB Analytics. Sports Data Scientist and Web Developer.
+      """) # founder
+      assert None == is_nondev("""
+        Twas brillig, and the slithy toves
+        Did gyre and gimble in the wabe
+      """)
+
+    def it_handles_set2() -> None:
+      assert is_nondev("""
+        ✒️ Co-founder of CollBoard.com
+      """)
+      assert False == is_nondev("""
+        Mathematician, Mentor, Founder, Fullstack Developer, Typographer, Tech Lead, Startup Engineer"
+      """)
+      assert False == is_nondev("""
+        Solidity developer with 10+ years experience. CTO at entro.solutions
+      """)
+      assert is_nondev("""
+        company founder at 18yo, programmer, game developer, virtual reality enthusiast
+      """)
