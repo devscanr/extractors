@@ -5,12 +5,12 @@ disallow_untyped_calls = false
 no_implicit_reexport = false
 
 [tool.ruff.lint]
-ignore = ["E701", "E741"]
+ignore = ["E701", "E711", "E712", "E741"]
 
 [tool.poetry]
 package-mode = true
 name = "extractors"
-version = "0.12.0"
+version = "0.13.0"
 description = ""
 authors = ["DevScanr team <info@devscanr.com>"]
 readme = "README.md"
