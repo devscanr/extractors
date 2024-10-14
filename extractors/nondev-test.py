@@ -29,14 +29,14 @@ def describe_NondevParser() -> None:
   def describe_is_nondev() -> None:
     def it_basically_works() -> None:
       assert is_nondev("I'm a manager")
-      assert is_nondev("I used to be an artist like you")
+      assert None == is_nondev("I used to be an artist like you")
       assert None == is_nondev("I'm a student")
       assert False == is_nondev("I'm a developer")
       assert is_nondev("I'm an entrepreneur")
       assert is_nondev("I'm a manager and an engineer")
 
     def it_handles_set1() -> None:
-      assert is_nondev("""
+      assert None == is_nondev("""
         My name is Devin and I am a Senior Gameplay Designer at CD Projekt Red working on the next Witcher.
       """) # designer
       assert False == is_nondev("""

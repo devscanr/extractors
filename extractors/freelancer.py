@@ -9,7 +9,8 @@ FREELANCER_NOUNS = {"consulting", "consultant", "freelancer", "freelance", "free
 FREELANCER_VERBS = {"consulting", "freelancing"}
 
 NON_FREELANCER_NOUNS = {
-  "lead", "leader", "founder", "cto", "vp"
+  "cofounder", "cto", "founder",
+  "lead", "leader", "vp",
 }
 
 class FreelancerParser:

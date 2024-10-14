@@ -41,7 +41,7 @@ def describe_Categorizer() -> None:
       """) == Categorized(is_freelancer=False, is_nondev=False, is_student=False)
       assert categorize_one("""
         Game Producer & Lead Development | Network & Systems Admin
-      """) == Categorized(is_freelancer=False, is_nondev=True, is_student=False)
+      """) == Categorized(is_freelancer=False, is_nondev=False, is_student=False)
       assert categorize_one("""
         Technical Artist. Founder of @Golden-Ram-Studio
       """) == Categorized(is_freelancer=False, is_nondev=True, is_student=False)

@@ -36,7 +36,7 @@ STRONG_NON_STUDENT_NOUNS = {
   "founder", "generalist", "guru", "lawyer", "lead", "leader", "magician", "manager",
   "mathematician", "mechanic",
   "mlops", "musician", "ninja", "physicist", "producer", "professor", "programmer", "researcher",
-  "recruiter", "scientist", "specialist", "vp",
+  "recruiter", "scientist", "secops", "specialist", "vp",
   # hr
 }
 ASPIRING_SYNONIMS = {"aspiring", "future", "wannabe"}
@@ -86,13 +86,13 @@ def is_student_noun(token: Token) -> bool:
 
 def is_strong_non_student_noun(token: Token) -> bool:
   return (
-    token.lower_ in STRONG_NON_STUDENT_NOUNS and
+    token.lower_.strip("-") in STRONG_NON_STUDENT_NOUNS and
     token.pos_ in {"NOUN", "PROPN", "ADJ"}
   )
 
 def is_weak_non_student_noun(token: Token) -> bool:
   return (
-    token.lower_ in WEAK_NON_STUDENT_NOUNS and
+    token.lower_.strip("-") in WEAK_NON_STUDENT_NOUNS and
     token.pos_ in {"NOUN", "PROPN", "ADJ"}
   )
 
@@ -107,7 +107,7 @@ def is_student_verb(token: Token) -> bool:
     # if token.dep_ == "ROOT":
     #   # yes, unless preceded by certain adverbs
     lefts = (
-      left.lower_
+      left.lower_.strip("-")
       for left in list(token.lefts) + list(get_root(token).lefts)
     )
     return not any(left in {"always", "frantically", "never"} for left in lefts)
