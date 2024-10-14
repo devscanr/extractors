@@ -5,15 +5,15 @@ from typing import Iterable
 
 __all__ = ["NondevParser"]
 
-DEV_NOUNS = {
-  "admin", "analyst", "architect", "dev", "developer", "devops",
-  "eng", "engineer", "hacker", "mathematician", "mlops", "programmer",
-  "researcher", "secops", "scientist",
+NONDEV_NOUNS = {
+  "cofounder", "ceo", "cto", "dean", "entrepreneur",
+  "founder", "manager", "professor", "recruiter", "svp", "vp",
 }
 
-NONDEV_NOUNS = {
-  "cofounder", "cto", "dean", "entrepreneur",
-  "founder", "manager", "professor", "recruiter", "vp",
+DEV_NOUNS = {
+  "admin", "analyst", "architect", "dev", "developer", "devops",
+  "eng", "engineer", "hacker", "investigator", "mathematician", "mlops", "programmer",
+  "researcher", "secops", "scientist",
 }
 
 class NondevParser:
@@ -28,9 +28,10 @@ class NondevParser:
 
   def is_nondev(self, ntext: str | Doc) -> bool | None:
     doc = ntext if type(ntext) is Doc else self.nlp(ntext)
+    # print([
+    #   (token, token.pos_, token.dep_) for token in doc if not token.is_punct
+    # ])
     for token in doc:
-      # if not token.is_space and not token.is_punct:
-      #   print(token, token.pos_, token.dep_, token.head.lemma_)
       if is_nondev_noun(token):
         return True
       elif is_dev_noun(token):

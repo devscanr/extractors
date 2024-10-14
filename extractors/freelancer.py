@@ -10,7 +10,7 @@ FREELANCER_VERBS = {"consulting", "freelancing"}
 
 NON_FREELANCER_NOUNS = {
   "cofounder", "cto", "founder",
-  "lead", "leader", "vp",
+  "lead", "leader", "svp", "vp",
 }
 
 class FreelancerParser:
@@ -25,9 +25,10 @@ class FreelancerParser:
 
   def is_freelancer(self, ntext: str | Doc) -> bool | None:
     doc = ntext if type(ntext) is Doc else self.nlp(ntext)
+     # print([
+    #   (token, token.pos_, token.dep_) for token in doc if not token.is_punct
+    # ])
     for token in doc:
-      # if not token.is_space and not token.is_punct:
-      #   print(token, token.pos_, token.dep_)
       if is_freelancer_noun(token):
         return True
       elif is_freelancer_verb(token):

@@ -14,7 +14,6 @@ IN = "IN"
 
 __all__ = [
   "normalize", "uniq", "fix_grammar",
-  "add_nnp_exceptions", "add_jj_exceptions",
   "get_nlp",
 ]
 
@@ -24,6 +23,7 @@ def normalize(text: str) -> str:
   text = re.sub(r"(📞|☎️|📱|☎)\s*:?\s*", "Phone: ", text, re.UNICODE)
   text = replace_emoji(text, "!")
   text = re.sub(r"(?<=\w)$", ".", text)
+  text = re.sub(r"\s+", " ", text)
   return text.strip()
 
 def uniq[T](arr: list[T] | Generator[str, Any, Any]) -> list[T]:
@@ -39,16 +39,20 @@ def uniq[T](arr: list[T] | Generator[str, Any, Any]) -> list[T]:
 # it's much easier to fix common errors preventively, than to fight them post-factum.
 # --------------------------------------------------------------------------------------------------
 
+LB = r"(?<!\w)"
+RB = r"(?!\w)"
+
 GRAMMAR_FIXES: list[tuple[str, str, re.RegexFlag | int]] = [
-  (r"free[-\s]+lanc([edring]*)", r"freelanc\1", re.IGNORECASE),
-  (r"B\.?[sS]\.?[cC]?\.?|S[cC]?\.?[bB]\.?", r"B.S", 0), # B.S  = Bachelor of Science
-  (r"M\.?[sS]\.?[cC]?\.?|S[cC]\.?[mM]\.?", r"M.S", 0),  # M.S  = Master of Science (not handling "SM" forms for now)
-  (r"P\.?[hH]\.?[dD]?\.?", r"Ph.D", 0),                 # Ph.D = Doctor of Philosophy
+  (rf"{LB}free[-\s]+lanc([edring]*){RB}", r"freelanc\1", re.IGNORECASE),
+  (rf"{LB}B\.?[sS]\.?[cC]?\.?|S[cC]?\.?[bB]\.?{RB}", r"B.S", 0), # B.S  = Bachelor of Science
+  (rf"{LB}M\.?[sS]\.?[cC]?\.?|S[cC]\.?[mM]\.?{RB}", r"M.S", 0),  # M.S  = Master of Science (not handling "SM" forms for now)
+  (rf"{LB}P\.?[hH]\.?[dD]?\.?{RB}", r"Ph.D", 0),                 # Ph.D = Doctor of Philosophy
+  (r" @ ", " at ", 0),
   # ...
   # TODO devops, mlops, sec-ops (insane number of varieties here)
 ]
 GRAMMAR_FIXES = [
-  (r"(?<!\w)" + pattern + r"(?!\w)", replacement, flags)
+  (pattern, replacement, flags)
   for (pattern, replacement, flags) in GRAMMAR_FIXES
 ]
 
@@ -60,14 +64,14 @@ def fix_grammar(text: str) -> str:
 nnp = {TAG: "NNP", POS: "PROPN"}
 jj = {TAG: "JJ", POS: "ADJ"}
 
-def add_nnp_exceptions(nlp: Language, nnp_items: list[str]) -> None:
+def add_nnp_exceptions(nlp: Language, items: list[str]) -> None:
   ruler = nlp.get_pipe("attribute_ruler")
-  for nnp_item in nnp_items:
-    spacecount = nnp_item.count(" ")
+  for item in items:
+    spacecount = item.count(" ")
     if spacecount >= 2:
       raise ValueError("NNP items with >= 2 spaces are not supported yet")
     elif spacecount == 1:
-      w1, w2 = nnp_item.split(" ")
+      w1, w2 = item.split(" ")
       pattern = [
         {LOWER: w1.lower()}, {LOWER: "-", "OP": "?"}, {LOWER: w2.lower()},
       ]
@@ -75,30 +79,48 @@ def add_nnp_exceptions(nlp: Language, nnp_items: list[str]) -> None:
       ruler.add([pattern], nnp, index=1)
     else:
       pattern = [
-        {LOWER: nnp_item.lower()}
+        {LOWER: item.lower()}
       ]
       ruler.add([pattern], nnp)
 
-def add_jj_exceptions(nlp: Language, nnp_items: list[str]) -> None:
+def add_jj_exceptions(nlp: Language, items: list[str]) -> None:
   ruler = nlp.get_pipe("attribute_ruler")
-  for nnp_item in nnp_items:
-    spacecount = nnp_item.count(" ")
+  for item in items:
+    spacecount = item.count(" ")
     if spacecount >= 1:
       raise ValueError("JJ items with >= 1 spaces are not supported")
     else:
       pattern = [
-        {LOWER: nnp_item.lower()}, {TAG: {IN: ["NN", "CD"]}}
+        {LOWER: item.lower()}, {TAG: {IN: ["NN", "CD"]}}
       ]
       ruler.add([pattern], jj)
 
+def add_jj_exceptions2(nlp: Language, items: list[str]) -> None:
+  ruler = nlp.get_pipe("attribute_ruler")
+  for item in items:
+    spacecount = item.count(" ")
+    if spacecount >= 1:
+      raise ValueError("VBG items with >= 1 spaces are not supported")
+    else:
+      pattern = [
+        {TAG: {IN: ["VBG"]}}, {LOWER: item.lower()},
+      ]
+      ruler.add([pattern], jj, index=1)
+
 def get_nlp(name: str | Path) -> Language:
   nlp = spacy.load("en_core_web_sm", exclude=["lemmatizer", "ner"])
+  # Make the following PROPER NOUNs
   add_nnp_exceptions(nlp, [
     "deep learning", "machine learning",
   ])
   add_jj_exceptions(nlp, [
+    # Make the following ADJECTIVEs if before NOUNs
     "graduate", "graduated",
     "undergraduate", "undergraduated",
     "learning", "aspiring",
+  ])
+  add_jj_exceptions2(nlp, [
+    # Make the following ADJECTIVEs if after VERBs
+    "leading",
   ])
   return nlp

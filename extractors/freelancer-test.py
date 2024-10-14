@@ -2,15 +2,15 @@ from extractors.freelancer import FreelancerParser
 from extractors.utils import fix_grammar, get_nlp, normalize
 
 nlp = get_nlp("en_core_web_sm")
-freelancer_parser = FreelancerParser(nlp)
+parser = FreelancerParser(nlp)
 
 def are_freelancers(texts: list[str]) -> list[bool | None]:
-  return freelancer_parser.are_freelancers([
+  return parser.are_freelancers([
     fix_grammar(normalize(text)) for text in texts
   ])
 
 def is_freelancer(text: str) -> bool | None:
-  return freelancer_parser.is_freelancer(
+  return parser.is_freelancer(
     fix_grammar(normalize(text))
   )
 

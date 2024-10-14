@@ -22,7 +22,7 @@ STUDENT_VERBS = {
 }
 WEAK_NON_STUDENT_NOUNS = {
   # Mean a Non-Student only if sentence contains no STUDENT_NOUNS (these words can precede it)
-  "B.S", "M.S", "Ph.D", "bachelor"
+  "B.S", "M.S", "Ph.D", "bachelor",
 }
 STRONG_NON_STUDENT_NOUNS = {
   # Non-included cases:
@@ -31,12 +31,12 @@ STRONG_NON_STUDENT_NOUNS = {
   # Conflicts:
   #   MS - Mississippi State
   #   BC - British Columbia Province
-  "admin", "analyst", "architect", "artist", "cto", "dean", "designer", "dev", "devops", "developer", "doctor",
+  "admin", "analyst", "architect", "artist", "ceo", "cto", "dean", "designer", "dev", "devops", "developer", "doctor",
   "engineer", "engineering", "eng", "entrepreneur",
-  "founder", "generalist", "guru", "lawyer", "lead", "leader", "magician", "manager",
+  "founder", "generalist", "guru", "investigator", "lawyer", "lead", "leader", "magician", "manager",
   "mathematician", "mechanic",
   "mlops", "musician", "ninja", "physicist", "producer", "professor", "programmer", "researcher",
-  "recruiter", "scientist", "secops", "specialist", "vp",
+  "recruiter", "scientist", "secops", "specialist", "svp", "vp",
   # hr
 }
 ASPIRING_SYNONIMS = {"aspiring", "future", "wannabe"}
@@ -56,65 +56,61 @@ class StudentParser:
 
   def is_student(self, ntext: str | Doc) -> bool | None:
     doc = ntext if type(ntext) is Doc else self.nlp(ntext)
+    # print([
+    #   (token, token.pos_, token.dep_) for token in doc if not token.is_punct
+    # ])
     for token in doc:
-      # if not token.is_space and not token.is_punct:
-      #   print(token, token.pos_, token.dep_)
-      # Assuming whatever role is found first, is more important and deciding
       if is_student_noun(token):
-        subtree = get_subtree_text(token)
-        if re.search(PERPETUAL_REGEX, subtree) is None:
-          return True
+        return True
       elif is_student_verb(token):
         return True
       elif is_strong_non_student_noun(token):
-        subtree = get_subtree_text(token)
-        if re.search(ASPIRING_REGEX, subtree) is None:
-          return False # not canceled by ASPIRING
+        return False
       elif is_weak_non_student_noun(token):
-        subtree = get_subtree_text(token)
-        is_aspiring = re.search(ASPIRING_REGEX, subtree) is not None
-        is_student_ = any(t for t in token.sent if is_student_noun(t))
-        if not is_aspiring and not is_student_:
-          return False # not canceled by ASPIRING or following STUDENT_NOUN
+        return False
     return None
 
 def is_student_noun(token: Token) -> bool:
-  return (
+  if (
     token.lower_.strip("-") in STUDENT_NOUNS and
     token.pos_ in {"NOUN", "PROPN", "ADJ"}
-  )
+  ):
+    subtree = get_subtree_text(token)
+    if re.search(PERPETUAL_REGEX, subtree) is None:
+      return True
+  return False
 
 def is_strong_non_student_noun(token: Token) -> bool:
-  return (
+  if (
     token.lower_.strip("-") in STRONG_NON_STUDENT_NOUNS and
     token.pos_ in {"NOUN", "PROPN", "ADJ"}
-  )
+  ):
+    subtree = get_subtree_text(token)
+    is_aspiring = re.search(ASPIRING_REGEX, subtree) is not None
+    return not is_aspiring
+  return False
 
 def is_weak_non_student_noun(token: Token) -> bool:
-  return (
+  if (
     token.lower_.strip("-") in WEAK_NON_STUDENT_NOUNS and
     token.pos_ in {"NOUN", "PROPN", "ADJ"}
-  )
+  ):
+    subtree = get_subtree_text(token)
+    is_aspiring = re.search(ASPIRING_REGEX, subtree) is not None
+    is_student = any(t for t in token.sent if is_student_noun(t))
+    return not is_aspiring and not is_student
+  return False
 
 def is_student_verb(token: Token) -> bool:
-  if token.lower_ not in STUDENT_VERBS:
-    return False
-  # Special case if it's the first word (a relatively often case)
-  if not token.i:
-    return True
-  # ...
-  if token.pos_ == "VERB":
-    # if token.dep_ == "ROOT":
-    #   # yes, unless preceded by certain adverbs
+  if (
+    token.lower_.strip("-") in STUDENT_VERBS and
+    (token.pos_ == "VERB" or token.i == 0)
+  ):
     lefts = (
       left.lower_.strip("-")
       for left in list(token.lefts) + list(get_root(token).lefts)
     )
     return not any(left in {"always", "frantically", "never"} for left in lefts)
-    # elif token.dep_ == "xcomp":
-    #   # no, unless parented by "started"
-    #   return token.head.lower_ == "started" if token.head else False
-    # return True
   return False
 
 def get_root(token: Token) -> Token:

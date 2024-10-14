@@ -2,15 +2,15 @@ from extractors.nondev import NondevParser
 from extractors.utils import fix_grammar, get_nlp, normalize
 
 nlp = get_nlp("en_core_web_sm")
-nondev_parser = NondevParser(nlp)
+parser = NondevParser(nlp)
 
 def are_nondevs(texts: list[str]) -> list[bool | None]:
-  return nondev_parser.are_nondevs([
+  return parser.are_nondevs([
     fix_grammar(normalize(text)) for text in texts
   ])
 
 def is_nondev(text: str) -> bool | None:
-  return nondev_parser.is_nondev(
+  return parser.is_nondev(
     fix_grammar(normalize(text))
   )
 

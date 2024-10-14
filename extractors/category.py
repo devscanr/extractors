@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from extractors.freelancer import FreelancerParser
+from extractors.lead import LeadParser
 from extractors.nondev import NondevParser
 from extractors.student import StudentParser
 from spacy.language import Language
@@ -10,23 +11,26 @@ __all__ = ["Categorized", "Categorizer"]
 
 @dataclass
 class Categorized:
-  is_freelancer: bool | None
-  is_nondev: bool | None
-  is_student: bool | None
+  is_freelancer: bool
+  is_lead: bool
+  is_nondev: bool
+  is_student: bool
 
 class Categorizer:
   def __init__(self, nlp: Language) -> None:
     self.nlp = nlp
-    self.freelancer_parser = FreelancerParser(self.nlp)
-    self.nondev_parser = NondevParser(self.nlp)
-    self.student_parser = StudentParser(self.nlp)
+    self.frparser = FreelancerParser(self.nlp)
+    self.ldparser = LeadParser(self.nlp)
+    self.ndparser = NondevParser(self.nlp)
+    self.stparser = StudentParser(self.nlp)
 
   def categorize(self, ntexts: Iterable[str | Doc]) -> list[Categorized]:
     docs = self.nlp.pipe(ntexts)
     return [
       Categorized(
-        is_freelancer = self.freelancer_parser.is_freelancer(doc),
-        is_nondev = self.nondev_parser.is_nondev(doc),
-        is_student = self.student_parser.is_student(doc),
+        is_freelancer = self.frparser.is_freelancer(doc) or False,
+        is_lead = self.ldparser.is_lead(doc) or False,
+        is_nondev = self.ndparser.is_nondev(doc) or False,
+        is_student = self.stparser.is_student(doc) or False,
       ) for doc in docs
     ]

@@ -2,15 +2,15 @@ from extractors.student import StudentParser
 from extractors.utils import fix_grammar, get_nlp, normalize
 
 nlp = get_nlp("en_core_web_sm")
-student_parser = StudentParser(nlp)
+parser = StudentParser(nlp)
 
 def are_students(texts: list[str]) -> list[bool | None]:
-  return student_parser.are_students([
+  return parser.are_students([
     fix_grammar(normalize(text)) for text in texts
   ])
 
 def is_student(text: str) -> bool | None:
-  return student_parser.is_student(
+  return parser.is_student(
     fix_grammar(normalize(text))
   )
 
