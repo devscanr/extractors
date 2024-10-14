@@ -46,6 +46,7 @@ def is_lead_noun(token: Token, doc: Doc) -> bool:
   ):
     tail = str(doc[token.i:token.i+3])
     return not re.search(r"^tl[-_/;, ]{0,2}dr", tail, re.IGNORECASE)
+  return False
 
 def is_lead_verb(token: Token) -> bool:
   return (

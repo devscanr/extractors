@@ -3,14 +3,12 @@ from emoji import replace_emoji
 from pathlib import Path
 import spacy
 from spacy import Language
-from spacy.symbols import LOWER, TAG, POS
 from typing import Any, Generator, cast, Iterable
 
 # RESOURCES
 # - https://stackoverflow.com/questions/15388831/what-are-all-possible-pos-tags-of-nltk
 
-OP = "OP"
-IN = "IN"
+(IN, LOWER, OP, POS, TAG) = ("IN", "LOWER", "OP", "POS", "TAG")
 
 __all__ = [
   "normalize", "uniq", "fix_grammar",
@@ -65,7 +63,7 @@ nnp = {TAG: "NNP", POS: "PROPN"}
 jj = {TAG: "JJ", POS: "ADJ"}
 
 def add_nnp_exceptions(nlp: Language, items: list[str]) -> None:
-  ruler = nlp.get_pipe("attribute_ruler")
+  ruler = cast(Any, nlp.get_pipe("attribute_ruler"))
   for item in items:
     spacecount = item.count(" ")
     if spacecount >= 2:
@@ -84,7 +82,7 @@ def add_nnp_exceptions(nlp: Language, items: list[str]) -> None:
       ruler.add([pattern], nnp)
 
 def add_jj_exceptions(nlp: Language, items: list[str]) -> None:
-  ruler = nlp.get_pipe("attribute_ruler")
+  ruler = cast(Any, nlp.get_pipe("attribute_ruler"))
   for item in items:
     spacecount = item.count(" ")
     if spacecount >= 1:
@@ -96,7 +94,7 @@ def add_jj_exceptions(nlp: Language, items: list[str]) -> None:
       ruler.add([pattern], jj)
 
 def add_jj_exceptions2(nlp: Language, items: list[str]) -> None:
-  ruler = nlp.get_pipe("attribute_ruler")
+  ruler = cast(Any, nlp.get_pipe("attribute_ruler"))
   for item in items:
     spacecount = item.count(" ")
     if spacecount >= 1:
