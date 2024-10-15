@@ -20,9 +20,10 @@ def normalize(text: str) -> str:
   text = re.sub(r"\s*[•|]+\s*", ". ", text)
   text = re.sub(r"(📞|☎️|📱|☎)\s*:?\s*", "Phone: ", text, re.UNICODE)
   text = replace_emoji(text, "!")
-  text = re.sub(r"(?<=\w)$", ".", text)
+  text = text.strip()
+  text = re.sub(r"(?<=\w)$", " .", text)
   text = re.sub(r"\s+", " ", text)
-  return text.strip()
+  return text
 
 def uniq[T](arr: list[T] | Generator[str, Any, Any]) -> list[T]:
   """

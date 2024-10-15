@@ -10,12 +10,12 @@ readme = "README.md"
 python = "^3.12"
 pydantic-settings = "^2.4.0"
 pytest-describe = "^2.2.0"
-emoji = "^2.13.2"
 markdown = "^3.7"
 spacy = "^3.8.2"
 lingua-language-detector = "^2.0.2"
 urlextract = "^1.9.0"
 beautifulsoup4 = "^4.12.3"
+emoji = "^2.14.0"
 
 [tool.poetry.group.dev.dependencies]
 mypy = "^1.11.2"
@@ -30,7 +30,7 @@ PYTHONPATH = "."
 
 [tool.poe.tasks]
 build = "poetry build --format=wheel"
-tc = "poetry run mypy --enable-incomplete-feature=NewGenericSyntax ."
+tc = "poetry run mypy ."
 test = "poetry run pytest --disable-warnings"
 lint = "poetry run ruff check"
 

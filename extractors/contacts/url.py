@@ -11,6 +11,7 @@ def parse_urls(ntext: str) -> list[str]:
     return []
   urls = extractor.find_urls(ntext)
   return uniq(
-    url for url in urls
+    url.strip("()[]{} ")
+    for url in urls # The library mistakenly grabs trailing "]" and ")" in MD
     if len(url) <= 255
   )
