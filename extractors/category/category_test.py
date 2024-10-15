@@ -1,5 +1,5 @@
-from extractors.category import Categorizer, Categorized
-from extractors.utils import fix_grammar, get_nlp, normalize
+from ..utils import fix_grammar, get_nlp, normalize
+from .category import Categorizer, Categorized
 
 nlp = get_nlp("en_core_web_sm")
 categorizer = Categorizer(nlp)

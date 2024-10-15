@@ -1,11 +1,14 @@
-from extractors.language import detect_language_iso639
+from .language import detect_language_iso639
 
 def describe_detect_language_iso639() -> None:
-  def it_works() -> None:
+  def it_works_for_single_language() -> None:
     assert detect_language_iso639("Backend developer, hiker") == "ENG"
     assert detect_language_iso639("Бекенд разработчик, хайкер") == "RUS"
     assert detect_language_iso639("Backend Entwickler, Wanderer und Abenteurer") == "ENG"
     # ^ https://github.com/pemistahl/lingua-py/discussions/240 (no "OTHER" category support from the lib)
+
+  def it_partially_works_for_multiple_languages() -> None:
+    assert detect_language_iso639("Backend developer, hiker | Бекенд разработчик, хайкер") == "RUS"
 
 # print(detect("Ein, zwei, drei, vier"))
 # print(detect("Один, два, три, четыре"))

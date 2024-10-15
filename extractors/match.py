@@ -1,9 +1,7 @@
 import re
-from spacy.language import Language
-from spacy.tokens import Doc
 from typing import Pattern
 
-__all__ = ["to_variants", "to_docs", "words_to_regex"]
+__all__ = ["to_variants", "words_to_regex"]
 
 SEPS = ["", "-", " "]
 
@@ -17,9 +15,6 @@ def to_variants(phrase: str) -> list[str]:
     ]
   else:
     return [phrase]
-
-def to_docs(nlp: Language, phrase: str) -> list[Doc]:
-  return [nlp.make_doc(variant) for variant in to_variants(phrase)]
 
 def words_to_regex(words: list[str] | set[str]) -> Pattern[str]:
   return re.compile(r"(?<!\w)(?:" + r"|".join(

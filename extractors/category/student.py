@@ -1,9 +1,9 @@
-from extractors.match import words_to_regex
 import re
 from spacy.language import Language
 # from spacy.matcher import PhraseMatcher
 from spacy.tokens import Doc, Token
 from typing import Iterable
+from ..match import words_to_regex
 
 __all__ = ["StudentParser"]
 
@@ -55,6 +55,8 @@ class StudentParser:
     ]
 
   def is_student(self, ntext: str | Doc) -> bool | None:
+    if not ntext:
+      return None
     doc = ntext if type(ntext) is Doc else self.nlp(ntext)
     # print([
     #   (token, token.pos_, token.dep_) for token in doc if not token.is_punct

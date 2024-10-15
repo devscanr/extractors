@@ -1,21 +1,24 @@
-from html2text import HTML2Text
+from bs4 import BeautifulSoup, NavigableString
 from markdown import markdown
-import re
 
 __all__ = ["html2text", "markdown2text"]
 
-h = HTML2Text()
-h.mark_code = True
-
 def html2text(html: str) -> str:
-  text = h.handle(html).strip()
-  return re.sub(
-    r"\[code].*\[/code]",
-    "--",
-    text,
-    flags=re.DOTALL  # | re.UNICODE | re.IGNORECASE | re.MULTILINE
-  )
+  soup = BeautifulSoup(html, features="html.parser")
+  texts = []
+  for element in soup.descendants:
+    if isinstance(element, NavigableString):
+      s = element.strip()
+      if s:
+        texts.append(
+          f"{s}: {element.parent["href"]}"
+          if element.parent and element.parent.name == "a" else
+          s
+        )
+  return "\n\n".join(text for text in texts)
 
 def markdown2text(md: str) -> str:
+  if not md:
+    return ""
   html = markdown(md, extensions=["fenced_code"])
   return html2text(html)

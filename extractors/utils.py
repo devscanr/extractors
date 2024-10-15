@@ -1,6 +1,6 @@
-import re
 from emoji import replace_emoji
 from pathlib import Path
+import re
 import spacy
 from spacy import Language
 from typing import Any, Generator, cast, Iterable
@@ -25,6 +25,9 @@ def normalize(text: str) -> str:
   return text.strip()
 
 def uniq[T](arr: list[T] | Generator[str, Any, Any]) -> list[T]:
+  """
+  Order-preserving uniq
+  """
   # Note: does not collapse "+NNN" with "NNN" so far
   d = {}
   for x in arr:

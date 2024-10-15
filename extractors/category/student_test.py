@@ -1,5 +1,5 @@
-from extractors.student import StudentParser
-from extractors.utils import fix_grammar, get_nlp, normalize
+from ..utils import fix_grammar, get_nlp, normalize
+from .student import StudentParser
 
 nlp = get_nlp("en_core_web_sm")
 parser = StudentParser(nlp)

@@ -1,11 +1,11 @@
-from extractors.email import parse_emails
-from extractors.utils import normalize
+from ..utils import normalize
+from .email import parse_emails
 
 def parse(text: str) -> list[str]:
   return parse_emails(normalize(text))
 
-# Emails and phone numbers are fake (generated). Potential clashes will existing contacts
-# of real people are coincidental and not intended.
+# Emails are fake (generated). Potential clashes will contacts
+# of real people are non-intentional.
 
 def describe_parse_emails() -> None:
   def it_parses_set1() -> None:

@@ -1,11 +1,11 @@
 from dataclasses import dataclass
-from extractors.freelancer import FreelancerParser
-from extractors.lead import LeadParser
-from extractors.nondev import NondevParser
-from extractors.student import StudentParser
 from spacy.language import Language
 from spacy.tokens import Doc
 from typing import Iterable
+from .freelancer import FreelancerParser
+from .lead import LeadParser
+from .nondev import NondevParser
+from .student import StudentParser
 
 __all__ = ["Categorized", "Categorizer"]
 

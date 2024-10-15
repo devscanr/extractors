@@ -1,11 +1,11 @@
-from extractors.phone import parse_phones
-from extractors.utils import normalize
+from ..utils import normalize
+from .phone import parse_phones
 
 def parse(text: str) -> list[str]:
   return parse_phones(normalize(text))
 
-# Emails and phone numbers are fake (generated). Potential clashes will existing contacts
-# of real people are coincidental and not intended.
+# Phone numbers are fake (generated). Potential clashes will contacts
+# of real people are non-intentional.
 
 def describe_parse_phones() -> None:
   def it_parses_international() -> None:
@@ -112,4 +112,3 @@ def describe_parse_phones() -> None:
     assert parse("Signal: +36202687810") == ["+36202687810"]
     assert parse("Phone/Viber/WhatsApp: +36202687812") == ["+36202687812"]
     assert parse("WhatsApp / Telegram / Signal: +1(647) 373 1111") == ["+16473731111"]
-

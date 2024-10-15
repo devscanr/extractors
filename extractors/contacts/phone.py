@@ -1,5 +1,5 @@
 import re
-from extractors.utils import uniq
+from ..utils import uniq
 
 __all__ = ["parse_phones"]
 
@@ -20,6 +20,9 @@ URLED_NUMBER = "|".join([
 # TODO viber://contact?number=%2B0000000000000
 
 def parse_phones(ntext: str) -> list[str]:
+  # TODO smart deduplicate
+  if not ntext:
+    return []
   phones1 = [
     phone
     for REGEX in TRIGGERED_NUMBERS

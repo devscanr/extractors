@@ -24,6 +24,8 @@ class FreelancerParser:
     ]
 
   def is_freelancer(self, ntext: str | Doc) -> bool | None:
+    if not ntext:
+      return None
     doc = ntext if type(ntext) is Doc else self.nlp(ntext)
      # print([
     #   (token, token.pos_, token.dep_) for token in doc if not token.is_punct

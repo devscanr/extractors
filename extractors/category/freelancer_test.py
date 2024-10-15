@@ -1,5 +1,5 @@
-from extractors.freelancer import FreelancerParser
-from extractors.utils import fix_grammar, get_nlp, normalize
+from ..utils import fix_grammar, get_nlp, normalize
+from .freelancer import FreelancerParser
 
 nlp = get_nlp("en_core_web_sm")
 parser = FreelancerParser(nlp)
