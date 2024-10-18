@@ -17,7 +17,7 @@ def html2text(html: str) -> str:
         elif is_whitelist_url(href):
           texts.append(f"URL: {href}")
         else:
-          texts.append("/Link/")
+          texts.append("/URL/")
     elif isinstance(element, NavigableString) and not isinstance(element, Comment):
       s = element.strip()
       if has_parent(element, "code"):
@@ -47,5 +47,57 @@ def markdown2text(md: str) -> str:
   return html2text(html)
 
 def is_whitelist_url(href: str) -> bool:
-  # TODO ...
-  return re.search(r"\b(meta|instagram|vk|telegram|youtube|facebook|twitter)\b", href) is not None
+  return re.search(WHITE_DOMAINS_REGEX, href) is not None
+
+WHITE_DOMAINS_REGEX = r"\b" + r"|".join([
+  r"about\.me",
+  r"behance\.net",
+  r"bio\.link",
+  r"buymeacoffee\.com",
+  r"codecademy\.com",
+  r"codepen\.io",
+  r"codersrank\.io",
+  r"codewars\.com",
+  r"dev\.to",
+  r"discord\.com",
+  r"discordapp\.com",
+  r"dribbble\.com",
+  r"facebook\.com",
+  r"fb\.com",
+  r"github\.com",
+  r"githubio\.io",
+  r"gitlab\.com",
+  r"habr\.com",
+  r"hashnode\.com",
+  r"hashnode\.dev",
+  r"herokuapp\.com",
+  r"hexlet\.io",
+  r"hh\.ru",
+  r"instagram\.com",
+  r"kaggle\.com",
+  r"leetcode\.com",
+  r"linkedin\.com",
+  r"linktr\.ee",
+  r"medium\.com",
+  r"netlify\.app",
+  r"patreon\.com",
+  r"reddit\.com",
+  r"showwcase\.com",
+  r"stackoverflow\.com",
+  r"stackshare\.io",
+  r"t\.me",
+  r"tiktok\.com",
+  r"tilda\.ws",
+  r"toptal\.com",
+  r"twitch\.tv",
+  r"twitter\.com",
+  r"udemy\.com",
+  r"upwork\.com",
+  r"vercel\.app",
+  r"vk\.com",
+  r"vk\.me",
+  r"wordpress\.com",
+  r"wordpress\.org",
+  r"youtube\.com",
+  r"x\.com",
+]) + r"\b"

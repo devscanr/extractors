@@ -93,9 +93,19 @@ def describe_markdown2text() -> None:
           <img src="https://raw.githubcontent.com/Sabya-Sachi-Seal/Sabya-Sachi-Seal/divider.gif">
         </a>
       </div>
+      <a href="https://toptal.com/resume/xxx">
+        <img src="foobar"/>
+      </a>
+      <a href="https://unknown-site.com">
+        <img src="foobar"/>
+      </a>  
     """)
     text = c("""
-      /Link/
+      URL: https://github.com/Sabya-Sachi-Seal
+      
+      URL: https://toptal.com/resume/xxx
+      
+      /URL/
     """)
     assert markdown2text(md) == text
 

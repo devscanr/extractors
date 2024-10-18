@@ -58,21 +58,21 @@ def describe_parse_contacts() -> None:
     assert parse(txt) == Contacts(
       emails = [],
       phones = [],
-      urls = ["https://scabbiaza.net", "https://paqmind.com"],
+      urls = ["https://playing-with-fastapi.vercel.app/weather/vienna", "https://scabbiaza.net", "https://paqmind.com"],
     )
 
   def it_parses_md_2() -> None:
     md = c("""
       <div>
-        <a href="https://github.com/Sabyasachi-Seal">
-        <img width=100% src="https://raw.githubusercontent.com/Sabyasachi-Seal/Sabyasachi-Seal/ouput/action2.gif" href="https://github.com/Sabyasachi-Seal" /></a>
+        <a href="https://github.com/Sabya-sachi-Seal">
+        <img width=100% src="https://raw.githubusercontent.com/Sabya-sachi-Seal/Sabya-sachi-Seal/ouput/action2.gif" href="https://github.com/Sabya-sachi-Seal" /></a>
       </div>
       <h1>
-        <a href="https://github.com/Sabyasachi-Seal">
-          <img width=7% height=15% src="https://raw.githubusercontent.com/Sabyasachi-Seal/Sabyasachi-Seal/ouput/Hi.gif"/>
+        <a href="https://github.com/Sabya-sachi-Seal">
+          <img width=7% height=15% src="https://raw.githubusercontent.com/Sabya-sachi-Seal/Sabya-sachi-Seal/ouput/Hi.gif"/>
         </a>
         I'm a
-        <a href="https://github.com/Sabyasachi-Seal">
+        <a href="https://github.com/Sabya-sachi-Seal">
           <img align=center width=100% src="https://readme-typing-svg.herokuapp.com?font=Sora&color=%2336BCF7&size=35&center=true&vCenter=true&width=600%&lines=Cloud+Computing+Enthusiast;Cybersecurity+Passionate;Data+Science+Practitioner;AI+%26+ML+Enthusiast;Computer+Science+Undergrad;Tech+Blogger" />
         </a>
       </h1>
@@ -81,7 +81,7 @@ def describe_parse_contacts() -> None:
     assert parse(txt) == Contacts(
       emails = [],
       phones = [],
-      urls = [],
+      urls = ["https://github.com/Sabya-sachi-Seal"],
     )
 
   def it_parses_md_3() -> None:
@@ -123,7 +123,7 @@ def describe_parse_contacts() -> None:
     assert parse(txt) == Contacts(
       emails = ["iam.sabya-sachi@gmail.com"],
       phones = [],
-      urls = ["https://www.youtube.com/channel/UC5VBAKQWkYdrALsQ_W8woCg"],
+      urls = ["https://github.com/Sabya-Sachi-Seal", "https://www.youtube.com/channel/UC5VBAKQWkYdrALsQ_W8woCg"],
     )
 
 def c(text: str) -> str:
