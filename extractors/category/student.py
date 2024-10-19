@@ -20,11 +20,11 @@ STUDENT_VERBS = {
   "learning",
   "studying",
 }
-WEAK_NON_STUDENT_NOUNS = {
+WEAK_NONSTUDENT_NOUNS = {
   # Mean a Non-Student only if sentence contains no STUDENT_NOUNS (these words can precede it)
   "B.S", "M.S", "Ph.D", "bachelor",
 }
-STRONG_NON_STUDENT_NOUNS = {
+STRONG_NONSTUDENT_NOUNS = {
   # Non-included cases:
   #   intern -- does not mean a non-student
   #   pilot -- non-digital
@@ -39,10 +39,16 @@ STRONG_NON_STUDENT_NOUNS = {
   "recruiter", "scientist", "secops", "specialist", "svp", "vp",
   # hr
 }
-ASPIRING_SYNONIMS = {"aspiring", "future", "wannabe"}
-ASPIRING_REGEX = words_to_regex(ASPIRING_SYNONIMS)
-PERPETUAL_SYNONIMS = {"constant", "eternal", "everlasting", "life=long", "permanent", "perpetual"}
-PERPETUAL_REGEX = words_to_regex(PERPETUAL_SYNONIMS)
+STUDENT_CANCELING_WORDS = {
+  "former", "formerly", "previous", "previously",
+  "constant", "eternal", "everlasting", "life=long", "permanent", "perpetual"
+}
+STUDENT_CANCELING_REGEX = words_to_regex(STUDENT_CANCELING_WORDS)
+NONSTUDENT_CANCELING_WORDS = {
+  "former", "formerly", "previous", "previously",
+  "aspiring", "future", "wannabe",
+}
+NONSTUDENT_CANCELING_REGEX = words_to_regex(NONSTUDENT_CANCELING_WORDS)
 
 class StudentParser:
   def __init__(self, nlp: Language) -> None:
@@ -78,27 +84,27 @@ def is_student_noun(token: Token) -> bool:
     token.pos_ in {"NOUN", "PROPN", "ADJ"}
   ):
     subtree = get_subtree_text(token)
-    if re.search(PERPETUAL_REGEX, subtree) is None:
+    if re.search(STUDENT_CANCELING_REGEX, subtree) is None:
       return True
   return False
 
 def is_strong_non_student_noun(token: Token) -> bool:
   if (
-    token.lower_.strip("-") in STRONG_NON_STUDENT_NOUNS and
+    token.lower_.strip("-") in STRONG_NONSTUDENT_NOUNS and
     token.pos_ in {"NOUN", "PROPN", "ADJ"}
   ):
     subtree = get_subtree_text(token)
-    is_aspiring = re.search(ASPIRING_REGEX, subtree) is not None
+    is_aspiring = re.search(NONSTUDENT_CANCELING_REGEX, subtree) is not None
     return not is_aspiring
   return False
 
 def is_weak_non_student_noun(token: Token) -> bool:
   if (
-    token.lower_.strip("-") in WEAK_NON_STUDENT_NOUNS and
+    token.lower_.strip("-") in WEAK_NONSTUDENT_NOUNS and
     token.pos_ in {"NOUN", "PROPN", "ADJ"}
   ):
     subtree = get_subtree_text(token)
-    is_aspiring = re.search(ASPIRING_REGEX, subtree) is not None
+    is_aspiring = re.search(NONSTUDENT_CANCELING_REGEX, subtree) is not None
     is_student = any(t for t in token.sent if is_student_noun(t))
     return not is_aspiring and not is_student
   return False

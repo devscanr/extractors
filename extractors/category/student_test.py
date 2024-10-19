@@ -176,6 +176,8 @@ def describe_StudentParser() -> None:
       assert False == is_student("Private Pilot | Bachelor of Science")
       assert False == is_student("Computer Engineer & MSc Student")
       assert is_student("MSCS Student")
+      assert None == is_student("Formerly a student at Something")
+      assert None == is_student("A former student at Something")
 
     def it_basically_handles_verbs() -> None:
       assert is_student("Learning")
