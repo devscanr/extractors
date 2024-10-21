@@ -65,7 +65,7 @@ WHITE_DOMAINS_REGEX = r"\b" + r"|".join([
   r"facebook\.com",
   r"fb\.com",
   r"github\.com",
-  r"githubio\.io",
+  r"github\.io",
   r"gitlab\.com",
   r"habr\.com",
   r"hashnode\.com",
