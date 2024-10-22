@@ -63,3 +63,11 @@ def describe_NondevParser() -> None:
       assert is_nondev("""
         company founder at 18yo, programmer, game developer, virtual reality enthusiast
       """)
+      assert is_nondev("""
+        Fullstack web design agency
+      """)
+
+    def it_handles_set3() -> None:
+      assert is_nondev("""
+        Lecturer at Rowan University
+      """)

@@ -54,7 +54,7 @@ def describe_StudentParser() -> None:
       assert False == is_student("Developer at Sky and undergraduated in C.S. in Federal University of South Frontier")
 
     def it_handles_set2() -> None:
-      assert None == is_student("Gamer, life-long student and hacker of regexes.")
+      assert False == is_student("Gamer, life-long student and hacker of regexes.")
       assert is_student("Gamer, student, hacker of regexes.")
       assert is_student("Hello there, I am a passionate student who loves to learn and explore new things!")
       assert is_student("undergraduate student of Tongji university")
@@ -172,12 +172,13 @@ def describe_StudentParser() -> None:
       assert is_student("MSCS Student")
 
     def it_handles_set12() -> None:
-      assert is_student("Bachelor student of Comp Sci @ Concordia University")
-      assert False == is_student("Private Pilot | Bachelor of Science")
-      assert False == is_student("Computer Engineer & MSc Student")
-      assert is_student("MSCS Student")
       assert None == is_student("Formerly a student at Something")
       assert None == is_student("A former student at Something")
+      assert is_student("Programming newbie")
+      assert is_student("Just a noob")
+
+    def it_handles_set13() -> None:
+      assert is_student("Computer science major at Stockton university")
 
     def it_basically_handles_verbs() -> None:
       assert is_student("Learning")

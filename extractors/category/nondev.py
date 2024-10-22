@@ -5,14 +5,18 @@ from typing import Iterable
 
 __all__ = ["NondevParser"]
 
+# Problematic words: "Intel" in "Threat Intel" vs "at Intel"
+
 NONDEV_NOUNS = {
-  "cofounder", "ceo", "cto", "dean", "entrepreneur",
-  "founder", "manager", "professor", "recruiter", "svp", "vp",
+  "academic", "agency",
+  "cofounder", "ceo", "cto", "dean", "director", "entrepreneur",
+  "founder", "head", "lecturer", "manager", "prof", "professor", "recruiter", "svp", "vp",
 }
 
 DEV_NOUNS = {
   "admin", "analyst", "architect", "dev", "developer", "devops",
-  "eng", "engineer", "hacker", "investigator", "mathematician", "mlops", "programmer",
+  "eng", "engineer", "hacker", "investigator", "mathematician", "mlops", "ops",
+  "pentester", "programmer", "tester", "qa",
   "researcher", "secops", "scientist",
 }
 

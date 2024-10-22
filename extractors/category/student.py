@@ -10,19 +10,18 @@ __all__ = ["StudentParser"]
 STUDENT_NOUNS = {
   "freshman",  # first-course
   "graduate",  # has a degree but often used as a shortening for "graduate student" which is someone who continues to learn
+  "newbie",
+  "noob",
   "sophomore", # second-course
   "student",   # junior student (3rd), senior student (4th year), no universal term for 5th year
-  "teenager",
+  "teenager",  # treating as 'student' for our purposes
   "undergraduate",
+  "major",
 }
 STUDENT_VERBS = {
   # Do not add "learn" or "study" words naively – lots of false positives
   "learning",
   "studying",
-}
-WEAK_NONSTUDENT_NOUNS = {
-  # Mean a Non-Student only if sentence contains no STUDENT_NOUNS (these words can precede it)
-  "B.S", "M.S", "Ph.D", "bachelor",
 }
 STRONG_NONSTUDENT_NOUNS = {
   # Non-included cases:
@@ -31,21 +30,40 @@ STRONG_NONSTUDENT_NOUNS = {
   # Conflicts:
   #   MS - Mississippi State
   #   BC - British Columbia Province
-  "admin", "analyst", "architect", "artist", "ceo", "cto", "dean", "designer", "dev", "devops", "developer", "doctor",
+  # Mean a Non-Student only if sentence contains no STUDENT_NOUNS (these words can precede it)
+  "academic", "architect", "ceo", "cto", "doc", "dean", "director",
+  "head", "prof", "professor", "svp", "vp",
+  "agency", "lead", "leader", "lecturer", "postdoc",
+  "admin", "analyst", "artist",
   "engineer", "engineering", "eng", "entrepreneur",
-  "founder", "generalist", "guru", "investigator", "lawyer", "lead", "leader", "magician", "manager",
-  "mathematician", "mechanic",
-  "mlops", "musician", "ninja", "physicist", "producer", "professor", "programmer", "researcher",
-  "recruiter", "scientist", "secops", "specialist", "svp", "vp",
-  # hr
+  "designer", "dev", "devops", "developer",
+  "manager", "mathematician", "mechanic", "mlops", "musician",
+  "physicist", "producer", "professional", "programmer",
+  "qa", "tester", "pentester", "ops",
+  "researcher", "recruiter", "scientist", "secops", "specialist",
+  "generalist", "guru", "investigator", "lawyer",
+  "expert", "ninja", "magician", "wizard",
+}
+WEAK_NONSTUDENT_NOUNS = {
+  # Non-included cases:
+  #   intern -- does not mean a non-student
+  #   pilot -- non-digital
+  # Conflicts:
+  #   MS - Mississippi State
+  #   BC - British Columbia Province
+  # Mean a Non-Student only if sentence contains no STUDENT_NOUNS (these words can precede it)
+  "B.S", "M.S", "Ph.D", "bachelor",
+  "cofounder", "founder", "hacker",
 }
 STUDENT_CANCELING_WORDS = {
+  "economic",
   "former", "formerly", "previous", "previously",
   "constant", "eternal", "everlasting", "life=long", "permanent", "perpetual"
 }
 STUDENT_CANCELING_REGEX = words_to_regex(STUDENT_CANCELING_WORDS)
 NONSTUDENT_CANCELING_WORDS = {
-  "former", "formerly", "previous", "previously",
+  "former", "formerly",
+  "previous", "previously",
   "aspiring", "future", "wannabe",
 }
 NONSTUDENT_CANCELING_REGEX = words_to_regex(NONSTUDENT_CANCELING_WORDS)
@@ -68,6 +86,7 @@ class StudentParser:
     #   (token, token.pos_, token.dep_) for token in doc if not token.is_punct
     # ])
     for token in doc:
+      print(token)
       if is_student_noun(token):
         return True
       elif is_student_verb(token):
