@@ -24,12 +24,6 @@ class Categorizer:
   def __init__(self, name: str = "en_core_web_sm") -> None:
     micronlp = spacy.load(name, exclude=["parser", "tagger", "lemmatizer", "ner"])
     self.nlp = get_nlp(name)
-    # self.ruler = self.nlp.add_pipe("entity_ruler", config={
-    #   "phrase_matcher_attr": "LOWER",
-    #   # "validate": True
-    # })
-    # self.ruler = cast(EntityRuler, self.ruler)
-    # self.nlp.remove_pipe("ner")
 
     self.matcher = Matcher(self.nlp.vocab)
     self.pmatcher = PhraseMatcher(self.nlp.vocab, attr="LOWER")
@@ -58,8 +52,12 @@ class Categorizer:
       ents[start] = (doc.vocab.strings[match_id], doc[start])
     return [ent for ent in ents if ent]
 
-  def categorize(self, text: str) -> Categorized:
-    doc = self.nlp(text)
+  def categorize_many(self, text_or_docs: list[str | Doc]) -> list[Categorized]:
+    docs = self.nlp.pipe(text_or_docs)
+    return [self.categorize(doc) for doc in docs]
+
+  def categorize(self, text_or_doc: str | Doc) -> Categorized:
+    doc = self.nlp(text_or_doc) if isinstance(text_or_doc, str) else text_or_doc
     ents = self.ents(doc)
 
     role: Role | None = None
