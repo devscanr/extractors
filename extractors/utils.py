@@ -20,7 +20,7 @@ def normalize(text: str) -> str:
   text = text.replace("：", ": ")
   text = re.sub(r"\s*[•|]+\s*", ". ", text)
   text = re.sub(r"\s*/{2,}\s*", ". ", text)
-  text = re.sub(r"(📞|☎️|📱|☎)\s*:?\s*", "Phone: ", text, re.UNICODE)
+  text = re.sub(r"(📞|☎️|📱|☎)\s*:?\s*", "Phone: ", text, flags=re.UNICODE)
   text = replace_emoji(text, "!")
   text = text.strip()
   text = re.sub(r"(?<=\w)$", " .", text)
@@ -64,7 +64,7 @@ GRAMMAR_FIXES = [
 
 def fix_grammar(text: str) -> str:
   for pattern, replacement, flags in GRAMMAR_FIXES:
-    text = re.sub(pattern, replacement, text, 0, flags)
+    text = re.sub(pattern, replacement, text, count=0, flags=flags)
   return text
 
 nnp = {TAG: "NNP", POS: "PROPN"}
@@ -149,7 +149,8 @@ def get_nlp(name: str | Path = "en_core_web_sm") -> Language:
   return nlp
 
 @Language.factory("index_tokens_by_sents")
-def component(_nlp: Language, _name: str) -> Callable[[Doc], Doc]:
+def component(nlp: Language, name: str) -> Callable[[Doc], Doc]:
+  del nlp, name
   if not Token.has_extension("i"):
     Token.set_extension("i", default=None)
   def index_tokens_by_sents(doc: Doc) -> Doc:

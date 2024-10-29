@@ -46,7 +46,7 @@ class Categorizer:
     ents: list[tuple[str, Token] | None] = list(None for _ in doc)
     matches = self.matcher(doc)
     pmatches = self.pmatcher(doc)
-    for match_id, start, end in matches + pmatches:
+    for match_id, start in matches + pmatches:
       if ents[start]:
         raise ValueError(f"multi-matcher binding to {start} offset")
       ents[start] = (doc.vocab.strings[match_id], doc[start])
@@ -132,6 +132,7 @@ def check_dev(label: str, token: Token, doc: Doc) -> Literal["Student", "Dev", "
   return None
 
 def check_student(label: str, token: Token, doc: Doc) -> Literal["Student", None]:
+  del doc
   if label == "STUDENT":
     subtree = [
       tok.lower_ for tok in token.head.subtree
@@ -158,6 +159,7 @@ def check_student(label: str, token: Token, doc: Doc) -> Literal["Student", None
   return None
 
 def check_org(label: str, token: Token, doc: Doc) -> Literal["Org", None]:
+  del doc
   if label == "ORG":
     master_words = [
       n for n in LABELED_PHRASES["STUDENT"] + LABELED_PHRASES["DEV"] + LABELED_PHRASES["NONDEV"]
@@ -171,6 +173,7 @@ def check_org(label: str, token: Token, doc: Doc) -> Literal["Org", None]:
   return None
 
 def check_freelancer(label: str, token: Token, doc: Doc) -> Literal["Freelancer", None]:
+  del doc
   if label == "FREELANCER":
     subtree = [
       tok.lower_ for tok in token.head.subtree
@@ -197,6 +200,7 @@ def check_freelancer(label: str, token: Token, doc: Doc) -> Literal["Freelancer"
   return None
 
 def check_lead(label: str, token: Token, doc: Doc) -> bool:
+  del doc
   if label == "LEAD":
     subtree = [
       tok.lower_ for tok in token.head.subtree
