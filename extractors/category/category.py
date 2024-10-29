@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Literal
+from typing import Literal, Sequence
 import spacy
 from spacy.matcher import Matcher, PhraseMatcher
 from spacy.tokens import Doc, Token
@@ -52,7 +52,7 @@ class Categorizer:
       ents[start] = (doc.vocab.strings[match_id], doc[start])
     return [ent for ent in ents if ent]
 
-  def categorize_many(self, text_or_docs: list[str | Doc]) -> list[Categorized]:
+  def categorize_many(self, text_or_docs: Sequence[str | Doc]) -> list[Categorized]:
     docs = self.nlp.pipe(text_or_docs)
     return [self.categorize(doc) for doc in docs]
 
