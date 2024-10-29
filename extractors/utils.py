@@ -18,8 +18,8 @@ __all__ = [
 
 def normalize(text: str) -> str:
   text = text.replace("：", ": ")
-  text = re.sub(r"\s*[•|]+\s*", ". ", text)
-  text = re.sub(r"\s*/{2,}\s*", ". ", text)
+  text = re.sub(r"\s+[•|]+\s+", ". ", text)
+  text = re.sub(r"\s+/{2,}\s+", ". ", text)
   text = re.sub(r"(📞|☎️|📱|☎)\s*:?\s*", "Phone: ", text, flags=re.UNICODE)
   text = replace_emoji(text, "!")
   text = text.strip()
