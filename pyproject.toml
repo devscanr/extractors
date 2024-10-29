@@ -1,7 +1,7 @@
 [tool.poetry]
 package-mode = true
 name = "extractors"
-version = "0.20.2"
+version = "0.20.3"
 description = ""
 authors = ["DevScanr team <info@devscanr.com>"]
 readme = "README.md"
