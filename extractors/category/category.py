@@ -260,9 +260,10 @@ METAPHORIC_MARKERS = {
 }
 REMOTE_JOB_MARKERS = {
   "coder", "company", "consultant", "developer", "engineer",
-  "freelancer", "job", "jobs", "mentor",
-  "online", "opportunity", "opportunities", "programmer",
-  "seeking", "remote", "remotely", "startup",
+  "enthusiast", "freelancer", "job", "jobs", "mentor",
+  "online", "opportunity", "opportunities",
+  "position", "positions", "programmer", "project", "projects",
+  "remote", "remotely", "role", "roles", "seeking", "startup",
   "teacher", "team", "work", "worker", "working",
 }
 INTENT_MARKERS = {

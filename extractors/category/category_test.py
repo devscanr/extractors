@@ -76,8 +76,15 @@ def describe_Categorizer() -> None:
     def it_handles_is_remote_8() -> None:
       assert cats("Remote. Building stuff with Typescript, Lua, and Swift.").is_remote
       assert cats("Remote iOS Developer").is_remote
+      assert cats("Senior Android Developer(Looking for Remote Role)").is_remote
       assert not cats("Remote tech").is_remote
       assert not cats("Remotely possible").is_remote
+
+    def it_handles_is_remote_9() -> None:
+      assert cats("Full Stack Web Developer | Remote enthusiast | Associate").is_remote
+      assert cats("Software Developer, React JS lover. Looking for new challenges in remote projects.").is_remote
+      assert cats("Want to join a remote project.").is_remote
+      assert cats("Wish to lead a remote position.").is_remote
 
     def it_works() -> None:
       assert cats("I'm a someone") == Cats()
