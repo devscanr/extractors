@@ -44,9 +44,8 @@ exclude = [
 ]
 
 [tool.ruff.lint]
-# select = ["ARG001", "ARG002"]
-# select = ["F", "B", "UP"]
-ignore = ["E701", "E711", "E712", "E731", "E741"]
+select = ["F", "B", "UP", "RUF"]
+ignore = ["E701", "E711", "E712", "E731", "E741", "RUF001", "RUF003"]
 
 [tool.pytest.ini_options]
 addopts = "--ignore=ignore"

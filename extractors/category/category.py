@@ -46,7 +46,7 @@ class Categorizer:
     ents: list[tuple[str, Token] | None] = list(None for _ in doc)
     matches = self.matcher(doc)
     pmatches = self.pmatcher(doc)
-    for match_id, start in matches + pmatches:
+    for match_id, start, _end in matches + pmatches:
       if ents[start]:
         raise ValueError(f"multi-matcher binding to {start} offset")
       ents[start] = (doc.vocab.strings[match_id], doc[start])
