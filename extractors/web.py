@@ -7,10 +7,10 @@ __all__ = ["html2text", "markdown2text"]
 
 def html2text(html: str) -> str:
   soup = BeautifulSoup(html, features="html.parser")
-  texts = []
+  texts: list[str] = []
   for element in soup.descendants:
     if isinstance(element, Tag) and element.name == "a":
-      if not element.get_text().strip():
+      if not element.get_text().strip() and element.has_attr("href"):
         href = str(element["href"])
         if href.startswith("mailto:"):
           texts.append(f"Email: {href}")

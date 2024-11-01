@@ -109,5 +109,12 @@ def describe_markdown2text() -> None:
     """)
     assert markdown2text(md) == text
 
+  def it_works4() -> None:
+    md = c("""
+      <a></a>  
+    """)
+    text = ""
+    assert markdown2text(md) == text
+
 def c(text: str) -> str:
   return dedent(text).strip()
