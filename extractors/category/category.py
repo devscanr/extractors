@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from typing import Literal, Sequence
 import spacy
 from spacy.matcher import Matcher, PhraseMatcher
-from spacy.tokens import Doc, Token
+from spacy.tokens import Doc, Span, Token
 from ..patterns import to_patterns2
 from ..utils import get_nlp
 from .labels import LABELED_PHRASES
@@ -161,15 +161,17 @@ def check_student(label: str, token: Token, doc: Doc) -> Literal["Student", None
 def check_org(label: str, token: Token, doc: Doc) -> Literal["Org", None]:
   del doc
   if label == "ORG":
+    root = get_root(token.sent)
     master_words = [
-      n for n in LABELED_PHRASES["STUDENT"] + LABELED_PHRASES["DEV"] + LABELED_PHRASES["NONDEV"]
+      n for n in ["contributor"] + LABELED_PHRASES["STUDENT"] + LABELED_PHRASES["DEV"] + LABELED_PHRASES["NONDEV"]
       if isinstance(n, str)
     ]
     cons_heads = get_cons_heads(token)
 
     if len(cons_heads) and cons_heads[-1].lower_ in master_words:
       return None
-    return "Org"
+    if root and (root == token or root.lower_ in {"is"}):
+      return "Org"
   return None
 
 def check_freelancer(label: str, token: Token, doc: Doc) -> Literal["Freelancer", None]:
@@ -337,3 +339,9 @@ def get_cons_heads(_token: Token) -> list[Token]:
 
 def is_word(token: Token) -> bool:
   return not token.is_punct and not token.is_space
+
+def get_root(sent: Span) -> Token | None:
+  for token in sent:
+    if token.dep_ == "ROOT":
+      return token
+  return None

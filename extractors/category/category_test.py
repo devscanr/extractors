@@ -190,6 +190,15 @@ def describe_Categorizer() -> None:
       assert cats("""
         daily.dev is a professional network for developers to learn, collaborate, and grow together.
       """) == Cats("Org")
+      assert cats("""
+        community
+      """).role == "Org"
+      assert not cats("""
+        community contributor
+      """).role
+      assert not cats("""
+        participated in incubating many projects about zero trust and Web3 organization
+      """).role
       assert cats("Software development done right").role == "Dev"
 
     def it_handles_set10() -> None:

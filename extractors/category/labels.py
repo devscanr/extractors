@@ -57,6 +57,7 @@ LABELED_PHRASES: LabeledPhrases = {
   "ORG": [
     "agency",
     "company",
+    "community",
     "organization",
     "platform",
     "professional network",
