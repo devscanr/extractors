@@ -9,7 +9,7 @@ from typing import Any, Callable, Generator, cast, Iterable
 # RESOURCES
 # - https://stackoverflow.com/questions/15388831/what-are-all-possible-pos-tags-of-nltk
 
-(IN, LOWER, OP, ORTH, POS, TAG) = ("IN", "LOWER", "OP", "ORTH", "POS", "TAG")
+(IN, IS_PUNCT, IS_SENT_START, LOWER, OP, ORTH, POS, TAG) = ("IN", "IS_PUNCT", "IS_SENT_START", "LOWER", "OP", "ORTH", "POS", "TAG")
 
 __all__ = [
   "normalize", "uniq", "fix_grammar",
@@ -18,8 +18,8 @@ __all__ = [
 
 def normalize(text: str) -> str:
   text = text.replace("：", ": ")
-  text = re.sub(r"\s+[•|]+\s+", ". ", text)
-  text = re.sub(r"\s+/{2,}\s+", ". ", text)
+  text = re.sub(r"\s+[•|]+\s+", " . ", text)
+  text = re.sub(r"\s+/{2,}\s+", " . ", text)
   text = re.sub(r"(📞|☎️|📱|☎)\s*:?\s*", "Phone: ", text, flags=re.UNICODE)
   text = replace_emoji(text, "!")
   text = text.strip()
@@ -70,6 +70,15 @@ def fix_grammar(text: str) -> str:
 nnp = {TAG: "NNP", POS: "PROPN"}
 jj = {TAG: "JJ", POS: "ADJ"}
 
+def add_go_exception(nlp: Language) -> None:
+  ruler = cast(Any, nlp.get_pipe("attribute_ruler"))
+  patterns = [
+    [{LOWER: "go"}, {IS_PUNCT: True}],
+    [{IS_PUNCT: True}, {LOWER: "go"}],
+    [{ORTH: "Go", IS_SENT_START: False}],
+  ]
+  ruler.add(patterns, nnp)
+
 def add_nnp_exceptions(nlp: Language, items: list[str]) -> None:
   ruler = cast(Any, nlp.get_pipe("attribute_ruler"))
   for item in items:
@@ -79,7 +88,7 @@ def add_nnp_exceptions(nlp: Language, items: list[str]) -> None:
     elif spacecount == 1:
       w1, w2 = item.split(" ")
       pattern = [
-        {LOWER: w1.lower()}, {LOWER: "-", "OP": "?"}, {LOWER: w2.lower()},
+        {LOWER: w1.lower()}, {LOWER: "-", OP: "?"}, {LOWER: w2.lower()},
       ]
       ruler.add([pattern], nnp, index=0)
       ruler.add([pattern], nnp, index=1)
@@ -133,6 +142,7 @@ def get_nlp(name: str | Path = "en_core_web_sm") -> Language:
   # nlp.tokenizer.add_special_case("node.js", [{ORTH: "ex."}])
 
   # Make the following PROPER NOUNs
+  add_go_exception(nlp)
   add_nnp_exceptions(nlp, [
     "deep learning", "machine learning",
   ])

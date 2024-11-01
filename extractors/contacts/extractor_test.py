@@ -1,10 +1,12 @@
 from textwrap import dedent
 from ..utils import normalize
 from ..web import markdown2text
-from .contacts import Contacts, parse_contacts
+from .extractor import Contacts, ContactExtractor
+
+ce = ContactExtractor()
 
 def parse(text: str) -> Contacts:
-  return parse_contacts(normalize(text))
+  return ce.extract(normalize(text))
 
 def parse_md(md: str) -> Contacts:
   return parse(markdown2text(md))

@@ -3,7 +3,7 @@ from .email import parse_emails
 from .phone import parse_phones
 from .url import parse_urls
 
-__all__ = ["Contacts", "parse_contacts"]
+__all__ = ["Contacts", "ContactExtractor"]
 
 @dataclass
 class Contacts:
@@ -11,11 +11,12 @@ class Contacts:
   phones: list[str] = field(default_factory=list)
   urls: list[str] = field(default_factory=list)
 
-def parse_contacts(ntext: str) -> Contacts:
-  if not ntext:
-    return Contacts()
-  return Contacts(
-    emails = parse_emails(ntext),
-    phones = parse_phones(ntext),
-    urls = parse_urls(ntext),
-  )
+class ContactExtractor:
+  def extract(self, ntext: str) -> Contacts:
+    if not ntext:
+      return Contacts()
+    return Contacts(
+      emails = parse_emails(ntext),
+      phones = parse_phones(ntext),
+      urls = parse_urls(ntext),
+    )

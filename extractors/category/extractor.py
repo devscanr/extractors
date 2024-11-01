@@ -5,9 +5,9 @@ from spacy.matcher import Matcher, PhraseMatcher
 from spacy.tokens import Doc, Token
 from ..patterns import to_patterns2
 from ..utils import get_nlp
-from .labels import LABELED_PHRASES
+from .data import LABELED_PHRASES
 
-__all__ = ["Categorized", "Categorizer", "Role"]
+__all__ = ["Categorized", "CategoryExtractor", "Role"]
 
 IN, LOWER, POS = "IN", "LOWER", "POS"
 
@@ -20,7 +20,7 @@ class Categorized:
   is_lead: bool
   is_remote: bool
 
-class Categorizer:
+class CategoryExtractor:
   def __init__(self, name: str = "en_core_web_sm") -> None:
     micronlp = spacy.load(name, exclude=["parser", "tagger", "lemmatizer", "ner"])
     self.nlp = get_nlp(name)
@@ -31,13 +31,13 @@ class Categorizer:
     for label, phrases in LABELED_PHRASES.items():
       for phrase in phrases:
         if isinstance(phrase, str):
-          self.pmatcher.add(label, list(micronlp.pipe(
+          self.pmatcher.add(label, list(micronlp.tokenizer.pipe(
             to_patterns2(phrase)
           )))
         else:
-          phrase, _pos = phrase
+          phrase, pos = phrase
           poss: list[str] = []
-          match _pos:
+          match pos:
             case "NOUN": poss = ["NOUN", "PROPN", "ADJ"]
             case "VERB": poss = ["VERB"]
           self.matcher.add(label, [[{LOWER: phrase, POS: {IN: poss}}]])
@@ -52,11 +52,11 @@ class Categorizer:
       ents[start] = (doc.vocab.strings[match_id], doc[start])
     return [ent for ent in ents if ent]
 
-  def categorize_many(self, text_or_docs: Sequence[str | Doc]) -> list[Categorized]:
+  def extract_many(self, text_or_docs: Sequence[str | Doc]) -> list[Categorized]:
     docs = self.nlp.pipe(text_or_docs)
-    return [self.categorize(doc) for doc in docs]
+    return [self.extract(doc) for doc in docs]
 
-  def categorize(self, text_or_doc: str | Doc) -> Categorized:
+  def extract(self, text_or_doc: str | Doc) -> Categorized:
     doc = self.nlp(text_or_doc) if isinstance(text_or_doc, str) else text_or_doc
     ents = self.ents(doc)
 
@@ -252,7 +252,7 @@ def check_remote(label: str, token: Token, doc: Doc) -> bool:
 PAST_MARKERS = {"ago", "former", "formerly", "past", "previous", "previously", "retired"}
 EX_MARKERS = {"ex", "ex."}
 NEW_MARKERS = {"new"}
-FUTURE_MARKERS = {"aspiring", "future", "wanna", "wannabe"}
+FUTURE_MARKERS = {"aspiring", "future", "upcoming", "wanna", "wannabe"}
 METAPHORIC_MARKERS = {
   "always", "constant", "eternal", "everlasting",
   "forever", "frantically", "life", "lifelong", "never",
