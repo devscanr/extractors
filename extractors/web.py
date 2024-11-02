@@ -1,7 +1,6 @@
-from bs4 import BeautifulSoup, Comment, NavigableString, PageElement, Tag
+from bs4 import BeautifulSoup, Comment, NavigableString, Tag
 from markdown import markdown
 import re
-from typing import cast
 
 __all__ = ["html2text", "markdown2text"]
 
@@ -9,36 +8,34 @@ def html2text(html: str) -> str:
   soup = BeautifulSoup(html, features="html.parser")
   texts: list[str] = []
   for element in soup.descendants:
-    if isinstance(element, Tag) and element.name == "a":
-      if not element.get_text().strip() and element.has_attr("href"):
-        href = str(element["href"])
+    if isinstance(element, NavigableString) and not isinstance(element, Comment):
+      text = element.strip()
+      if getattr(element.parent, "name") == "code":
+      # if element.parent and element.parent.name == "code":
+        if text:
+          texts.append("/Code/")
+      elif element.parent and element.parent.name == "a":
+        href = str(element.parent.get("href", ""))
+        if href.startswith("mailto:"):
+          texts.append(f"{text.capitalize() or "Email"}: {href}")
+        elif href and text:
+          texts.append(f"{text.capitalize()}: {href}")
+        elif text:
+          texts.append(text)
+      elif text:
+        texts.append(text)
+    elif isinstance(element, Tag) and element.name == "a":
+      if not element.get_text().strip():
+        # ^ Non-empty cases are handled by the first branch
+        href = str(element.get("href", ""))
         if href.startswith("mailto:"):
           texts.append(f"Email: {href}")
         elif is_whitelist_url(href):
           texts.append(f"URL: {href}")
-        else:
+        elif href:
           texts.append("/URL/")
-    elif isinstance(element, NavigableString) and not isinstance(element, Comment):
-      s = element.strip()
-      if has_parent(element, "code"):
-        if s:
-          texts.append("/Code/")
-      # elif has_parent(element, "a"):
-      elif has_parent(element, "a"):
-        parent_href = str(cast(Tag, element.parent)["href"])
-        if parent_href.startswith("mailto:"):
-          texts.append(f"{s.capitalize() or "Email"}: {parent_href}")
-        elif parent_href and s:
-          texts.append(f"{s.capitalize()}: {parent_href}")
-        elif s:
-          texts.append(s)
-      elif s:
-        texts.append(s)
 
   return "\n\n".join(text for text in texts)
-
-def has_parent(element: PageElement, name: str) -> bool:
-  return element.parent is not None and element.parent.name == name
 
 def markdown2text(md: str) -> str:
   if not md:
