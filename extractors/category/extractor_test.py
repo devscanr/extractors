@@ -1,8 +1,8 @@
 from dataclasses import dataclass
 from ..utils import fix_grammar, normalize
-from .category import Categorizer, Categorized, Role
+from .extractor import Categorized, CategoryExtractor, Role
 
-categorizer = Categorizer("en_core_web_sm")
+categorizer = CategoryExtractor("en_core_web_sm")
 
 @dataclass
 class Cats(Categorized):
@@ -12,7 +12,7 @@ class Cats(Categorized):
   is_remote: bool = False
 
 def cats(text: str) -> Cats:
-  cs = categorizer.categorize(fix_grammar(normalize(text)))
+  cs = categorizer.extract(fix_grammar(normalize(text)))
   return Cats(
     role = cs.role,
     is_freelancer = cs.is_freelancer,
@@ -21,7 +21,7 @@ def cats(text: str) -> Cats:
   )
 
 def describe_Categorizer() -> None:
-  def describe_categorize() -> None:
+  def describe_extract() -> None:
     def it_handles_is_remote_1() -> None:
       assert cats("Remote Software Engineer").is_remote
       assert cats("Machine Learning Engineer (Remote Worker)").is_remote

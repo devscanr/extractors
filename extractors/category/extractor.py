@@ -5,9 +5,9 @@ from spacy.matcher import Matcher, PhraseMatcher
 from spacy.tokens import Doc, Span, Token
 from ..patterns import to_patterns2
 from ..utils import get_nlp
-from .labels import LABELED_PHRASES
+from .data import LABELED_PHRASES
 
-__all__ = ["Categorized", "Categorizer", "Role"]
+__all__ = ["Categorized", "CategoryExtractor", "Role"]
 
 IN, LOWER, POS = "IN", "LOWER", "POS"
 
@@ -20,7 +20,7 @@ class Categorized:
   is_lead: bool
   is_remote: bool
 
-class Categorizer:
+class CategoryExtractor:
   def __init__(self, name: str = "en_core_web_sm") -> None:
     micronlp = spacy.load(name, exclude=["parser", "tagger", "lemmatizer", "ner"])
     self.nlp = get_nlp(name)
@@ -35,9 +35,9 @@ class Categorizer:
             to_patterns2(phrase)
           )))
         else:
-          phrase, _pos = phrase
+          phrase, pos = phrase
           poss: list[str] = []
-          match _pos:
+          match pos:
             case "NOUN": poss = ["NOUN", "PROPN", "ADJ"]
             case "VERB": poss = ["VERB"]
           self.matcher.add(label, [[{LOWER: phrase, POS: {IN: poss}}]])
@@ -52,11 +52,11 @@ class Categorizer:
       ents[start] = (doc.vocab.strings[match_id], doc[start])
     return [ent for ent in ents if ent]
 
-  def categorize_many(self, text_or_docs: Sequence[str | Doc]) -> list[Categorized]:
+  def extract_many(self, text_or_docs: Sequence[str | Doc]) -> list[Categorized]:
     docs = self.nlp.pipe(text_or_docs)
-    return [self.categorize(doc) for doc in docs]
+    return [self.extract(doc) for doc in docs]
 
-  def categorize(self, text_or_doc: str | Doc) -> Categorized:
+  def extract(self, text_or_doc: str | Doc) -> Categorized:
     doc = self.nlp(text_or_doc) if isinstance(text_or_doc, str) else text_or_doc
     ents = self.ents(doc)
 
@@ -67,17 +67,17 @@ class Categorizer:
 
     for label, token in ents:
       r: Role | None
-      if role is None and (r := check_dev(label, token, doc)):
+      if role is None and (r := check_dev(label, token)):
         role = r
-      elif role is None and (r := check_student(label, token, doc)):
+      elif role is None and (r := check_student(label, token)):
         role = r
-      elif role is None and (r := check_org(label, token, doc)):
+      elif role is None and (r := check_org(label, token)):
         role = r
-      elif not is_freelancer and check_freelancer(label, token, doc):
+      elif not is_freelancer and check_freelancer(label, token):
         is_freelancer = True
-      elif not is_lead and check_lead(label, token, doc):
+      elif not is_lead and check_lead(label, token):
         is_lead = True
-      elif not is_remote and check_remote(label, token, doc):
+      elif not is_remote and check_remote(label, token):
         is_remote = True
 
     return Categorized(
@@ -87,9 +87,9 @@ class Categorizer:
       is_remote = is_remote,
     )
 
-def check_dev(label: str, token: Token, doc: Doc) -> Literal["Student", "Dev", "Nondev", None]:
+def check_dev(label: str, token: Token) -> Literal["Student", "Dev", "Nondev", None]:
   if label in {"DEV", "NONDEV"}:
-    preceding = [token.lower_ for token in get_preceding(doc, token)]
+    preceding = [token.lower_ for token in get_preceding(token.doc, token)]
     subtree = [
       tok.lower_ for tok in token.head.subtree
       if is_word(tok)
@@ -131,8 +131,7 @@ def check_dev(label: str, token: Token, doc: Doc) -> Literal["Student", "Dev", "
     return "Dev" if label == "DEV" else "Nondev"
   return None
 
-def check_student(label: str, token: Token, doc: Doc) -> Literal["Student", None]:
-  del doc
+def check_student(label: str, token: Token) -> Literal["Student", None]:
   if label == "STUDENT":
     subtree = [
       tok.lower_ for tok in token.head.subtree
@@ -158,8 +157,7 @@ def check_student(label: str, token: Token, doc: Doc) -> Literal["Student", None
     return "Student"
   return None
 
-def check_org(label: str, token: Token, doc: Doc) -> Literal["Org", None]:
-  del doc
+def check_org(label: str, token: Token) -> Literal["Org", None]:
   if label == "ORG":
     root = get_root(token.sent)
     master_words = [
@@ -174,8 +172,7 @@ def check_org(label: str, token: Token, doc: Doc) -> Literal["Org", None]:
       return "Org"
   return None
 
-def check_freelancer(label: str, token: Token, doc: Doc) -> Literal["Freelancer", None]:
-  del doc
+def check_freelancer(label: str, token: Token) -> Literal["Freelancer", None]:
   if label == "FREELANCER":
     subtree = [
       tok.lower_ for tok in token.head.subtree
@@ -201,8 +198,7 @@ def check_freelancer(label: str, token: Token, doc: Doc) -> Literal["Freelancer"
     return "Freelancer"
   return None
 
-def check_lead(label: str, token: Token, doc: Doc) -> bool:
-  del doc
+def check_lead(label: str, token: Token) -> bool:
   if label == "LEAD":
     subtree = [
       tok.lower_ for tok in token.head.subtree
@@ -228,9 +224,9 @@ def check_lead(label: str, token: Token, doc: Doc) -> bool:
     return True
   return False
 
-def check_remote(label: str, token: Token, doc: Doc) -> bool:
+def check_remote(label: str, token: Token) -> bool:
   if label == "REMOTE":
-    preceding = [token.lower_ for token in get_preceding(doc, token)]
+    preceding = [token.lower_ for token in get_preceding(token.doc, token)]
     cons_heads = get_cons_heads(token)
     sent = token.sent
     j = token._.i
@@ -254,7 +250,7 @@ def check_remote(label: str, token: Token, doc: Doc) -> bool:
 PAST_MARKERS = {"ago", "former", "formerly", "past", "previous", "previously", "retired"}
 EX_MARKERS = {"ex", "ex."}
 NEW_MARKERS = {"new"}
-FUTURE_MARKERS = {"aspiring", "future", "wanna", "wannabe"}
+FUTURE_MARKERS = {"aspiring", "future", "upcoming", "wanna", "wannabe"}
 METAPHORIC_MARKERS = {
   "always", "constant", "eternal", "everlasting",
   "forever", "frantically", "life", "lifelong", "never",

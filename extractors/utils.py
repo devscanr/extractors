@@ -9,7 +9,7 @@ from typing import Any, Callable, Generator, cast, Iterable
 # RESOURCES
 # - https://stackoverflow.com/questions/15388831/what-are-all-possible-pos-tags-of-nltk
 
-(IN, LOWER, OP, ORTH, POS, TAG) = ("IN", "LOWER", "OP", "ORTH", "POS", "TAG")
+(IN, IS_PUNCT, IS_SENT_START, LOWER, OP, ORTH, POS, TAG) = ("IN", "IS_PUNCT", "IS_SENT_START", "LOWER", "OP", "ORTH", "POS", "TAG")
 
 __all__ = [
   "normalize", "uniq", "fix_grammar",
@@ -18,8 +18,8 @@ __all__ = [
 
 def normalize(text: str) -> str:
   text = text.replace("：", ": ")
-  text = re.sub(r"\s+[•|]+\s+", ". ", text)
-  text = re.sub(r"\s+/{2,}\s+", ". ", text)
+  text = re.sub(r"\s+[•|]+\s+", " . ", text)
+  text = re.sub(r"\s+/{2,}\s+", " . ", text)
   text = re.sub(r"(📞|☎️|📱|☎)\s*:?\s*", "Phone: ", text, flags=re.UNICODE)
   text = replace_emoji(text, "!")
   text = text.strip()
@@ -70,6 +70,36 @@ def fix_grammar(text: str) -> str:
 nnp = {TAG: "NNP", POS: "PROPN"}
 jj = {TAG: "JJ", POS: "ADJ"}
 
+def add_dev_exceptions(nlp: Language) -> None:
+  # Covers most common cases (ideally, we should retrain the model)
+  ruler = cast(Any, nlp.get_pipe("attribute_ruler"))
+  problematic = ["Go", "Next", "Node", "REST"]
+  # "foo Go. bar Next"
+  ruler.add([
+    [{ORTH: orth, IS_SENT_START: False}]
+    for orth in problematic
+  ], {TAG: "NNP", POS: "PROPN"}, index=0)
+  # "#go, #node, #next"
+  ruler.add([
+    [{ORTH: "#"}, {LOWER: orth.lower()}]
+    for orth in problematic
+  ], {TAG: "NNP", POS: "PROPN"}, index=1)
+  # "; go,"
+  ruler.add([
+    [{IS_PUNCT: True}, {LOWER: orth.lower()}, {IS_PUNCT: True}]
+    for orth in problematic
+  ], {TAG: "NNP", POS: "PROPN"}, index=1)
+  # e.g. "_/go"
+  ruler.add([
+    [{ORTH: "/"}, {LOWER: orth.lower()}]
+    for orth in problematic
+  ], {TAG: "NNP", POS: "PROPN"}, index=1)
+  # e.g. "go/_"
+  ruler.add([
+    [{LOWER: orth.lower()}, {ORTH: "/"}]
+    for orth in problematic
+  ], {TAG: "NNP", POS: "PROPN"}, index=0)
+
 def add_nnp_exceptions(nlp: Language, items: list[str]) -> None:
   ruler = cast(Any, nlp.get_pipe("attribute_ruler"))
   for item in items:
@@ -79,7 +109,7 @@ def add_nnp_exceptions(nlp: Language, items: list[str]) -> None:
     elif spacecount == 1:
       w1, w2 = item.split(" ")
       pattern = [
-        {LOWER: w1.lower()}, {LOWER: "-", "OP": "?"}, {LOWER: w2.lower()},
+        {LOWER: w1.lower()}, {LOWER: "-", OP: "?"}, {LOWER: w2.lower()},
       ]
       ruler.add([pattern], nnp, index=0)
       ruler.add([pattern], nnp, index=1)
@@ -118,13 +148,27 @@ def get_nlp(name: str | Path = "en_core_web_sm") -> Language:
   nlp.add_pipe("index_tokens_by_sents", after="parser")
 
   prefixes = list(nlp.Defaults.prefixes or [])
-  prefixes.append("-")
+  prefixes.extend(["-", "="])
   prefix_regex = spacy.util.compile_prefix_regex(prefixes)
   nlp.tokenizer.prefix_search = prefix_regex.search # type: ignore
 
+  suffixes = list(nlp.Defaults.suffixes or [])
+  suffixes.extend(["-", "="])
+  suffix_regex = spacy.util.compile_suffix_regex(suffixes)
+  nlp.tokenizer.suffix_search = suffix_regex.search # type: ignore
+
+  infixes = list(nlp.Defaults.infixes or [])
+  infixes.append(r"(?<=[a-zA-Z_])[(](?=[a-zA-Z_])")
+  infixes.append(r"(?<=[#+a-zA-Z_])[,](?=[#+a-zA-Z_])")
+  infixes.append(r"(?<=[a-zA-Z])[+](?=[a-zA-Z])")
+  infix_finditer = spacy.util.compile_infix_regex(infixes)
+  nlp.tokenizer.infix_finditer = infix_finditer.finditer # type: ignore
+
   # Tokenizer exceptions
   def token_match(token: str) -> bool | None:
-    if token.lower() in {"c#", "ex."}:
+    KNOWN_SUFFIXES = (".js", ".py")
+    tokenl = token.lower()
+    if tokenl in {"c#", "ex."} or tokenl.endswith(KNOWN_SUFFIXES):
       return True
     return False
   nlp.tokenizer.token_match = token_match # type: ignore
@@ -133,6 +177,7 @@ def get_nlp(name: str | Path = "en_core_web_sm") -> Language:
   # nlp.tokenizer.add_special_case("node.js", [{ORTH: "ex."}])
 
   # Make the following PROPER NOUNs
+  add_dev_exceptions(nlp)
   add_nnp_exceptions(nlp, [
     "deep learning", "machine learning",
   ])

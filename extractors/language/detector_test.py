@@ -1,4 +1,4 @@
-from .language import detect_language_iso639
+from .detector import detect_language_iso639
 
 def describe_detect_language_iso639() -> None:
   def it_works_for_single_language() -> None:

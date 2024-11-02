@@ -1,12 +1,13 @@
 ## Extractors
 
-Extract (parse) phones, email, etc. from human texts. Aims to supports an imprecisely formatted data,
-to the degree it's possible to support.
+Mine DEV related data from badly formatted texts:
 
-Extracts:
-- Phone numbers (string)
-- Emails (string)
-- Whether someone is a student (boolean)
+- `category`: categorize small texts (like GH bios): infer dev/nondev roles and extra flags;
+- `contacts`: extract emails, phones, websites;
+- `language`: detect used language (human);
+- `skills`: extract tech. skills with rule-based system (spaCy);
+
+--
 
 ## Phone Extractor
 
