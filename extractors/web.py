@@ -10,8 +10,7 @@ def html2text(html: str) -> str:
   for element in soup.descendants:
     if isinstance(element, NavigableString) and not isinstance(element, Comment):
       text = element.strip()
-      if getattr(element.parent, "name") == "code":
-      # if element.parent and element.parent.name == "code":
+      if element.parent and element.parent.name == "code":
         if text:
           texts.append("/Code/")
       elif element.parent and element.parent.name == "a":

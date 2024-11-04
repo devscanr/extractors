@@ -137,7 +137,7 @@ def describe_SkillExtractor() -> None:
       assert extract("Where old projects go to live out the rest of their days") == []
 
     def it_handles_set10() -> None:
-      assert extract("I'm Julia, a marketing manager") == ["Julia"] # Known FP
+      assert extract("I'm Julia, a marketing manager") == ["Julia"] # known FP
       assert extract("I learn Julia language") == ["Julia"]
       assert extract("developer:iOS,Robot,Fintech") == ["iOS"]
       assert extract("C Plus Plus programmar from India") == ["C++"]
@@ -152,3 +152,10 @@ def describe_SkillExtractor() -> None:
       assert extract("R, Matlab, Tableau") == ["R", "Matlab", "Tableau"]
       assert extract("Pulumi, Kotlin, PowerShell | Postgres") == ["Pulumi", "Kotlin", "PowerShell", "PostgreSQL"]
       assert extract("MariaDB for backend | Scss for the FE") == ["MariaDB", "SASS"]
+
+  def it_handles_set12() -> None:
+    assert extract("ARM processors") == ["ARM"]
+    assert extract("Hi, my name is Arm") == []
+    assert extract("My left arm is stronger than my right arm") == []
+    assert extract("I’m doing high-performance computing work on CPU, including x86, arm.") == ["x86", "ARM"]
+    assert extract("Embrace AI-IoT | RISC-V | ARM | ARC") == ["RISC", "ARM", "ARC"]

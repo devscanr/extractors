@@ -89,7 +89,7 @@ class CategoryExtractor:
 
 def check_dev(label: str, token: Token) -> Literal["Student", "Dev", "Nondev", None]:
   if label in {"DEV", "NONDEV"}:
-    preceding = [token.lower_ for token in get_preceding(token.doc, token)]
+    preceding = [token.lower_ for token in get_preceding(token)]
     subtree = [
       tok.lower_ for tok in token.head.subtree
       if is_word(tok)
@@ -226,7 +226,7 @@ def check_lead(label: str, token: Token) -> bool:
 
 def check_remote(label: str, token: Token) -> bool:
   if label == "REMOTE":
-    preceding = [token.lower_ for token in get_preceding(token.doc, token)]
+    preceding = [token.lower_ for token in get_preceding(token)]
     cons_heads = get_cons_heads(token)
     sent = token.sent
     j = token._.i
@@ -297,19 +297,19 @@ HEAD_MARKERS = {
 #     i += 1
 #   return result
 
-def get_preceding(doc: Doc, token: Token) -> list[Token]:
-  return list(doc[token.sent.start : token.i])
+def get_preceding(token: Token) -> list[Token]:
+  return list(token.doc[token.sent.start : token.i])
 
-def get_consequent(doc: Doc, token: Token) -> list[Token]:
-  return list(doc[token.i+1 : token.sent.end])
+def get_consequent(token: Token) -> list[Token]:
+  return list(token.doc[token.i+1 : token.sent.end])
 
 # def next_word(doc: Doc, token: Token) -> Token | None:
 #   j = token.i + 1
 #   return doc[j].lower_ if doc[j] and is_word(doc[j]) else None
 
-# def get_consequent_nouns(doc: Doc, token: Token) -> list[Token]:
+# def get_consequent_nouns(token: Token) -> list[Token]:
 #   res = []
-#   for cons in get_consequent(doc, token):
+#   for cons in get_consequent(token):
 #     if cons.pos_ in {"NOUN", "PROPN", "ADJ"}:
 #       res.append(cons)
 #     else:

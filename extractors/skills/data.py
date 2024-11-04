@@ -18,6 +18,7 @@ class Skill:
     tuple[str, str] |    # Custom shortcut to narrow POS
     list[dict[str, Any]] # Spacy pattern
   ]
+  # categories: list[str] | None = field(default_factory=lambda: [])
 
 SKILLS: list[Skill] = [
   # ANALYSIS
@@ -231,16 +232,22 @@ SKILLS: list[Skill] = [
   # BLOCKCHAIN
   Skill(name="Bitcoin", phrases=["bitcoin"]),
   Skill(name="Ethereum", phrases=["ethereum"]),
+  Skill(name="EVM", phrases=["evm"]),
+  Skill(name="Solana", phrases=["solana"]),
+  # Skill(name="SVM", phrases=["svm"]), TODO disambiguate Support-Vector-Machine vs Solana-Virtual-Machine
   # Skill(name="Web3", phrases=["web3"]), topic/concept, not a skill
 
   # NETWORKING
   Skill(name="CompTIA-Network+", phrases=["network+", "comptia n(etwork)+"]), # certificate
   Skill(name="Cisco-CNA", phrases=["ccna"]), # certificate
   Skill(name="Cisco-CNP", phrases=["ccnp"]), # certificate
+  Skill(name="LoRa", phrases=[("LoRa", "PROPN")]), # transmission tech
   Skill(name="MTCNA", phrases=["mtcna"]),    # certificate
+  Skill(name="MQTT", phrases=["mqtt"]),      # IoT messaging standard, also CLOUD
   Skill(name="Nmap", phrases=["nmap"]),             # also SECURITY
-  Skill(name="Wireshark", phrases=["wireshark"]),   # also SECURITY
   Skill(name="Netcat", phrases=["netcat", "ncat"]), # also SECURITY
+  Skill(name="Zigbee", phrases=["zigbee"]), # protocol spec. also EMBEDDED
+  Skill(name="Wireshark", phrases=["wireshark"]),   # also SECURITY
 
   # SECURITY
   Skill(name="Burpsuite", phrases=["burpsuite"]),
@@ -276,16 +283,43 @@ SKILLS: list[Skill] = [
   # Skill(name="Yaskawa", phrases=["yaskawa"]),   # electric and robotics corporation
 
   # EMBEDDED-n-SYSTEM
-  Skill(name="Arduino", phrases=["arduino"]),
-  Skill(name="ARM", phrases=["arm"]), # CPU family
-  Skill(name="AVR", phrases=["avr"]), # microcontrollers
-  Skill(name="ESP32", phrases=["esp=32"]), # microcontrollers
-  Skill(name="ESP8266", phrases=["esp=8266"]), # microcontrollers
-  Skill(name="MicroPython", phrases=["micro=python"]), # compiler
-  Skill(name="MSP430", phrases=["msp=430"]), # microcontrollers
-  Skill(name="Raspberry-Pi", phrases=["raspberry", "rasp=pi", "raspberry=pi(s)"]),
-  Skill(name="STM32", phrases=["stm=32"]), # microcontrollers
-  Skill(name="Z80", phrases=["Z=80"]), # microcontrollers
+  Skill(name="Debian", phrases=["debian"]),
+  Skill(name="FreeBSD", phrases=["freebsd"]), # also SECURITY, CROSS-PLATFORM
+  Skill(name="Linux", phrases=["linux"]), # also SECURITY, CROSS-PLATFORM
+  Skill(name="MacOS", phrases=["macos"]), # also SECURITY, CROSS-PLATFORM
+  Skill(name="Ubuntu", phrases=["ubuntu"]),
+  Skill(name="Unix", phrases=["unix"]),   # also SECURITY, CROSS-PLATFORM
+
+  Skill(name="Apple", phrases=["apple"]), # company
+  Skill(name="AMD", phrases=["amd", "amd=32", "amd=64"]), # company
+  Skill(name="Arduino", phrases=["arduino"]), # controller brand
+  Skill(name="ARC", phrases=[("ARC", "PROPN")]), # CPU family
+  Skill(name="ARC:maybe", phrases=["arc"]), # CPU family
+  Skill(name="ARM", phrases=[("ARM", "PROPN")]), # CPU family
+  Skill(name="ARM:maybe", phrases=["arm"]), # CPU family
+  Skill(name="AVR", phrases=["avr"]), # controller family
+  Skill(name="Aarch32", phrases=["aarch32", "arm32"]), # CPU architecture
+  Skill(name="Aarch64", phrases=["aarch64", "arm64"]), # CPU architecture
+  Skill(name="Elbrus-2000", phrases=["elbrus=2000", "e2k"]), # CPU
+  Skill(name="Embox", phrases=["embox"]), # Embox is a configurable RTOS designed for resource constrained and embedded systems
+  Skill(name="ESP32", phrases=["esp=32"]), # controller family
+  Skill(name="ESP8266", phrases=["esp=8266"]), # controller family
+  Skill(name="Intel", phrases=["intel"]), # company
+  Skill(name="i.MX6", phrases=["i.mx=6"]), # platform
+  Skill(name="MicroBlaze", phrases=["microblaze"]), # soft core
+  Skill(name="MicroPython", phrases=["micropython"]), # compiler
+  Skill(name="MIPS", phrases=["mips"]), # CPU architecture
+  Skill(name="MSP430", phrases=["msp=430"]), # controller family
+  Skill(name="PowerPC", phrases=["powerpc"]), # CPU architecture
+  Skill(name="Raspberry-Pi", phrases=["raspberry", "rasp=pi", "raspberry=pi(s)"]), # platform
+  Skill(name="RISC", phrases=["risc", "risc-v"]), # CPU architecture
+  Skill(name="SPARC", phrases=["sparc"]), # platform
+  Skill(name="STM32", phrases=["stm=32"]), # platform
+  Skill(name="x32", phrases=["x32"]), # CPU architecture umbrella
+  Skill(name="x64", phrases=["x64"]), # CPU architecture umbrella
+  Skill(name="x86", phrases=["x86", "x86-32", "x86-64"]), # CPU architecture
+  Skill(name="VLIW", phrases=["vliw"]), # CPU architecture
+  Skill(name="Z80", phrases=["Z=80"]), # CPU brand
   # Skill(name="CPU", phrases=["cpu"]),
   # Skill(name="GPU", phrases=["gpu"]),
   # Skill(name="HPC", phrases=["hpc"]), # high performance computing
