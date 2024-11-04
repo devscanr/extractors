@@ -18,7 +18,7 @@ def html2text(html: str) -> str:
         href = str(element.parent.get("href", ""))
         if href.startswith("mailto:"):
           texts.append(f"{text.capitalize() or "Email"}: {href}")
-        elif href and text:
+        elif href and text and "://" not in text:
           texts.append(f"{text.capitalize()}: {href}")
         elif text:
           texts.append(text)
