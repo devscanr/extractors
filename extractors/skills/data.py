@@ -1,544 +1,626 @@
 from dataclasses import dataclass
-from typing import Any
+import re
+from spacy.tokens import Span
+from typing import Any, Callable
 
-__all__ = ["Skill", "SKILLS"]
+__all__ = ["Pattern", "Skill", "SKILLS"]
 
-IN, LOWER, OP, REGEX, TEXT = "IN", "LOWER", "OP", "REGEX", "TEXT"
+IN, LOWER, OP, ORTH, POS, REGEX, TEXT = "IN", "LOWER", "OP", "ORTH", "POS", "REGEX", "TEXT"
 
-def ver1(word: str) -> list[dict[str, Any]]:
+type Pattern = list[dict[str, Any]]
+
+def ver1(word: str) -> Pattern:
   return [
     {LOWER: {REGEX: r"^" + word + r"[-\d.]{0,4}$"}}
   ]
+
+def noun(word: str) -> Pattern:
+  poss = ["NOUN", "PROPN", "ADJ"]
+  if re.search(r"[A-Z]", word):
+    return [
+      {ORTH: word, POS: {IN: poss}}
+    ]
+  else:
+    return [
+      {LOWER: word, POS: {IN: poss}}
+    ]
+
+def propn(word: str) -> Pattern:
+  poss = ["PROPN"]
+  if re.search(r"[A-Z]", word):
+    return [
+      {ORTH: word, POS: {IN: poss}}
+    ]
+  else:
+    return [
+      {LOWER: word, POS: {IN: poss}}
+    ]
+
+def verb(word: str) -> Pattern:
+  poss = ["VERB"]
+  if re.search(r"[A-Z]", word):
+    return [
+      {ORTH: word, POS: {IN: poss}}
+    ]
+  else:
+    return [
+      {LOWER: word, POS: {IN: poss}}
+    ]
 
 @dataclass
 class Skill:
   name: str
   phrases: list[
     str |                # Custom lang (produces exact matches)
-    tuple[str, str] |    # Custom shortcut to narrow POS
     list[dict[str, Any]] # Spacy pattern
   ]
   # categories: list[str] | None = field(default_factory=lambda: [])
 
+type Disambiguate = Callable[[Span], bool]
+
+def contextual(ctx_skills: set[str]) -> Disambiguate:
+  def disambiguate(ent: Span) -> bool:
+    doc = ent[0].doc
+    skill = ent[0].ent_type_
+    other_skills = [ent.label_ for ent in doc.ents if ent.label_ != skill]
+    return any(
+      True for skill in other_skills if any(
+        skill == cs or skill.startswith(cs + "-") and not ":maybe:" in skill
+        for cs in ctx_skills
+      )
+    )
+  return disambiguate
+
+def neighbour(distance: int) -> Disambiguate:
+  def disambiguate(ent: Span) -> bool:
+    doc = ent[0].doc
+    tis = [t.i for t in ent] # indexes of current Entity' tokens
+    otis = [t.i for e in doc.ents for t in e if e != ent] # indexes of other Entities' tokens
+    return any(
+      True for ti in tis
+      if any(abs(oti - ti) <= distance for oti in otis)
+    )
+  return disambiguate
+
+@dataclass
+class MaybeSkill(Skill):
+  disambiguate: Disambiguate
+
 SKILLS: list[Skill] = [
   # ANALYSIS
-  Skill(name="Excel", phrases=[("excel", "NOUN")]),
-  Skill(name="Google-Sheets", phrases=["google=sheets"]),
-  Skill(name="Power-BI", phrases=["power=bi"]),
-  Skill(name="Tableau", phrases=["tableau"]),
+  Skill("Excel", [propn("excel")]),
+  Skill("Google-Sheets", ["google=sheets"]),
+  Skill("Power-BI", ["power=bi"]),
+  Skill("Tableau", ["tableau"]),
 
   # CLOUD
-  Skill(name="Azure", phrases=["azure"]),
-  Skill(name="AWS", phrases=["aws"]),
-  Skill(name="Cloudflare", phrases=["cloudflare"]),
-  Skill(name="Heroku", phrases=["heroku"]),
-  Skill(name="Google-Cloud", phrases=["google=cloud", "gcp"]),
-  Skill(name="Netlify", phrases=["netlify"]),
+  Skill("Azure", ["azure"]),
+  Skill("AWS", ["aws"]),
+  Skill("Cloudflare", ["cloudflare"]),
+  Skill("Heroku", ["heroku"]),
+  Skill("Google-Cloud", ["google=cloud", "gcp"]),
+  Skill("Netlify", ["netlify"]),
 
   # MOBILE & CROSS-PLATFORM
   # notification, ui, gui, interface, native, web
   # Bluetooth, TCP, USB
-  Skill(name=".NET", phrases=[".net", "dotnet", "dot.net"]),
-  Skill(name="Android", phrases=["android"]),
-  Skill(name="CMake", phrases=["cmake"]),
-  Skill(name="Cocoa", phrases=["cocoa"]),
-  Skill(name="Cordova", phrases=["cordova", "phonegap"]),
-  Skill(name="Dagger2", phrases=["dagger2"]),
-  Skill(name="Flutter", phrases=["flutter"]),
-  Skill(name="GTK", phrases=["gtk", "gtk+"]),
-  Skill(name="Ionic", phrases=["ionic"]),
-  Skill(name="Jetpack-Compose", phrases=["jetpack=compose", "android=compose"]), # just Jetpack is ambiguous
-  Skill(name="iOS", phrases=["ios"]), # also SYSTEM
-  Skill(name="iPadOS", phrases=["ipados"]), # also SYSTEM
-  Skill(name="tvOS", phrases=["tvos"]), # also SYSTEM
-  Skill(name="watchOS", phrases=["watchos"]), # also SYSTEM
-  Skill(name="iMac", phrases=["imac"]),
-  Skill(name="iPad", phrases=["ipad"]),
-  Skill(name="iPhone", phrases=["iphone"]),
-  Skill(name="iWatch", phrases=["iwatch"]),
-  Skill(name="Lottie", phrases=["lottie"]),
-  Skill(name="Onsen UI", phrases=["onsen", "onsen=ui"]),
-  Skill(name="Native-Script", phrases=["native=script"]),
-  Skill(name="Novu", phrases=["novu"]), # open-source notification platform, framework, CMS https://github.com/novuhq/novu
-  Skill(name="QML", phrases=["qml"]), # Qt modeling language
-  Skill(name="Qt", phrases=["pyqt", "pyside", "qtruby", "qtjambi", "php=qt", ver1("qt")]),
-  Skill(name="React-Native", phrases=["react=native"]),
-  Skill(name="Retrofit", phrases=["retrofit"]),
-  Skill(name="SDL", phrases=["sdl"]),
-  Skill(name="SFML", phrases=["sfml"]),
-  Skill(name="Xamarin", phrases=["xamarin"]),
-  Skill(name="Xcode", phrases=["xcode"]),
+  Skill(".NET", [".net", "dotnet", "dot.net"]),
+  Skill("Android", ["android"]),
+  Skill("CMake", ["cmake"]),
+  Skill("Cocoa", ["cocoa"]),
+  Skill("Cordova", ["cordova", "phonegap"]),
+  Skill("Dagger2", ["dagger2"]),
+  Skill("Flutter", ["flutter"]),
+  Skill("GTK", ["gtk", "gtk+"]),
+  Skill("Ionic", ["ionic"]),
+  Skill("Jetpack-Compose", ["jetpack=compose", "android=compose"]), # just Jetpack is ambiguous
+  Skill("iOS", ["ios"]), # also SYSTEM
+  Skill("iPadOS", ["ipados"]), # also SYSTEM
+  Skill("tvOS", ["tvos"]), # also SYSTEM
+  Skill("watchOS", ["watchos"]), # also SYSTEM
+  Skill("iMac", ["imac"]),
+  Skill("iPad", ["ipad"]),
+  Skill("iPhone", ["iphone"]),
+  Skill("iWatch", ["iwatch"]),
+  Skill("Lottie", ["lottie"]),
+  Skill("Onsen UI", ["onsen", "onsen=ui"]),
+  Skill("Native-Script", ["native=script"]),
+  Skill("Novu", ["novu"]), # open-source notification platform, framework, CMS https://github.com/novuhq/novu
+  Skill("QML", ["qml"]), # Qt modeling language
+  Skill("Qt", ["pyqt", "pyside", "qtruby", "qtjambi", "php=qt", ver1("qt")]),
+  Skill("React-Native", ["react=native"]),
+  Skill("Retrofit", ["retrofit"]),
+  Skill("SDL", ["sdl"]),
+  Skill("SFML", ["sfml"]),
+  Skill("Xamarin", ["xamarin"]),
+  Skill("Xcode", ["xcode"]),
   # Titanium -- disambiguate
-  Skill(name="VoIP", phrases=["voip"]), # voice over IP
-  Skill(name="Vue-Native", phrases=["vue=native"]),
-  Skill(name="WebRTC", phrases=["webrtc"]), # web real-time communication
+  Skill("VoIP", ["voip"]), # voice over IP
+  Skill("Vue-Native", ["vue=native"]),
+  Skill("WebRTC", ["webrtc"]), # web real-time communication
 
-  Skill(name="AppKit", phrases=["appkit"]), # framework
-  Skill(name="SwiftUI", phrases=["swiftui"]), # framework
-  Skill(name="UIKit", phrases=["uikit"]), # framework
+  Skill("AppKit", ["appkit"]), # framework
+  Skill("SwiftUI", ["swiftui"]), # framework
+  Skill("UIKit", ["uikit"]), # framework
 
   # BIGDATA
-  Skill(name="Apache-Kafka", phrases=["apache=kafka", "kafka"]),
-  Skill(name="Apache-Hadoop", phrases=["apache=hadoop", "hadoop"]),
-  Skill(name="Apache-Spark", phrases=["apache=spark", "spark"]), # also ANALYTICS
-  Skill(name="Amazon-Redshift", phrases=["amazon=redshift", "aws=redshift", "redshift"]),
-  Skill(name="ELK-Stack", phrases=["elk=stack", "elk"]),
-  Skill(name="Google-BigQuery", phrases=["google=bigquery"]),
-  Skill(name="Trino", phrases=["trino"]), # also DATA-SCIENCE, ANALYTICS (https://trino.io/ Fast distributed SQL query engine for big data analytics)
+  Skill("Apache-Ambari", ["apache=ambari", "ambari"]), # running app manager
+  Skill("Apache-Flume", ["apache=flume", "flume"]), # Hadoop data ingestion (streams, logs) to HDFS
+  Skill("Apache-Flink", ["apache=flink", "flink"]), # Stream processing, like Storm but higher-level API, newer tool
+  Skill("Apache-Hadoop", ["apache=hadoop", "hadoop"]),
+  Skill("Apache-HDFS", ["apache=hdfs", "hdfs"]), # Hadoop drive FS
+  Skill("Apache-HBase", ["apache=hbase", "hbase"]), # Hadoop NoSQl key-value DB
+  Skill("Apache-Hive", ["apache=hive"]), # Hadoop data warehoose with SQL querying
+  MaybeSkill("Apache-Hive", ["hive"], disambiguate=contextual({"Apache"})), # /
+  Skill("Apache-Kafka", ["apache=kafka", "kafka"]),
+  Skill("Apache-Lucene", ["apache=lucene", "lucene"]),
+  Skill("Apache-MapReduce", ["apache=mapreduce", "mapreduce"]), # Hadoop data pipilene
+  Skill("Apache-Mahout", ["apache=mahout"]), # ML, substituted by Spark
+  Skill("Apache-Oozie", ["apache=oozie", "oozie"]), # Hadoop jobs workflow scheduler (~ GitHub actions)
+  Skill("Apache-Pig", ["apache=pig"]), # Used to analyze Hadoop data (higher-level MapReduce)
+  MaybeSkill("Apache-Pig", ["pig"], disambiguate=contextual({"Apache"})), # /
+  Skill("Apache-Sqoop", ["apache=sqoop", "sqoop"]), # Hadoop data ingestion from rel. DBs to HDFS
+  Skill("Apache-Spark", ["apache=spark", "spark"]), # Replaces MapReduce, much faster (RAM, batched), also ANALYTICS
+  Skill("Apache-Storm", ["apache=storm"]), # Like Kafka but for real-time streaming
+  MaybeSkill("Apache-Storm", ["storm"], disambiguate=contextual({"Apache"})), # /
+
+  Skill("Amazon-Redshift", ["amazon=redshift", "aws=redshift", "redshift"]),
+  Skill("ELK-Stack", ["elk=stack", "elk"]),
+  Skill("Google-BigQuery", ["google=bigquery"]),
+  Skill("Trino", ["trino"]), # also DATA-SCIENCE, ANALYTICS (https://trino.io/ Fast distributed SQL query engine for big data analytics)
+  # Apache-Ranger, Apache-Knox -- security tools
 
   # DATABASE
-  Skill(name="Apache-Arrow", phrases=["apache=arrow"]),
-  Skill(name="Apache-Cassandra", phrases=["apache=cassandra", "cassandra"]),
-  Skill(name="Apache-DataFusion", phrases=["apache=datafusion", "datafusion"]),
-  Skill(name="CouchBase", phrases=["couchbase"]),
-  Skill(name="CouchDB", phrases=["couch=db"]),
-  Skill(name="DynamoDB", phrases=["dynamo=db"]),
-  Skill(name="Elasticsearch", phrases=["elastic=search"]),
-  Skill(name="Firebase", phrases=["firebase"]),
-  Skill(name="MariaDB", phrases=["maria=db"]),
-  Skill(name="Memcached", phrases=["memcache(d)"]),
-  Skill(name="MongoDB", phrases=["mongo=db", "mongo"]),
-  Skill(name="Microsoft-SQL", phrases=["microsoft=sql", "ms=sql", "sql=server"]),
-  Skill(name="MySQL", phrases=["my=sql"]),
-  Skill(name="Neo4j", phrases=["neo4j", "neo4j=db"]),
-  Skill(name="Oracle", phrases=["oracle=db", "oracle", "plsql"]),
-  Skill(name="PouchDB", phrases=["pouch=db"]),
-  Skill(name="PostgreSQL", phrases=["postgre=sql", "postgres=sql", "postgres", "psql", "pgsql"]),
-  Skill(name="Redis", phrases=["redis"]),
-  Skill(name="S3", phrases=["aws=s3", "amazon=s3", "s3"]),
-  Skill(name="Supabase", phrases=["supabase"]),
-  Skill(name="SQLite", phrases=[ver1("sqlite")]),
+  Skill("Apache-Arrow", ["apache=arrow"]),
+  Skill("Apache-Cassandra", ["apache=cassandra", "cassandra"]),
+  Skill("Apache-DataFusion", ["apache=datafusion", "datafusion"]),
+  Skill("CouchBase", ["couchbase"]),
+  Skill("CouchDB", ["couch=db"]),
+  Skill("DynamoDB", ["dynamo=db"]),
+  Skill("Elasticsearch", ["elastic=search"]),
+  Skill("Firebase", ["firebase"]),
+  Skill("MariaDB", ["maria=db"]),
+  Skill("Memcached", ["memcache(d)"]),
+  Skill("MongoDB", ["mongo=db", "mongo"]),
+  Skill("Microsoft-SQL", ["microsoft=sql", "ms=sql", "sql=server"]),
+  Skill("MySQL", ["my=sql"]),
+  Skill("Neo4j", ["neo4j", "neo4j=db"]),
+  Skill("Oracle", ["oracle=db", "oracle", "plsql"]),
+  Skill("PouchDB", ["pouch=db"]),
+  Skill("PostgreSQL", ["postgre=sql", "postgres=sql", "postgres", "psql", "pgsql"]),
+  Skill("Redis", ["redis"]),
+  Skill("S3", ["aws=s3", "amazon=s3", "s3"]),
+  Skill("Supabase", ["supabase"]),
+  Skill("SQLite", [ver1("sqlite")]),
 
   # DATA SCIENCE
-  Skill(name="Anaconda", phrases=["anaconda", "miniconda", "conda"]),
-  Skill(name="Beautiful-Soup", phrases=["beautiful=soup"]),
-  Skill(name="Flax", phrases=["flax"]), # NN for Jax
-  Skill(name="IPython", phrases=["ipython"]), # interactive shell
-  Skill(name="JAX", phrases=[("JAX", "PROPN")]), # TensorFlow alternative
-  Skill(name="JAX:maybe", phrases=["jax"]),
-  Skill(name="Jupyter", phrases=["jupyter=lab", "jupyter=notebook(s)", "jupyter"]),
-  Skill(name="Matplotlib", phrases=["matplotlib"]),
-  Skill(name="Numba", phrases=[[{LOWER: "numba"}, {OP: "!", LOWER: {IN: ["1", "one", "wan"]}}]]),
-  Skill(name="NumPy", phrases=["numpy"]),
-  Skill(name="Pandas", phrases=["pandas"]),
-  Skill(name="PyTorch", phrases=["pytorch"]),
-  Skill(name="Keras", phrases=["keras"]),
-  Skill(name="RAPIDS", phrases=[("rapids", "PROPN")]), # also BIGDATA, GAMEDEV (`https://rapids.ai/`)
-  Skill(name="Scikit-Learn", phrases=["scikit=learn", "sklearn"]),
-  Skill(name="SciPy", phrases=["scipy"]),
-  Skill(name="Seaborn", phrases=["seaborn"]),
-  Skill(name="Spacy", phrases=["spacy"]),
-  Skill(name="Tensorflow", phrases=["tensorflow"]),
-
-  # TODO jax https://github.com/jax-ml/jax
+  Skill("Anaconda", ["anaconda", "miniconda", "conda"]),
+  Skill("Beautiful-Soup", ["beautiful=soup"]),
+  Skill("Flax", ["flax"]), # NN for Jax
+  Skill("IPython", ["ipython"]), # interactive shell
+  Skill("JAX", [propn("JAX")]), # TensorFlow alternative
+  MaybeSkill("JAX", ["jax"], disambiguate=neighbour(2)), # /
+  Skill("Jupyter", ["jupyter=lab", "jupyter=notebook(s)", "jupyter"]),
+  Skill("Matplotlib", ["matplotlib"]),
+  Skill("Numba", [[{LOWER: "numba"}, {OP: "!", LOWER: {IN: ["1", "one", "wan"]}}]]),
+  Skill("NumPy", ["numpy"]),
+  Skill("Pandas", ["pandas"]),
+  Skill("PyTorch", ["pytorch"]),
+  Skill("Keras", ["keras"]),
+  Skill("RAPIDS", [propn("rapids")]), # also BIGDATA, GAMEDEV (`https://rapids.ai/`)
+  Skill("Scikit-Learn", ["scikit=learn", "sklearn"]),
+  Skill("SciPy", ["scipy"]),
+  Skill("Seaborn", ["seaborn"]),
+  Skill("Spacy", ["spacy"]),
+  Skill("TensorFlow", ["tensorflow"]),
 
   # GAME
-  Skill(name="CUDA", phrases=["cuda"]), # also ROBOTICS, EMBEDDED, BIGDATA (GPU computing, NVIDIA)
-  Skill(name="Godot", phrases=["godot=engine", "godot", "gd=script"]),
-  Skill(name="Phaser", phrases=["phaser.=js", "phaser"]),
-  Skill(name="PixiJS", phrases=["pixi.=js", "pixi"]),
-  Skill(name="PlayStation", phrases=["playstation", "ps4", "ps5"]),
-  Skill(name="PyGame", phrases=["pygame"]),
-  Skill(name="Roblox", phrases=["roblox"]),
-  Skill(name="Solar2D", phrases=["solar2d"]),
-  Skill(name="Unity", phrases=["unity-engine", "unity=platform", "unity=3d", "unity"]),
-  Skill(name="Unreal-Engine", phrases=["unreal=engine", "unreal", "ue-4", "ue-5", "ue4", "ue5"]),
-  Skill(name="ThreeJS", phrases=["three.=js"]),
+  Skill("CUDA", ["cuda"]), # also ROBOTICS, EMBEDDED, BIGDATA (GPU computing, NVIDIA)
+  Skill("Godot", ["godot=engine", "godot", "gd=script"]),
+  Skill("Phaser", ["phaser.=js", "phaser"]),
+  Skill("PixiJS", ["pixi.=js", "pixi"]),
+  Skill("PlayStation", ["playstation", "ps4", "ps5"]),
+  Skill("PyGame", ["pygame"]),
+  Skill("Roblox", ["roblox"]),
+  Skill("Solar2D", ["solar2d"]),
+  Skill("Unity", ["unity-engine", "unity=platform", "unity=3d", "unity"]),
+  Skill("Unreal-Engine", ["unreal=engine", "unreal", "ue-4", "ue-5", "ue4", "ue5"]),
+  Skill("ThreeJS", ["three.=js"]),
 
-  Skill(name="OpenGL", phrases=["opengl"]),
+  Skill("OpenGL", ["opengl"]),
 
   # WEB BACKEND
-  Skill(name="ASP.NET", phrases=["asp.net", "asp"]),
-  Skill(name="Blazor", phrases=["blazor"]),
-  Skill(name="Bun", phrases=["bun"]),
-  Skill(name="CakePHP", phrases=["cake=php"]),
-  Skill(name="CherryPy", phrases=["cherry=py"]),
-  Skill(name="CodeIgniter", phrases=["code=igniter"]),
-  Skill(name="Deno", phrases=["deno"]),
-  Skill(name="Django", phrases=["django"]),
-  Skill(name="Express", phrases=["express.=js", "express"]),
-  Skill(name="FastAPI", phrases=["fast=api"]),
-  Skill(name="Fastify", phrases=["fastify"]),
-  Skill(name="Flask", phrases=["flask"]),
-  Skill(name="Hasura", phrases=["hasura"]),
-  Skill(name="Koa", phrases=["koa"]),
-  Skill(name="Laravel", phrases=["laravel"]),
-  Skill(name="NestJS", phrases=["nest.=js", ("nest", "PROPN")]),
-  Skill(name="Nginx", phrases=["nginx"]),
-  Skill(name="Phoenix", phrases=["phoenix"]),
-  Skill(name="Ruby-on-Rails", phrases=["ruby=on=rails", "rails", "ror"]),
-  Skill(name="SailsJS", phrases=["sails.=js"]),
-  Skill(name="SMTP", phrases=["smtp"]),
-  Skill(name="Spring", phrases=["spring"]),
-  Skill(name="Symfony", phrases=["symfony"]),
-  Skill(name="Yii", phrases=["yii"]),
+  Skill("ASP.NET", ["asp.net", "asp"]),
+  Skill("Blazor", ["blazor"]),
+  Skill("Bun", ["bun"]),
+  Skill("CakePHP", ["cake=php"]),
+  Skill("CherryPy", ["cherry=py"]),
+  Skill("CodeIgniter", ["code=igniter"]),
+  Skill("Deno", ["deno"]),
+  Skill("Django", ["django"]),
+  Skill("Express", ["express.=js", "express"]),
+  Skill("FastAPI", ["fast=api"]),
+  Skill("Fastify", ["fastify"]),
+  Skill("Flask", ["flask"]),
+  Skill("Hasura", ["hasura"]),
+  Skill("Koa", ["koa"]),
+  Skill("Laravel", ["laravel"]),
+  Skill("NestJS", ["nest.=js", propn("nest")]),
+  Skill("Nginx", ["nginx"]),
+  Skill("Phoenix", ["phoenix"]),
+  Skill("Ruby-on-Rails", ["ruby=on=rails", "rails", "ror"]),
+  Skill("SailsJS", ["sails.=js"]),
+  Skill("SMTP", ["smtp"]),
+  Skill("Spring", ["spring"]),
+  Skill("Symfony", ["symfony"]),
+  Skill("Yii", ["yii"]),
 
   # WEB FRONTEND
-  Skill(name="Angular", phrases=["angular.=js", "angular"]),
-  Skill(name="Astro", phrases=["astro.=js", "astro"]),
-  Skill(name="Bootstrap", phrases=["bootstrap"]),
-  Skill(name="Chakra-UI", phrases=["chakra=ui", "chakra"]),
-  Skill(name="Chrome", phrases=["chrome"]),
-  Skill(name="D3JS", phrases=["d3.=js", "d3"]),
-  Skill(name="EmberJS", phrases=["ember.=js", "ember"]),
-  Skill(name="Figma", phrases=["figma"]),
-  Skill(name="Firefox", phrases=["firefox"]),
-  Skill(name="jQuery", phrases=["jquery"]),
-  Skill(name="Material-UI", phrases=["material=ui", "mui", ("material", "PROPN")]),
-  Skill(name="Materialize", phrases=["materialize"]),
-  Skill(name="Photoshop", phrases=["photoshop"]),
-  Skill(name="React", phrases=["react.=js", "react"]),
-  Skill(name="Safari", phrases=["safari"]),
-  Skill(name="SolidJS", phrases=["solid.=js", ("solid", "PROPN")]),
-  Skill(name="Svelte", phrases=["svelte.=js", "svelte"]),
-  Skill(name="Tailwind-CSS", phrases=["tailwind.=css", "tailwind"]),
-  Skill(name="Vite", phrases=["vite"]),
-  Skill(name="VueJS", phrases=["vue.=js", "vue"]),
-  Skill(name="Webpack", phrases=["webpack"]),
-  Skill(name="WebKit", phrases=["webkit"]), # browser engine
+  Skill("Angular", ["angular.=js", "angular"]),
+  Skill("Astro", ["astro.=js", "astro"]),
+  Skill("Bootstrap", ["bootstrap"]),
+  Skill("Chakra-UI", ["chakra=ui", "chakra"]),
+  Skill("Chrome", ["chrome"]),
+  Skill("D3JS", ["d3.=js", "d3"]),
+  Skill("EmberJS", ["ember.=js", "ember"]),
+  Skill("Figma", ["figma"]),
+  Skill("Firefox", ["firefox"]),
+  Skill("jQuery", ["jquery"]),
+  Skill("Material-UI", ["material=ui", "mui", propn("material")]),
+  Skill("Materialize", ["materialize"]),
+  Skill("Photoshop", ["photoshop"]),
+  Skill("React", ["react.=js", "react"]),
+  Skill("Safari", ["safari"]),
+  Skill("SolidJS", ["solid.=js", propn("solid")]),
+  Skill("Svelte", ["svelte.=js", "svelte"]),
+  Skill("Tailwind-CSS", ["tailwind.=css", "tailwind"]),
+  Skill("Vite", ["vite"]),
+  Skill("VueJS", ["vue.=js", "vue"]),
+  Skill("Webpack", ["webpack"]),
+  Skill("WebKit", ["webkit"]), # browser engine
   # TODO edge, ambiguous
 
   # WEB FULLSTACK
-  Skill(name="GraphQL", phrases=["graphql"]),
-  Skill(name="HTMX", phrases=["htmx"]),
-  Skill(name="Meteor", phrases=["meteor", "meteor.=js"]),
-  Skill(name="MEAN-Stack", phrases=["mean=stack", ("mean", "PROPN")]),
-  Skill(name="MERN-Stack", phrases=["mern=stack", "mern"]),
-  Skill(name="Ktor", phrases=["ktor"]), # fullstack framework in Kotlin
-  Skill(name="NextJS", phrases=["next.=js", ("next", "PROPN")]),
-  Skill(name="NextJS:maybe", phrases=["next"]),
-  Skill(name="NuxtJS", phrases=["nuxt.=js", "nuxt"]),
-  Skill(name="NodeJS", phrases=["node.=js", ("node", "PROPN")]),
-  Skill(name="OpenAPI", phrases=["openapi"]),
-  Skill(name="REST", phrases=[("rest", "PROPN")]),
-  Skill(name="SvelteKit", phrases=["svelte=kit"]),
-  Skill(name="Swagger", phrases=["swagger"]),
+  Skill("GraphQL", ["graphql"]),
+  Skill("HTMX", ["htmx"]),
+  Skill("Meteor", ["meteor", "meteor.=js"]),
+  Skill("MEAN-Stack", ["mean=stack", propn("mean")]),
+  Skill("MERN-Stack", ["mern=stack", "mern"]),
+  Skill("Ktor", ["ktor"]), # fullstack framework in Kotlin
+  Skill("NextJS", ["next.=js", propn("next")]),
+  MaybeSkill("NextJS", ["next"], disambiguate=neighbour(1)),
+  Skill("NuxtJS", ["nuxt.=js", "nuxt"]),
+  Skill("NodeJS", ["node.=js", propn("node")]),
+  Skill("OpenAPI", ["openapi"]),
+  Skill("REST", [propn("rest")]),
+  Skill("SvelteKit", ["svelte=kit"]),
+  Skill("Swagger", ["swagger"]),
 
   # LOW-CODE
-  Skill(name="Airtable", phrases=["airtable"]),
-  Skill(name="Bitrix", phrases=["bitrix", "bitrix24"]),
-  Skill(name="Drupal", phrases=["drupal"]),
-  Skill(name="Hygraph", phrases=["hygraph", "graph=cms"]),
-  Skill(name="Joomla", phrases=["joomla"]),
-  Skill(name="Magento", phrases=["magento"]),
-  Skill(name="MODx", phrases=["modx"]),
-  Skill(name="Power-Apps", phrases=["power=apps"]),
-  Skill(name="Power-Automate", phrases=["power=automate"]),
-  Skill(name="Power-Platform", phrases=["power=platform"]),
-  Skill(name="Shopify", phrases=["shopify"]),
-  Skill(name="Strapi", phrases=["strapi"]),
-  Skill(name="WooCommerce", phrases=["woo=commerce"]),
-  Skill(name="WordPress", phrases=["wordpress"]),
+  Skill("Airtable", ["airtable"]),
+  Skill("Bitrix", ["bitrix", "bitrix24"]),
+  Skill("Drupal", ["drupal"]),
+  Skill("Hygraph", ["hygraph", "graph=cms"]),
+  Skill("Joomla", ["joomla"]),
+  Skill("Magento", ["magento"]),
+  Skill("MODx", ["modx"]),
+  Skill("Power-Apps", ["power=apps"]),
+  Skill("Power-Automate", ["power=automate"]),
+  Skill("Power-Platform", ["power=platform"]),
+  Skill("Shopify", ["shopify"]),
+  Skill("Strapi", ["strapi"]),
+  Skill("WooCommerce", ["woo=commerce"]),
+  Skill("WordPress", ["wordpress"]),
 
   # INFRASTRUCTURE
-  Skill(name="Apache-Airflow", phrases=["airflow", "apache=airflow"]), # also BIGDATA
-  Skill(name="Amazon-ECS", phrases=["amazon=ecs", "aws=ecs", "ecs"]),
-  Skill(name="Ansible", phrases=["ansible"]),
-  Skill(name="CircleCI", phrases=["circleci"]),
-  Skill(name="CKA", phrases=["cka"]), # certificate
-  Skill(name="CKAD", phrases=["ckad"]), # certificate
-  Skill(name="CompTIA-ITOps", phrases=["cios"]), # certificate
-  Skill(name="MCSA", phrases=["mcsa"]), # certificate
-  Skill(name="Docker", phrases=["docker"]),
-  Skill(name="Dokku", phrases=["dokku"]), # also Cloud
-  Skill(name="Jenkins", phrases=["jenkins"]),
-  Skill(name="Kibana", phrases=["kibana"]), # also BIGDATA
-  Skill(name="Kubernetes", phrases=["kubernetes", "k8s", "k3s"]),
-  Skill(name="Logstash", phrases=["logstash"]), # also BIGDATA
-  Skill(name="Pulumi", phrases=["pulumi"]),
-  Skill(name="Puppet", phrases=["puppet"]),
-  Skill(name="Splunk", phrases=["splunk"]), # also BIGDATA & SECURITY
-  Skill(name="RHCE", phrases=["rhce"]),   # certificate
-  Skill(name="RHCSA", phrases=["rhcsa"]), # certificate
-  Skill(name="Terraform", phrases=["terraform"]),
-  Skill(name="Vagrant", phrases=["vagrant"]),
+  Skill("Apache-Airflow", ["airflow", "apache=airflow"]), # also BIGDATA
+  Skill("Amazon-ECS", ["amazon=ecs", "aws=ecs", "ecs"]),
+  Skill("Ansible", ["ansible"]),
+  Skill("CircleCI", ["circleci"]),
+  Skill("CKA", ["cka"]), # certificate
+  Skill("CKAD", ["ckad"]), # certificate
+  Skill("CompTIA-ITOps", ["cios"]), # certificate
+  Skill("MCSA", ["mcsa"]), # certificate
+  Skill("Docker", ["docker"]),
+  Skill("Dokku", ["dokku"]), # also Cloud
+  Skill("Jenkins", ["jenkins"]),
+  Skill("Kibana", ["kibana"]), # also BIGDATA
+  Skill("Kubernetes", ["kubernetes", "k8s", "k3s"]),
+  Skill("Logstash", ["logstash"]), # also BIGDATA
+  Skill("Pulumi", ["pulumi"]),
+  Skill("Puppet", ["puppet"]),
+  Skill("Splunk", ["splunk"]), # also BIGDATA & SECURITY
+  Skill("RHCE", ["rhce"]),   # certificate
+  Skill("RHCSA", ["rhcsa"]), # certificate
+  Skill("Terraform", ["terraform"]),
+  Skill("Vagrant", ["vagrant"]),
 
   # QA-n-AUTOMATION
-  Skill(name="Appium", phrases=["appium"]),
-  Skill(name="Cucumber", phrases=["cucumber"]),
-  Skill(name="Cypress", phrases=["cypress", "cypress.=js"]),
-  Skill(name="Jasmine", phrases=["jasmine"]),
-  Skill(name="Jest", phrases=["jest"]),
-  Skill(name="JUnit", phrases=["junit"]),
-  Skill(name="Playwright", phrases=["playwright"]),
-  Skill(name="Postman", phrases=["postman"]),
-  Skill(name="Protractor", phrases=["protractor"]),
-  Skill(name="PyTest", phrases=["pytest"]),
-  Skill(name="Selenium", phrases=["selenium"]),
-  Skill(name="Sentry", phrases=["sentry"]),
-  Skill(name="TestCafe", phrases=["testcafe"]),
-  Skill(name="TestNg", phrases=["testng"]),
-  Skill(name="WebdriverIO", phrases=["webdriverio"]),
+  Skill("Appium", ["appium"]),
+  Skill("Cucumber", ["cucumber"]),
+  Skill("Cypress", ["cypress", "cypress.=js"]),
+  Skill("Jasmine", ["jasmine"]),
+  Skill("Jest", ["jest"]),
+  Skill("JUnit", ["junit"]),
+  Skill("Playwright", ["playwright"]),
+  Skill("Postman", ["postman"]),
+  Skill("Protractor", ["protractor"]),
+  Skill("PyTest", ["pytest"]),
+  Skill("Selenium", ["selenium"]),
+  Skill("Sentry", ["sentry"]),
+  Skill("TestCafe", ["testcafe"]),
+  Skill("TestNg", ["testng"]),
+  Skill("WebdriverIO", ["webdriverio"]),
 
   # BLOCKCHAIN
-  Skill(name="Bitcoin", phrases=["bitcoin"]),
-  Skill(name="Ethereum", phrases=["ethereum"]),
-  Skill(name="EVM", phrases=["evm"]),
-  Skill(name="Solana", phrases=["solana"]),
-  Skill(name="Web3js", phrases=["web3.=js"]),
-  # Skill(name="SVM", phrases=["svm"]), TODO disambiguate Support-Vector-Machine vs Solana-Virtual-Machine
-  # Skill(name="Web3", phrases=["web3"]), topic/concept, not a skill
+  Skill("Bitcoin", ["bitcoin"]),
+  Skill("Ethereum", ["ethereum"]),
+  Skill("EVM", ["evm"]),
+  Skill("Solana", ["solana"]),
+  Skill("Web3js", ["web3.=js"]),
+  # Skill("SVM", ["svm"]), TODO disambiguate Support-Vector-Machine vs Solana-Virtual-Machine
+  # Skill("Web3", ["web3"]), topic/concept, not a skill
 
   # NETWORKING
-  Skill(name="CompTIA-Network+", phrases=["network+", "comptia n(etwork)+"]), # certificate
-  Skill(name="Cisco-CNA", phrases=["ccna"]), # certificate
-  Skill(name="Cisco-CNP", phrases=["ccnp"]), # certificate
-  Skill(name="LoRa", phrases=[("LoRa", "PROPN")]), # transmission tech
-  Skill(name="MTCNA", phrases=["mtcna"]),    # certificate
-  Skill(name="MQTT", phrases=["mqtt"]),      # IoT messaging standard, also CLOUD
-  Skill(name="Nmap", phrases=["nmap"]),             # also SECURITY
-  Skill(name="Netcat", phrases=["netcat", "ncat"]), # also SECURITY
-  Skill(name="Zigbee", phrases=["zigbee"]), # protocol spec. also EMBEDDED
-  Skill(name="Wireshark", phrases=["wireshark"]),   # also SECURITY
+  Skill("CompTIA-Network+", ["network+", "comptia n(etwork)+"]), # certificate
+  Skill("Cisco-CNA", ["ccna"]), # certificate
+  Skill("Cisco-CNP", ["ccnp"]), # certificate
+  Skill("LoRa", [propn("LoRa")]), # transmission tech
+  Skill("MTCNA", ["mtcna"]),    # certificate
+  Skill("MQTT", ["mqtt"]),      # IoT messaging standard, also CLOUD
+  Skill("Nmap", ["nmap"]),             # also SECURITY
+  Skill("Netcat", ["netcat", "ncat"]), # also SECURITY
+  Skill("Zigbee", ["zigbee"]), # protocol spec. also EMBEDDED
+  Skill("Wireshark", ["wireshark"]),   # also SECURITY
 
   # SECURITY
-  Skill(name="Burpsuite", phrases=["burpsuite"]),
-  Skill(name="CEH", phrases=["ceh"]),     # certificate
-  Skill(name="CISA", phrases=["cisa"]),   # certificate
-  Skill(name="CISM", phrases=["cism"]),   # certificate
-  Skill(name="CISSP", phrases=["ciss", "cissp"]), # certificate
-  Skill(name="CompTIA-PenTest+", phrases=["pentest+", "comptia p(entest)+"]), # certificate
-  Skill(name="CompTIA-Security+", phrases=["security+", "comptia s(ecurity)+"]), # certificate
-  Skill(name="GIAC-CIH", phrases=["gcih"]),   # certificate
-  Skill(name="GIAC-SEC", phrases=["gsec"]),   # certificate
-  Skill(name="GIAC-REM", phrases=["grem"]),   # certificate
-  Skill(name="GIAC-WAPT", phrases=["gwapt"]), # certificate
-  Skill(name="JWT", phrases=["jwt"]),
-  Skill(name="Metasploit", phrases=["metasploit"]),
-  Skill(name="Nessus", phrases=["nessus"]),
-  Skill(name="OAuth", phrases=[ver1("oauth")]),
-  Skill(name="OpenID", phrases=["openid"]),
-  Skill(name="SAML", phrases=["saml"]),
-  Skill(name="Snort", phrases=[("snort", "NOUN")]),
-  Skill(name="SSCP", phrases=["sscp"]), # certificate
+  Skill("Burpsuite", ["burpsuite"]),
+  Skill("CEH", ["ceh"]),     # certificate
+  Skill("CISA", ["cisa"]),   # certificate
+  Skill("CISM", ["cism"]),   # certificate
+  Skill("CISSP", ["ciss", "cissp"]), # certificate
+  Skill("CompTIA-PenTest+", ["pentest+", "comptia p(entest)+"]), # certificate
+  Skill("CompTIA-Security+", ["security+", "comptia s(ecurity)+"]), # certificate
+  Skill("GIAC-CIH", ["gcih"]),   # certificate
+  Skill("GIAC-SEC", ["gsec"]),   # certificate
+  Skill("GIAC-REM", ["grem"]),   # certificate
+  Skill("GIAC-WAPT", ["gwapt"]), # certificate
+  Skill("JWT", ["jwt"]),
+  Skill("Metasploit", ["metasploit"]),
+  Skill("Nessus", ["nessus"]),
+  Skill("OAuth", [ver1("oauth")]),
+  Skill("OpenID", ["openid"]),
+  Skill("SAML", ["saml"]),
+  Skill("Snort", [propn("snort")]),
+  Skill("SSCP", ["sscp"]), # certificate
 
   # ROBOTICS
-  Skill(name="ABB", phrases=["abb"]),           # robot brand
-  Skill(name="Fanuc", phrases=["fanuc"]),       # robot brand
-  Skill(name="iCub", phrases=["icub"]),         # robot brand
-  Skill(name="HyQ", phrases=["hyq"]),           # robot brand
-  Skill(name="KUKA", phrases=["kuka"]),         # robot brand
-  Skill(name="OpenCV", phrases=["opencv"]),     # open source Computer Vision library
-  # Skill(name="Omron", phrases=["omron"]),       # electronics corporation
-  Skill(name="FreeRTOS", phrases=["freertos"]), # OS, also EMBEDDED-n-SYSTEM
-  Skill(name="ROS", phrases=["ros"]),           # OS, also EMBEDDED-n-SYSTEM
-  # Skill(name="SLAM", phrases=["slam", "vslam"]), # simultaneous localization and mapping
-  # Skill(name="Yaskawa", phrases=["yaskawa"]), # electric and robotics corporation
+  Skill("ABB", ["abb"]),           # robot brand
+  Skill("Fanuc", ["fanuc"]),       # robot brand
+  Skill("iCub", ["icub"]),         # robot brand
+  Skill("HyQ", ["hyq"]),           # robot brand
+  Skill("KUKA", ["kuka"]),         # robot brand
+  Skill("OpenCV", ["opencv"]),     # open source Computer Vision library
+  # Skill("Omron", ["omron"]),       # electronics corporation
+  Skill("FreeRTOS", ["freertos"]), # OS, also EMBEDDED-n-SYSTEM
+  Skill("ROS", ["ros"]),           # OS, also EMBEDDED-n-SYSTEM
+  # Skill("SLAM", ["slam", "vslam"]), # simultaneous localization and mapping
+  # Skill("Yaskawa", ["yaskawa"]), # electric and robotics corporation
 
-  Skill(name="Simulink", phrases=["simulink"]), # some lang.
+  Skill("Simulink", ["simulink"]), # some lang.
 
   # SYSTEM
-  Skill(name="Debian", phrases=["debian"]),
-  Skill(name="FreeBSD", phrases=["freebsd"]), # also CROSS-PLATFORM
-  Skill(name="Linux", phrases=["linux"]), # also CROSS-PLATFORM
-  Skill(name="MacOS", phrases=["macos", "osx"]), # also CROSS-PLATFORM
-  Skill(name="Ubuntu", phrases=["ubuntu"]),
-  Skill(name="Unix", phrases=["unix"]),   # also CROSS-PLATFORM
-  Skill(name="Windows", phrases=["windows", "win32", "win64"]), # also CROSS-PLATFORM
+  Skill("Debian", ["debian"]),
+  Skill("FreeBSD", ["freebsd"]), # also CROSS-PLATFORM
+  Skill("Linux", ["linux"]), # also CROSS-PLATFORM
+  Skill("MacOS", ["macos", "osx"]), # also CROSS-PLATFORM
+  Skill("Ubuntu", ["ubuntu"]),
+  Skill("Unix", ["unix"]),   # also CROSS-PLATFORM
+  Skill("Windows", ["windows", "win32", "win64"]), # also CROSS-PLATFORM
 
-  Skill(name="Clang", phrases=["clang"]),
-  Skill(name="MicroPython", phrases=["micropython"]), # compiler
-  Skill(name="GCC", phrases=["gcc"]), # compiler
-  Skill(name="Kernel", phrases=["kernel"]),
-  Skill(name="LLVM", phrases=["llvm"]),
+  Skill("Clang", ["clang"]),
+  Skill("MicroPython", ["micropython"]), # compiler
+  Skill("GCC", ["gcc"]), # compiler
+  Skill("Kernel", ["kernel"]),
+  Skill("LLVM", ["llvm"]),
 
   # BIGTECH
-  Skill(name="Apple", phrases=["apple"]), # company
-  Skill(name="Amazon", phrases=["amazon"]), # company
-  Skill(name="AMD", phrases=["amd", "amd=32", "amd=64"]), # company
-  Skill(name="eBay", phrases=["ebay"]), # company
-  Skill(name="Facebook", phrases=["facebook"]), # company TODO meta
-  Skill(name="Intel", phrases=["intel"]), # company
-  Skill(name="Google", phrases=["google"]), # company TODO alphabet
-  Skill(name="Microsoft", phrases=["microsoft"]), # company
-  Skill(name="Netflix", phrases=["netflix"]), # company
-  Skill(name="NVidia", phrases=["nvidia"]), # company
-  Skill(name="SalesForce", phrases=["salesforce"]),
-  Skill(name="Vercel", phrases=["vercel"]),
+  Skill("Apple", ["apple"]), # company
+  Skill("Amazon", ["amazon"]), # company
+  Skill("AMD", ["amd", "amd=32", "amd=64"]), # company
+  Skill("eBay", ["ebay"]), # company
+  Skill("Facebook", ["facebook"]), # company TODO meta
+  Skill("Intel", ["intel"]), # company
+  Skill("Google", ["google"]), # company TODO alphabet
+  Skill("Microsoft", ["microsoft"]), # company
+  Skill("Netflix", ["netflix"]), # company
+  Skill("NVidia", ["nvidia"]), # company
+  Skill("SalesForce", ["salesforce"]),
+  Skill("Vercel", ["vercel"]),
 
   # MIXED TOPICS
-  Skill(name="CPU", phrases=["cpu"]),
-  Skill(name="GPU", phrases=["gpu"]),
-  Skill(name="CLI", phrases=["cli"]),
-  Skill(name="GUI", phrases=["gui"]),
-  Skill(name="UI", phrases=["ui", "user=interface"]),
-  Skill(name="API", phrases=["api"]),
-  # Skill(name="Client", phrases=["client"]),
-  # Skill(name="Server", phrases=["server"]),
-  # Skill(name="REPL", phrases=["repl"]),
-  # Skill(name="Shell", phrases=["shell"]), -- too widespread
-  # Skill(name="Terminal", phrases=["terminal"]), -- too widespread
-  # Skill(name="Cross-Platform", phrases=["cross=platform"]),
-  Skill(name="TDD", phrases=["tdd"]),
-  Skill(name="BDD", phrases=["bdd"]),
-  Skill(name="Plugin", phrases=["plugin", "plug-in"]),
-  Skill(name="Widget", phrases=["widget"]),
-  Skill(name="Middleware", phrases=["middleware"]),
-  Skill(name="Bindings", phrases=["bindings"]),
-  Skill(name="Engine", phrases=["engine"]),
-  # Skill(name="Mobile", phrases=["mobile"]),
-  # Skill(name="PC", phrases=["pc"]),
-  # Skill(name="Web", phrases=["web"]),
-  # Skill(name="IoT", phrases=["iot"]),
-  Skill(name="CI/CD", phrases=["ci/cd"]),
-  Skill(name="Voxel", phrases=["voxel"]),
-  Skill(name="Pixel", phrases=["pixel"]),
-  Skill(name="Sprite", phrases=["sprite"]),
-  Skill(name="Texture", phrases=["texture"]),
-  # Skill(name="Byte", phrases=["byte"]),
-  Skill(name="Bytecode", phrases=["bytecode"]),
-  # Skill(name="2D", phrases=["2d"]), -- too widespread
-  # Skill(name="3D", phrases=["3d"]), -- too widespread
-  Skill(name="Ray-Tracing", phrases=["ray=tracing"]),
-  Skill(name="Compiler", phrases=["compiler"]),
-  Skill(name="Singleplayer", phrases=["single=player"]),
-  Skill(name="Multiplayer", phrases=["multi=player"]),
-  Skill(name="Entity-Component-System", phrases=["entity=component=system", "ecs"]),
-  Skill(name="Cron", phrases=["cron", "crond", "cronjob"]),
-  Skill(name="IP", phrases=["ip"]),
-  Skill(name="TCP", phrases=["TCP"]),
-  Skill(name="HTTP", phrases=["http"]),
-  Skill(name="HTTPS", phrases=["https"]),
-  Skill(name="SSL", phrases=["ssl"]),
-  Skill(name="SSH", phrases=["ssh"]),
-  Skill(name="FTP", phrases=["ftp"]),
-  Skill(name="SFTP", phrases=["sftp"]),
-  Skill(name="E2E", phrases=["e2e"]),
-  Skill(name="RTOS", phrases=["rtos"]),
-  Skill(name="GPOS", phrases=["gpos"]),
-  # Skill(name="Analysis", phrases=["analysis"]),
-  # Skill(name="Analytics", phrases=["analytics"]),
-  # Skill(name="Network", phrases=["network"]),
-  # Skill(name="Networking", phrases=["networking"]),
-  # Skill(name="Machine-Learning", phrases=["machine=learning", "ML", "ai/ml"]),
-  # Skill(name="Deep-Learning", phrases=["deep=learning"]),
-  # Skill(name="Embedded", phrases=["embedded"]),
-  # Skill(name="Security", phrases=["security", "appsec", "infosec", "cybersec"]),
-  # Skill(name="Performance", phrases=["performance"]),
-  # Skill(name="Scalability", phrases=["scalability"]),
-  # Skill(name="Reliability", phrases=["reliability"]),
-  # Skill(name="Database", phrases=["database", "db"]),
-  # Skill(name="Deploy", phrases=["deploy"]),
-  # Skill(name="Architecture", phrases=["architecture"]),
-  # Skill(name="Integration", phrases=["integration"]),
-  # Skill(name="QA", phrases=["qa"]),
-  # Skill(name="Testing", phrases=["testing"]),
-  # Skill(name="Automation", phrases=["automation"]),
-  # Skill(name="Scraping", phrases=["scraping"]),
-  # Skill(name="Mining", phrases=["mining"]), # ambiguous (Data-mining vs Crypto-mining)
-  # Skill(name="Software", phrases=["software"]),
-  # Skill(name="Hardware", phrases=["hardware"]),
-  # Skill(name="Firmware", phrases=["firmware"]),
-  # Skill(name="Algorithm", phrases=["algorithm(s)"]),
-  # Skill(name="Science", phrases=["science"]),
-  # Skill(name="CMS", phrases=["cms"]),
-  # Skill(name="E-Commerce", phrases=["e=commerce"]),
-  # Skill(name="Cluster", phrases=["cluster"]),
-  # Skill(name="Container", phrases=["container"]),
-  # Skill(name="Orchestration", phrases=["orchestration"]),
-  # Skill(name="NLP", phrases=["nlp"]),
+  Skill("CPU", ["cpu"]),
+  Skill("GPU", ["gpu"]),
+  Skill("CLI", ["cli"]),
+  Skill("GUI", ["gui"]),
+  Skill("UI", ["ui", "user=interface"]),
+  Skill("API", ["api"]),
+  # Skill("Client", ["client"]),
+  # Skill("Server", ["server"]),
+  # Skill("REPL", ["repl"]),
+  # Skill("Shell", ["shell"]), -- too widespread
+  # Skill("Terminal", ["terminal"]), -- too widespread
+  # Skill("Cross-Platform", ["cross=platform"]),
+  Skill("TDD", ["tdd"]),
+  Skill("BDD", ["bdd"]),
+  Skill("Plugin", ["plugin", "plug-in"]),
+  Skill("Widget", ["widget"]),
+  Skill("Middleware", ["middleware"]),
+  Skill("Bindings", ["bindings"]),
+  Skill("Engine", ["engine"]),
+  # Skill("Mobile", ["mobile"]),
+  # Skill("PC", ["pc"]),
+  # Skill("Web", ["web"]),
+  # Skill("IoT", ["iot"]),
+  Skill("CI/CD", ["ci/cd"]),
+  Skill("Voxel", ["voxel"]),
+  Skill("Pixel", ["pixel"]),
+  Skill("Sprite", ["sprite"]),
+  Skill("Texture", ["texture"]),
+  # Skill("Byte", ["byte"]),
+  Skill("Bytecode", ["bytecode"]),
+  # Skill("2D", ["2d"]), -- too widespread
+  # Skill("3D", ["3d"]), -- too widespread
+  Skill("Ray-Tracing", ["ray=tracing"]),
+  Skill("Compiler", ["compiler"]),
+  Skill("Singleplayer", ["single=player"]),
+  Skill("Multiplayer", ["multi=player"]),
+  Skill("Entity-Component-System", ["entity=component=system", "ecs"]),
+  Skill("Cron", ["cron", "crond", "cronjob"]),
+  Skill("IP", ["ip"]),
+  Skill("TCP", ["TCP"]),
+  Skill("HTTP", ["http"]),
+  Skill("HTTPS", ["https"]),
+  Skill("SSL", ["ssl"]),
+  Skill("SSH", ["ssh"]),
+  Skill("FTP", ["ftp"]),
+  Skill("SFTP", ["sftp"]),
+  Skill("E2E", ["e2e"]),
+  Skill("RTOS", ["rtos"]),
+  Skill("GPOS", ["gpos"]),
+  # Skill("Analysis", ["analysis"]),
+  # Skill("Analytics", ["analytics"]),
+  # Skill("Network", ["network"]),
+  # Skill("Networking", ["networking"]),
+  # Skill("Machine-Learning", ["machine=learning", "ML", "ai/ml"]),
+  # Skill("Deep-Learning", ["deep=learning"]),
+  # Skill("Embedded", ["embedded"]),
+  # Skill("Security", ["security", "appsec", "infosec", "cybersec"]),
+  # Skill("Performance", ["performance"]),
+  # Skill("Scalability", ["scalability"]),
+  # Skill("Reliability", ["reliability"]),
+  # Skill("Database", ["database", "db"]),
+  # Skill("Deploy", ["deploy"]),
+  # Skill("Architecture", ["architecture"]),
+  # Skill("Integration", ["integration"]),
+  # Skill("QA", ["qa"]),
+  # Skill("Testing", ["testing"]),
+  # Skill("Automation", ["automation"]),
+  # Skill("Scraping", ["scraping"]),
+  # Skill("Mining", ["mining"]), # ambiguous (Data-mining vs Crypto-mining)
+  # Skill("Software", ["software"]),
+  # Skill("Hardware", ["hardware"]),
+  # Skill("Firmware", ["firmware"]),
+  # Skill("Algorithm", ["algorithm(s)"]),
+  # Skill("Science", ["science"]),
+  # Skill("CMS", ["cms"]),
+  # Skill("E-Commerce", ["e=commerce"]),
+  # Skill("Cluster", ["cluster"]),
+  # Skill("Container", ["container"]),
+  # Skill("Orchestration", ["orchestration"]),
+  # Skill("NLP", ["nlp"]),
 
   # HARDWARE & EMBEDDED
-  # Skill(name="HPC", phrases=["hpc"]), # high performance computing
-  Skill(name="Aarch32", phrases=["aarch32", "arm32"]), # CPU architecture
-  Skill(name="Aarch64", phrases=["aarch64", "arm64"]), # CPU architecture
-  Skill(name="Arduino", phrases=["arduino"]), # controller brand
-  Skill(name="ASIC", phrases=["asic"]), # ASICs are custom-designed circuits for specific applications, offering high performance and efficiency
-  Skill(name="ARC", phrases=[("ARC", "PROPN")]), # CPU family
-  Skill(name="ARC:maybe", phrases=["arc"]), # CPU family
-  Skill(name="ARM", phrases=[("ARM", "PROPN")]), # CPU family
-  Skill(name="ARM:maybe", phrases=["arm"]), # CPU family
-  Skill(name="AVR", phrases=["avr"]), # controller family
-  Skill(name="Elbrus-2000", phrases=["elbrus=2000", "e2k"]), # CPU
-  Skill(name="Embox", phrases=["embox"]), # Embox is a configurable RTOS designed for resource constrained and embedded systems
-  Skill(name="ESP32", phrases=["esp=32"]), # controller family
-  Skill(name="ESP8266", phrases=["esp=8266"]), # controller family
-  Skill(name="FPGA", phrases=["fpga"]), # FPGAs are reprogrammable devices that provide flexibility and rapid prototyping capabilities
-  Skill(name="i.MX6", phrases=["i.mx=6"]), # platform
-  Skill(name="LabVIEW", phrases=["labview"]),
-  Skill(name="MicroBlaze", phrases=["microblaze"]), # soft core
-  Skill(name="MIPS", phrases=["mips"]), # CPU architecture
-  Skill(name="MSP430", phrases=["msp=430"]), # controller family
-  Skill(name="PowerPC", phrases=["powerpc"]), # CPU architecture
-  Skill(name="Raspberry-Pi", phrases=["raspberry", "rasp=pi", "raspberry=pi(s)"]), # platform
-  Skill(name="RISC", phrases=["risc", "risc-v"]), # CPU architecture
-  Skill(name="SPARC", phrases=["sparc"]), # platform
-  Skill(name="STM32", phrases=["stm=32"]), # platform
-  Skill(name="Verilog", phrases=["verilog", "sysverilog", "systemverilog"]), # PL
-  Skill(name="VHDL", phrases=["vhdl"]), # PL
-  Skill(name="VLIW", phrases=["vliw"]), # CPU architecture
-  Skill(name="x32", phrases=["x32"]), # CPU architecture umbrella
-  Skill(name="x64", phrases=["x64"]), # CPU architecture umbrella
-  Skill(name="x86", phrases=["x86", "x86-32", "x86-64", "i286", "i386"]), # CPU architecture
-  Skill(name="Yosys", phrases=["yosys"]), # https://github.com/YosysHQ/yosys
-  Skill(name="Z80", phrases=["Z=80"]), # CPU brand
+  # Skill("HPC", ["hpc"]), # high performance computing
+  Skill("Aarch32", ["aarch32", "arm32"]), # CPU architecture
+  Skill("Aarch64", ["aarch64", "arm64"]), # CPU architecture
+  Skill("Arduino", ["arduino"]), # controller brand
+  Skill("ASIC", ["asic"]), # ASICs are custom-designed circuits for specific applications, offering high performance and efficiency
+  Skill("ARC", [propn("ARC")]), # CPU family
+  MaybeSkill("ARC", ["arc"], disambiguate=neighbour(2)), # /
+  Skill("ARM", [propn("ARM")]), # CPU family
+  MaybeSkill("ARM", ["arm"], disambiguate=neighbour(2)), # /
+  Skill("AVR", ["avr"]), # controller family
+  Skill("Elbrus-2000", ["elbrus=2000", "e2k"]), # CPU
+  Skill("Embox", ["embox"]), # Embox is a configurable RTOS designed for resource constrained and embedded systems
+  Skill("ESP32", ["esp=32"]), # controller family
+  Skill("ESP8266", ["esp=8266"]), # controller family
+  Skill("FPGA", ["fpga"]), # FPGAs are reprogrammable devices that provide flexibility and rapid prototyping capabilities
+  Skill("i.MX6", ["i.mx=6"]), # platform
+  Skill("LabVIEW", ["labview"]),
+  Skill("MicroBlaze", ["microblaze"]), # soft core
+  Skill("MIPS", ["mips"]), # CPU architecture
+  Skill("MSP430", ["msp=430"]), # controller family
+  Skill("PowerPC", ["powerpc"]), # CPU architecture
+  Skill("Raspberry-Pi", ["raspberry", "rasp=pi", "raspberry=pi(s)"]), # platform
+  Skill("RISC", ["risc", "risc-v"]), # CPU architecture
+  Skill("SPARC", ["sparc"]), # platform
+  Skill("STM32", ["stm=32"]), # platform
+  Skill("Verilog", ["verilog", "sysverilog", "systemverilog"]), # PL
+  Skill("VHDL", ["vhdl"]), # PL
+  Skill("VLIW", ["vliw"]), # CPU architecture
+  Skill("x32", ["x32"]), # CPU architecture umbrella
+  Skill("x64", ["x64"]), # CPU architecture umbrella
+  Skill("x86", ["x86", "x86-32", "x86-64", "i286", "i386"]), # CPU architecture
+  Skill("Yosys", ["yosys"]), # https://github.com/YosysHQ/yosys
+  Skill("Z80", ["Z=80"]), # CPU brand
 
   # DESKTOP
-  # Skill(name="Electron", phrases=["electron"]), tons of FP
+  # Skill("Electron", ["electron"]), tons of FP
 
   # LANGUAGES
-  Skill(name="Ada", phrases=["ada"]),
-  Skill(name="Apex", phrases=["apex"]),
-  Skill(name="Assembly", phrases=["assembly"]),
-  Skill(name="C", phrases=["c-lang", "c"]),
-  Skill(name="C++", phrases=["c++", "cpp", "c=plus=plus"]),
-  Skill(name="C#", phrases=["c#", "csharp"]),
-  Skill(name="Clojure", phrases=["clojure", "clojurian"]),
-  Skill(name="ClojureScript", phrases=["clojure=script"]),
-  Skill(name="Cobol", phrases=["cobol"]),
-  Skill(name="Crystal", phrases=["crystal=lang", "crystal"]),
-  Skill(name="CSS", phrases=[ver1("css")]),
-  Skill(name="D", phrases=["d", "d=lang"]),
-  Skill(name="Dart", phrases=["dart"]),
-  Skill(name="Delphi", phrases=["delphi"]),
-  Skill(name="Elixir", phrases=["elixir"]),
-  Skill(name="Elm", phrases=["elm"]),
-  Skill(name="Erlang", phrases=["erlang"]),
-  Skill(name="Fortran", phrases=["fortran"]),
-  Skill(name="F#", phrases=["f#", "f=lang", "fsharp"]),
-  Skill(name="Gleam", phrases=["gleam"]),
-  Skill(name="Go", phrases=["golang", ("go", "NOUN")]),
-  Skill(name="Groovy", phrases=["groovy"]),
-  Skill(name="Haskell", phrases=["haskell"]),
-  Skill(name="HTML", phrases=[ver1("html")]),
-  Skill(name="Java", phrases=[ver1("java")]),
-  Skill(name="JavaScript", phrases=["java=script", "js"]),
-  Skill(name="Julia", phrases=["julia"]),
-  Skill(name="Kotlin", phrases=["kotlin"]),
-  Skill(name="Lisp", phrases=["lisp"]),
-  Skill(name="Lua", phrases=["lua"]),
-  Skill(name="Nim", phrases=["nim"]),
-  Skill(name="Makefile", phrases=["makefile"]),
-  Skill(name="Matlab", phrases=["matlab"]),
-  Skill(name="Mojo", phrases=["mojo"]),
-  Skill(name="Objective-C", phrases=["objective=c", "objective=c++", "objective=cpp"]),
-  Skill(name="Ocaml", phrases=["ocaml"]),
-  Skill(name="Odin", phrases=["odin"]),
-  Skill(name="Perl", phrases=["perl"]),
-  Skill(name="PHP", phrases=[ver1("php"), "phper"]),
-  Skill(name="PowerShell", phrases=["power=shell"]),
-  Skill(name="Prolog", phrases=["prolog"]),
-  Skill(name="Python", phrases=["python", "pythonist(a)"]),
-  Skill(name="R", phrases=["r=lang", "r"]),
-  Skill(name="Ruby", phrases=["ruby=lang", "ruby", "rubyist", "rubist"]),
-  Skill(name="Rust", phrases=["rust", "rustacean"]),
-  Skill(name="SASS", phrases=["sass", "scss"]),
-  Skill(name="Scala", phrases=["scala"]),
-  Skill(name="Solidity", phrases=["solidity"]),
-  Skill(name="Swift", phrases=["swift"]),
-  Skill(name="TypeScript", phrases=["type=script", "ts"]),
-  Skill(name="Shell", phrases=["shell", "bash", "zsh"]),
-  Skill(name="SQL", phrases=["sql"]),
-  # Skill(name="XML", phrases=["xml"]),
-  Skill(name="V", phrases=["v", "vlang"]),
-  Skill(name="Vyper", phrases=["vyper"]),
-  Skill(name="Visual-Basic", phrases=["visual=basic", "vb(a)", "vb.net"]),
-  Skill(name="WebAssembly", phrases=["wasm", "web=assembly"]),
-  Skill(name="Zig", phrases=["zig"]),
+  Skill("Ada", ["ada"]),
+  Skill("Apex", ["apex"]),
+  Skill("Assembly", ["assembly"]),
+  Skill("C", ["c-lang", "c"]),
+  Skill("C++", ["c++", "cpp", "c=plus=plus"]),
+  Skill("C#", ["c#", "csharp"]),
+  Skill("Clojure", ["clojure", "clojurian"]),
+  Skill("ClojureScript", ["clojure=script"]),
+  Skill("Cobol", ["cobol"]),
+  Skill("Crystal", ["crystal=lang", "crystal"]),
+  Skill("CSS", [ver1("css")]),
+  Skill("D", ["d", "d=lang"]),
+  Skill("Dart", ["dart"]),
+  Skill("Delphi", ["delphi"]),
+  Skill("Elixir", ["elixir"]),
+  Skill("Elm", ["elm"]),
+  Skill("Erlang", ["erlang"]),
+  Skill("Fortran", ["fortran"]),
+  Skill("F#", ["f#", "f=lang", "fsharp"]),
+  Skill("Gleam", ["gleam"]),
+  Skill("Go", ["golang", propn("go")]),
+  Skill("Groovy", ["groovy"]),
+  Skill("Haskell", ["haskell"]),
+  Skill("HTML", [ver1("html")]),
+  Skill("Java", [ver1("java")]),
+  Skill("JavaScript", ["java=script", "js"]),
+  Skill("Julia", ["julia"]),
+  Skill("Kotlin", ["kotlin"]),
+  Skill("Lisp", ["lisp"]),
+  Skill("Lua", ["lua"]),
+  Skill("Nim", ["nim"]),
+  Skill("Makefile", ["makefile"]),
+  Skill("Matlab", ["matlab"]),
+  Skill("Mojo", ["mojo"]),
+  Skill("Objective-C", ["objective=c", "objective=c++", "objective=cpp"]),
+  Skill("Ocaml", ["ocaml"]),
+  Skill("Odin", ["odin"]),
+  Skill("Perl", ["perl"]),
+  Skill("PHP", [ver1("php"), "phper"]),
+  Skill("PowerShell", ["power=shell"]),
+  Skill("Prolog", ["prolog"]),
+  Skill("Python", ["python", "pythonist(a)"]),
+  Skill("R", ["r=lang", "r"]),
+  Skill("Ruby", ["ruby=lang", "ruby", "rubyist", "rubist"]),
+  Skill("Rust", ["rust", "rustacean"]),
+  Skill("SASS", ["sass", "scss"]),
+  Skill("Scala", ["scala"]),
+  Skill("Solidity", ["solidity"]),
+  Skill("Swift", ["swift"]),
+  Skill("TypeScript", ["type=script", "ts"]),
+  Skill("Shell", ["shell", "bash", "zsh"]),
+  Skill("SQL", ["sql"]),
+  # Skill("XML", ["xml"]),
+  Skill("V", ["v", "vlang"]),
+  Skill("Vyper", ["vyper"]),
+  Skill("Visual-Basic", ["visual=basic", "vb(a)", "vb.net"]),
+  Skill("WebAssembly", ["wasm", "web=assembly"]),
+  Skill("Zig", ["zig"]),
 
   # UNSORTED
-  Skill(name="Blender", phrases=["blender"]),
-  Skill(name="CompTIA-A+", phrases=["comptia a+"]), # certificate for tech. support and IT ops
+  Skill("Blender", ["blender"]),
+  Skill("CompTIA-A+", ["comptia a+"]), # certificate for tech. support and IT ops
 ]
 
 # // SECURITY TOOLS

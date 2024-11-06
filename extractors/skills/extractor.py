@@ -2,54 +2,40 @@
 import re
 from spacy.pipeline import EntityRuler
 from spacy.tokens import Doc, Span
-from typing import Any, cast, Sequence
-from ..category.extractor import get_consequent, get_preceding
+from typing import Any, Callable, cast, Sequence
 from ..patterns import to_patterns2
-from ..utils import get_nlp, uniq
-from .data import SKILLS, Skill
+from ..utils import get_nlp, hash_skillname, uniq
+from .data import MaybeSkill, Pattern, SKILLS, Skill
 
 IN, LOWER, ORTH, POS = "IN", "LOWER", "ORTH", "POS"
 
+type Disambiguate = Callable[[Span], bool]
+
 class SkillExtractor:
   def __init__(self, name: str = "en_core_web_sm") -> None:
+    self.disambiguates: dict[str, Disambiguate] = {}
     self.nlp = get_nlp(name)
     self.nlp.add_pipe("index_tokens_by_sents")
-    ruler1: EntityRuler = cast(Any, self.nlp.add_pipe("entity_ruler", config={
+    skills: list[Skill] = []
+    mskills: list[Skill] = []
+    for skill in SKILLS:
+      is_mskill = isinstance(skill, MaybeSkill)
+      (skills, mskills)[int(is_mskill)].append(skill)
+    self.add_pipe_er("entity_ruler1", skills)
+    self.add_pipe_er("entity_ruler2", mskills)
+
+  def add_pipe_er(self, name: str, skills: list[Skill]) -> None:
+    ruler: EntityRuler = cast(Any, self.nlp.add_pipe("entity_ruler", config={
       "phrase_matcher_attr": "LOWER",
-    }, name="entity_ruler1"))
-    ruler2: EntityRuler = cast(Any, self.nlp.add_pipe("entity_ruler", config={
-      "phrase_matcher_attr": "LOWER",
-    }, name="entity_ruler2"))
-    def add_patterns_to(ruler: EntityRuler, skills: list[Skill]) -> None:
-      for skill in skills:
-        for item in skill.phrases:
-          if isinstance(item, str):
-            ruler.add_patterns([{
-              "label": skill.name,
-              "pattern": pattern,
-            } for pattern in to_patterns2(item)])
-          elif isinstance(item, tuple):
-            phrase, pos = item
-            poss: list[str] = []
-            match pos:
-              case "NOUN": poss = ["NOUN", "PROPN", "ADJ"]
-              case "PROPN": poss = ["PROPN"]
-              case "VERB": poss = ["VERB"]
-            ruler.add_patterns([{
-              "label": skill.name,
-              "pattern": (
-                [{ORTH: phrase, POS: {IN: poss}}]
-                if re.search(r"[A-Z]", phrase)
-                else [{LOWER: phrase, POS: {IN: poss}}]
-              )
-            }])
-          elif isinstance(item, list):
-            ruler.add_patterns([{
-              "label": skill.name,
-              "pattern": item
-            }])
-    add_patterns_to(ruler1, [skill for skill in SKILLS if not skill.name.endswith(":maybe")]) # TODO better split fn
-    add_patterns_to(ruler2, [skill for skill in SKILLS if skill.name.endswith(":maybe")])     # /
+    }, name=name))
+    for skill in skills:
+      if isinstance(skill, MaybeSkill):
+        self.disambiguates[label(skill)] = skill.disambiguate
+      for item in skill.phrases:
+        if isinstance(item, str):
+          ruler.add_patterns(from_phrase(skill, item))
+        elif isinstance(item, list):
+          ruler.add_patterns(from_pattern(skill, item))
 
   def extract_many(self, text_or_docs: Sequence[str | Doc]) -> list[list[str]]:
     docs = self.nlp.pipe(text_or_docs)
@@ -66,12 +52,25 @@ class SkillExtractor:
     return uniq(skills)
 
   def ensure_skill(self, ent: Span) -> str | None:
-    if ent.label_.endswith(":maybe"):
-      has_neighbour_skill = any(
-        token
-        for token in get_preceding(ent[0])[-2:] + get_consequent(ent[-1])[:2]
-        if not token.is_punct and token.ent_type_
-      )
-      return ent.label_.replace(":maybe", "") if has_neighbour_skill else None
-    else:
-      return ent.label_
+    if ":maybe:" in ent.label_:
+      is_skill = self.disambiguates[ent.label_](ent)
+      return re.sub(r":maybe:.+$", "", ent.label_) if is_skill else None
+    return ent.label_
+
+def from_pattern(skill: Skill, pattern: Pattern) -> Pattern:
+  return [{
+    "label": label(skill),
+    "pattern": pattern
+  }]
+
+def from_phrase(skill: Skill, phrase: str) -> Pattern:
+  return [{
+    "label": label(skill),
+    "pattern": pattern,
+  } for pattern in to_patterns2(phrase)]
+
+def label(skill: Skill) -> str:
+  if isinstance(skill, MaybeSkill):
+    return skill.name + ":maybe:" + hash_skillname(skill.name)
+  else:
+    return skill.name

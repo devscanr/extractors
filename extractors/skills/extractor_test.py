@@ -18,6 +18,14 @@ def describe_SkillExtractor() -> None:
       ]
 
   def describe_extract() -> None:
+    def it_disambiguates_set1() -> None:
+      assert extract("Kafka and Pig all the way") == ["Apache-Kafka", "Apache-Pig"]
+      assert extract("Guinea Pig loves Science.") == []
+      assert extract("Guinea Pig loves Science. Hadoop!") == ["Apache-Pig", "Apache-Hadoop"]
+      assert extract("My name is Jax") == []
+      assert extract("Jax, TensorFlow") == ["JAX", "TensorFlow"]
+      assert extract("Jax vs TensorFlow") == ["JAX", "TensorFlow"]
+
     def it_handles_set1() -> None:
       assert extract("Self-employed web engineer. #Rust #Wasm #Go #TypeScript #React #REST") == [
         "Rust", "WebAssembly", "Go", "TypeScript", "React", "REST"

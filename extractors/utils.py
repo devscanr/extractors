@@ -1,4 +1,5 @@
 from emoji import replace_emoji
+import hashlib
 from pathlib import Path
 import re
 import spacy
@@ -204,3 +205,6 @@ def component(nlp: Language, name: str) -> Callable[[Doc], Doc]:
       token._.i = token.i - token.sent.start
     return doc
   return index_tokens_by_sents
+
+def hash_skillname(text: str) -> str:
+  return hashlib.md5(text.encode()).hexdigest()[:12]
