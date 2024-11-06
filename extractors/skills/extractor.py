@@ -2,7 +2,7 @@
 import re
 from spacy.pipeline import EntityRuler
 from spacy.tokens import Doc, Span
-from typing import Sequence, cast
+from typing import Any, cast, Sequence
 from ..category.extractor import get_consequent, get_preceding
 from ..patterns import to_patterns2
 from ..utils import get_nlp, uniq
@@ -13,12 +13,13 @@ IN, LOWER, ORTH, POS = "IN", "LOWER", "ORTH", "POS"
 class SkillExtractor:
   def __init__(self, name: str = "en_core_web_sm") -> None:
     self.nlp = get_nlp(name)
-    ruler1 = cast(EntityRuler, self.nlp.add_pipe("entity_ruler", config={
+    self.nlp.add_pipe("index_tokens_by_sents")
+    ruler1: EntityRuler = cast(Any, self.nlp.add_pipe("entity_ruler", config={
       "phrase_matcher_attr": "LOWER",
-    }, name="er1"))
-    ruler2 = cast(EntityRuler, self.nlp.add_pipe("entity_ruler", config={
+    }, name="entity_ruler1"))
+    ruler2: EntityRuler = cast(Any, self.nlp.add_pipe("entity_ruler", config={
       "phrase_matcher_attr": "LOWER",
-    }, name="er2"))
+    }, name="entity_ruler2"))
     def add_patterns_to(ruler: EntityRuler, skills: list[Skill]) -> None:
       for skill in skills:
         for item in skill.phrases:
@@ -56,7 +57,7 @@ class SkillExtractor:
 
   def extract(self, text_or_doc: str | Doc) -> list[str]:
     doc = self.nlp(text_or_doc) if isinstance(text_or_doc, str) else text_or_doc
-    # pprint(list((token, token.pos_) for token in doc if not token.is_punct))
+    # pprint(list((token, token.pos_, token.dep_) for token in doc if not token.is_punct))
     # print("ents:", list(ent.label_ for ent in doc.ents))
     skills = [
       skill for ent in doc.ents

@@ -87,7 +87,7 @@ def describe_SkillExtractor() -> None:
         "Arduino", "Qt", "C", "C++", "Roblox"
       ]
       assert extract("Community-supported HTML5 CSS3 platform extension for Unreal Engine 4") == [
-        "HTML", "CSS", "Unreal"
+        "HTML", "CSS", "Unreal-Engine"
       ]
       assert extract("@jupyter | @jupyterhub | @ipython | @jupyter-incubator") == []
       assert extract("@jupyter-resources | @jupytercalpoly | @jupyter-attic") == []
@@ -103,7 +103,7 @@ def describe_SkillExtractor() -> None:
         "Unity", "Amazon-ECS", "C#", "TypeScript", "NodeJS", "Android"
       ]
       assert extract("Dev & Speaker • Microsoft MVP Azure, .NET, Blazor 🥔 Couch potato") == [
-        "Azure", ".NET", "Blazor"
+        "Microsoft", "Azure", ".NET", "Blazor"
       ]
       assert extract("far better rest I go to than I have ever known") == []
 
@@ -123,7 +123,7 @@ def describe_SkillExtractor() -> None:
 
     def it_handles_set9() -> None:
       assert extract("FULL STACK JAVA | NETBEANS | C# | MICROSOFT MANAGEMENT STUDIO | JAVASCRIPT | VISUAL CODE | JUPYTER NOTEBOOK | PYTHON & RUBY") == [
-        "Java", "C#", "JavaScript", "Jupyter", "Python", "Ruby"
+        "Java", "C#", "Microsoft", "JavaScript", "Jupyter", "Python", "Ruby"
       ]
       assert extract("Learning ReactJS & Next.js to become a proficient frontender") == [
         "React", "NextJS"
@@ -157,5 +157,18 @@ def describe_SkillExtractor() -> None:
     assert extract("ARM processors") == ["ARM"]
     assert extract("Hi, my name is Arm") == []
     assert extract("My left arm is stronger than my right arm") == []
-    assert extract("I’m doing high-performance computing work on CPU, including x86, arm.") == ["x86", "ARM"]
+    assert extract("I’m doing high-performance computing work on CPU, including x86, arm.") == ["CPU", "x86", "ARM"]
     assert extract("Embrace AI-IoT | RISC-V | ARM | ARC") == ["RISC", "ARM", "ARC"]
+
+  def it_handles_set13() -> None:
+     assert extract("My favorite language is Jax") == []
+     assert extract("My name is Jax") == []
+     assert extract("Hi, I'm Jax, an avid computer sorcerer") == []
+     assert extract("CUDA C++ , Pytorch RT, JAX(JIT,Haiku enjoyer, FLAX Flexer)") == ["CUDA", "C++", "PyTorch", "JAX", "Flax"]
+     assert extract("JAX @NVIDIA") == ["JAX"]
+     assert extract("Scientist @ JAX") == ["JAX"]
+     assert extract("I like learning | JAX | Google Brain") == ["JAX", "Google"]
+     assert extract("Software Engineer at Google DeepMind working on JAX/Flax") == ["Google", "JAX", "Flax"]
+     assert extract("Jax + Haiku fan. Self-attention for the win") == [] # known FN
+     assert extract("Julia, GraalVM, LLVM, NVidia, CNCF, Program Synthesis, 3D-QSAR") == ["Julia", "LLVM", "NVidia"]
+     assert extract("Sample for UE5's CommonConversation Feature") == ["Unreal-Engine"]
