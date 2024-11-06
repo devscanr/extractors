@@ -145,7 +145,8 @@ def add_jj_exceptions2(nlp: Language, items: list[str]) -> None:
 
 def get_nlp(name: str | Path = "en_core_web_sm") -> Language:
   nlp = spacy.load(name, exclude=["lemmatizer", "ner"])
-  nlp.add_pipe("index_tokens_by_sents", after="parser")
+  # nlp.add_pipe("index_tokens_by_sents", after="parser")
+  # ^ can't add here as we sometimes merge ENT tokens
 
   prefixes = list(nlp.Defaults.prefixes or [])
   prefixes.extend(["-", "="])

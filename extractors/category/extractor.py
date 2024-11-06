@@ -1,15 +1,15 @@
 from dataclasses import dataclass
-from typing import Literal, Sequence
-import spacy
-from spacy.matcher import Matcher, PhraseMatcher
+import re
+from spacy.pipeline import EntityRuler
 from spacy.tokens import Doc, Span, Token
+from typing import Any, cast, Literal, Sequence
 from ..patterns import to_patterns2
 from ..utils import get_nlp
 from .data import LABELED_PHRASES
 
 __all__ = ["Categorized", "CategoryExtractor", "Role"]
 
-IN, LOWER, POS = "IN", "LOWER", "POS"
+IN, LOWER, ORTH, POS = "IN", "LOWER", "ORTH", "POS"
 
 type Role = Literal["Dev", "Nondev", "Org", "Student"]
 
@@ -22,35 +22,33 @@ class Categorized:
 
 class CategoryExtractor:
   def __init__(self, name: str = "en_core_web_sm") -> None:
-    micronlp = spacy.load(name, exclude=["parser", "tagger", "lemmatizer", "ner"])
     self.nlp = get_nlp(name)
-
-    self.matcher = Matcher(self.nlp.vocab)
-    self.pmatcher = PhraseMatcher(self.nlp.vocab, attr="LOWER")
-
+    ruler: EntityRuler = cast(Any, self.nlp.add_pipe("entity_ruler", config={
+      "phrase_matcher_attr": "LOWER",
+    }, name="entity_ruler"))
+    self.nlp.add_pipe("merge_entities")
+    self.nlp.add_pipe("index_tokens_by_sents")
     for label, phrases in LABELED_PHRASES.items():
-      for phrase in phrases:
-        if isinstance(phrase, str):
-          self.pmatcher.add(label, list(micronlp.pipe(
-            to_patterns2(phrase)
-          )))
-        else:
-          phrase, pos = phrase
+      for item in phrases:
+        if isinstance(item, str):
+          ruler.add_patterns([{
+            "label": label,
+            "pattern": pattern,
+          } for pattern in to_patterns2(item)])
+        elif isinstance(item, tuple):
+          phrase, pos = item
           poss: list[str] = []
           match pos:
             case "NOUN": poss = ["NOUN", "PROPN", "ADJ"]
             case "VERB": poss = ["VERB"]
-          self.matcher.add(label, [[{LOWER: phrase, POS: {IN: poss}}]])
-
-  def ents(self, doc: Doc) -> list[tuple[str, Token]]:
-    ents: list[tuple[str, Token] | None] = list(None for _ in doc)
-    matches = self.matcher(doc)
-    pmatches = self.pmatcher(doc)
-    for match_id, start, _end in matches + pmatches:
-      if ents[start]:
-        raise ValueError(f"multi-matcher binding to {start} offset")
-      ents[start] = (doc.vocab.strings[match_id], doc[start])
-    return [ent for ent in ents if ent]
+          ruler.add_patterns([{
+            "label": label,
+            "pattern": (
+              [{ORTH: phrase, POS: {IN: poss}}]
+              if re.search(r"[A-Z]", phrase)
+              else [{LOWER: phrase, POS: {IN: poss}}]
+            )
+          }])
 
   def extract_many(self, text_or_docs: Sequence[str | Doc]) -> list[Categorized]:
     docs = self.nlp.pipe(text_or_docs)
@@ -58,28 +56,25 @@ class CategoryExtractor:
 
   def extract(self, text_or_doc: str | Doc) -> Categorized:
     doc = self.nlp(text_or_doc) if isinstance(text_or_doc, str) else text_or_doc
-    ents = self.ents(doc)
-
     role: Role | None = None
     is_freelancer = False
     is_lead = False
     is_remote = False
-
-    for label, token in ents:
+    for ent in doc.ents:
+      token = doc[ent.start] # entity spans are merged by this point
       r: Role | None
-      if role is None and (r := check_dev(label, token)):
+      if role is None and (r := check_dev(ent.label_, token)):
         role = r
-      elif role is None and (r := check_student(label, token)):
+      elif role is None and (r := check_student(ent.label_, token)):
         role = r
-      elif role is None and (r := check_org(label, token)):
+      elif role is None and (r := check_org(ent.label_, token)):
         role = r
-      elif not is_freelancer and check_freelancer(label, token):
+      elif not is_freelancer and check_freelancer(ent.label_, token):
         is_freelancer = True
-      elif not is_lead and check_lead(label, token):
+      elif not is_lead and check_lead(ent.label_, token):
         is_lead = True
-      elif not is_remote and check_remote(label, token):
+      elif not is_remote and check_remote(ent.label_, token):
         is_remote = True
-
     return Categorized(
       role = role,
       is_freelancer = is_freelancer,
@@ -101,7 +96,6 @@ def check_dev(label: str, token: Token) -> Literal["Student", "Dev", "Nondev", N
     cons_heads = get_cons_heads(token)
     sent = token.sent
     j = token._.i
-
     if any(True for word in subtree if word in FUTURE_MARKERS):
       return "Student"
     if any(True for tok in token.lefts if tok.lower_ in NEW_MARKERS):
@@ -144,7 +138,6 @@ def check_student(label: str, token: Token) -> Literal["Student", None]:
     cons_heads = get_cons_heads(token)
     sent = token.sent
     j = token._.i
-
     if any(True for word in subtree if word in PAST_MARKERS | FUTURE_MARKERS | METAPHORIC_MARKERS):
       return None
     if (
@@ -165,7 +158,6 @@ def check_org(label: str, token: Token) -> Literal["Org", None]:
       if isinstance(n, str)
     ]
     cons_heads = get_cons_heads(token)
-
     if len(cons_heads) and cons_heads[-1].lower_ in master_words:
       return None
     if root and (root == token or root.lower_ in {"is"}):
@@ -185,7 +177,6 @@ def check_freelancer(label: str, token: Token) -> Literal["Freelancer", None]:
     cons_heads = get_cons_heads(token)
     sent = token.sent
     j = token._.i
-
     if any(True for word in subtree if word in PAST_MARKERS | FUTURE_MARKERS):
       return None
     if (
@@ -211,7 +202,6 @@ def check_lead(label: str, token: Token) -> bool:
     cons_heads = get_cons_heads(token)
     sent = token.sent
     j = token._.i
-
     if any(True for word in subtree if word in PAST_MARKERS | FUTURE_MARKERS):
       return False
     if (
@@ -230,7 +220,6 @@ def check_remote(label: str, token: Token) -> bool:
     cons_heads = get_cons_heads(token)
     sent = token.sent
     j = token._.i
-
     if sent[j - 1] == "#":
       return True
     elif token.head.lower_ in REMOTE_JOB_MARKERS:

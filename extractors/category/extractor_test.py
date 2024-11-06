@@ -94,6 +94,11 @@ def describe_Categorizer() -> None:
       assert cats("I'm an engineer and an MBA graduate") == Cats("Dev")
       assert cats("I'm a MIT graduate, soon to become an engineer") == Cats("Student")
       assert cats("I'm a freelance developer") == Cats("Dev", is_freelancer=True)
+      # Testing overlaps:
+      assert cats("I'm a Dev") == Cats("Dev")
+      assert cats("I'm an Ops") == Cats("Dev")
+      assert cats("I'm an dev ops") == Cats("Dev")
+      assert cats("I'm an devops") == Cats("Dev")
 
     def it_handles_student_verbs_1() -> None:
       assert cats("I'm learning Python at the moment").role == "Student"
