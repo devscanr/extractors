@@ -4,8 +4,8 @@ from spacy.pipeline import EntityRuler
 from spacy.tokens import Doc, Span
 from typing import Any, Callable, cast, Sequence
 from ..patterns import to_patterns2
-from ..utils import get_nlp, hash_skillname, uniq
-from .data import MaybeSkill, Pattern, SKILLS, Skill
+from ..utils import get_nlp, hash_skillname, Pattern, uniq
+from .data.all import MaybeSkill, SKILLS, Skill
 
 IN, LOWER, ORTH, POS = "IN", "LOWER", "ORTH", "POS"
 

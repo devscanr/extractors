@@ -1,92 +1,12 @@
-from dataclasses import dataclass
-import re
-from spacy.tokens import Span
-from typing import Any, Callable
+from ...utils import IN, LOWER, OP, propn, ver1
+from ..utils import Skill, MaybeSkill, neighbour
+from .apache import SKILLS as APACHE_SKILLS
 
-__all__ = ["Pattern", "Skill", "SKILLS"]
-
-IN, LOWER, OP, ORTH, POS, REGEX, TEXT = "IN", "LOWER", "OP", "ORTH", "POS", "REGEX", "TEXT"
-
-type Pattern = list[dict[str, Any]]
-
-def ver1(word: str) -> Pattern:
-  return [
-    {LOWER: {REGEX: r"^" + word + r"[-\d.]{0,4}$"}}
-  ]
-
-def noun(word: str) -> Pattern:
-  poss = ["NOUN", "PROPN", "ADJ"]
-  if re.search(r"[A-Z]", word):
-    return [
-      {ORTH: word, POS: {IN: poss}}
-    ]
-  else:
-    return [
-      {LOWER: word, POS: {IN: poss}}
-    ]
-
-def propn(word: str) -> Pattern:
-  poss = ["PROPN"]
-  if re.search(r"[A-Z]", word):
-    return [
-      {ORTH: word, POS: {IN: poss}}
-    ]
-  else:
-    return [
-      {LOWER: word, POS: {IN: poss}}
-    ]
-
-def verb(word: str) -> Pattern:
-  poss = ["VERB"]
-  if re.search(r"[A-Z]", word):
-    return [
-      {ORTH: word, POS: {IN: poss}}
-    ]
-  else:
-    return [
-      {LOWER: word, POS: {IN: poss}}
-    ]
-
-@dataclass
-class Skill:
-  name: str
-  phrases: list[
-    str |                # Custom lang (produces exact matches)
-    list[dict[str, Any]] # Spacy pattern
-  ]
-  # categories: list[str] | None = field(default_factory=lambda: [])
-
-type Disambiguate = Callable[[Span], bool]
-
-def contextual(ctx_skills: set[str]) -> Disambiguate:
-  def disambiguate(ent: Span) -> bool:
-    doc = ent[0].doc
-    skill = ent[0].ent_type_
-    other_skills = [ent.label_ for ent in doc.ents if ent.label_ != skill]
-    return any(
-      True for skill in other_skills if any(
-        skill == cs or skill.startswith(cs + "-") and not ":maybe:" in skill
-        for cs in ctx_skills
-      )
-    )
-  return disambiguate
-
-def neighbour(distance: int) -> Disambiguate:
-  def disambiguate(ent: Span) -> bool:
-    doc = ent[0].doc
-    tis = [t.i for t in ent] # indexes of current Entity' tokens
-    otis = [t.i for e in doc.ents for t in e if e != ent] # indexes of other Entities' tokens
-    return any(
-      True for ti in tis
-      if any(abs(oti - ti) <= distance for oti in otis)
-    )
-  return disambiguate
-
-@dataclass
-class MaybeSkill(Skill):
-  disambiguate: Disambiguate
+__all__ = ["SKILLS"]
 
 SKILLS: list[Skill] = [
+  *APACHE_SKILLS,
+
   # ANALYSIS
   Skill("Excel", [propn("excel")]),
   Skill("Google-Sheets", ["google=sheets"]),
@@ -144,36 +64,14 @@ SKILLS: list[Skill] = [
   Skill("UIKit", ["uikit"]), # framework
 
   # BIGDATA
-  Skill("Apache-Ambari", ["apache=ambari", "ambari"]), # running app manager
-  Skill("Apache-Flume", ["apache=flume", "flume"]), # Hadoop data ingestion (streams, logs) to HDFS
-  Skill("Apache-Flink", ["apache=flink", "flink"]), # Stream processing, like Storm but higher-level API, newer tool
-  Skill("Apache-Hadoop", ["apache=hadoop", "hadoop"]),
-  Skill("Apache-HDFS", ["apache=hdfs", "hdfs"]), # Hadoop drive FS
-  Skill("Apache-HBase", ["apache=hbase", "hbase"]), # Hadoop NoSQl key-value DB
-  Skill("Apache-Hive", ["apache=hive"]), # Hadoop data warehoose with SQL querying
-  MaybeSkill("Apache-Hive", ["hive"], disambiguate=contextual({"Apache"})), # /
-  Skill("Apache-Kafka", ["apache=kafka", "kafka"]),
-  Skill("Apache-Lucene", ["apache=lucene", "lucene"]),
-  Skill("Apache-MapReduce", ["apache=mapreduce", "mapreduce"]), # Hadoop data pipilene
-  Skill("Apache-Mahout", ["apache=mahout"]), # ML, substituted by Spark
-  Skill("Apache-Oozie", ["apache=oozie", "oozie"]), # Hadoop jobs workflow scheduler (~ GitHub actions)
-  Skill("Apache-Pig", ["apache=pig"]), # Used to analyze Hadoop data (higher-level MapReduce)
-  MaybeSkill("Apache-Pig", ["pig"], disambiguate=contextual({"Apache"})), # /
-  Skill("Apache-Sqoop", ["apache=sqoop", "sqoop"]), # Hadoop data ingestion from rel. DBs to HDFS
-  Skill("Apache-Spark", ["apache=spark", "spark"]), # Replaces MapReduce, much faster (RAM, batched), also ANALYTICS
-  Skill("Apache-Storm", ["apache=storm"]), # Like Kafka but for real-time streaming
-  MaybeSkill("Apache-Storm", ["storm"], disambiguate=contextual({"Apache"})), # /
+
 
   Skill("Amazon-Redshift", ["amazon=redshift", "aws=redshift", "redshift"]),
   Skill("ELK-Stack", ["elk=stack", "elk"]),
   Skill("Google-BigQuery", ["google=bigquery"]),
   Skill("Trino", ["trino"]), # also DATA-SCIENCE, ANALYTICS (https://trino.io/ Fast distributed SQL query engine for big data analytics)
-  # Apache-Ranger, Apache-Knox -- security tools
 
   # DATABASE
-  Skill("Apache-Arrow", ["apache=arrow"]),
-  Skill("Apache-Cassandra", ["apache=cassandra", "cassandra"]),
-  Skill("Apache-DataFusion", ["apache=datafusion", "datafusion"]),
   Skill("CouchBase", ["couchbase"]),
   Skill("CouchDB", ["couch=db"]),
   Skill("DynamoDB", ["dynamo=db"]),
@@ -313,7 +211,6 @@ SKILLS: list[Skill] = [
   Skill("WordPress", ["wordpress"]),
 
   # INFRASTRUCTURE
-  Skill("Apache-Airflow", ["airflow", "apache=airflow"]), # also BIGDATA
   Skill("Amazon-ECS", ["amazon=ecs", "aws=ecs", "ecs"]),
   Skill("Ansible", ["ansible"]),
   Skill("CircleCI", ["circleci"]),
@@ -632,7 +529,6 @@ SKILLS: list[Skill] = [
 #   ".NET": {pattern: "asp.net, dotnet=core, dotnet, .net=core, .net", category: "platform", role: "Engineer"},
 #   // .NET is a general-purpose platform for Windows development
 #   // TODO ASP.NET is a framework for web service (backend) development, a part of .NET platform
-#   // "Apache": -- ambiguous
 #   "Apollo": {pattern: "apollo=js, apollo=client, apollo=server, apollo", category: "platform", role: "Engineer"},
 #   "Chef": {pattern: "chef", category: "platform", role: "Engineer"},
 #   // should we add new char like "css𝐕" or should we consume numbers after EACH term?
@@ -654,7 +550,6 @@ SKILLS: list[Skill] = [
 #   "tRPC": {pattern: "trpc", category: "tech"},
 #   "RPC": {pattern: "rpc", category: "tech"},
 #   "RxJS": {pattern: "rx.=js, RX", category: "tech", role: "Engineer"},
-#   "Spark": {pattern: "spark", category: "tech", role: "Engineer"}, // or Apache Spark?
 #   "Salt": {pattern: "salt", category: "platform", role: "Engineer"},
 #   "Vyper": {pattern: "vyper", category: "lang", role: "Engineer"},
 #   "Web3.js": {pattern: "web3.js", category: "tech"},

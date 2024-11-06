@@ -10,11 +10,13 @@ from typing import Any, Callable, Generator, cast, Iterable
 # RESOURCES
 # - https://stackoverflow.com/questions/15388831/what-are-all-possible-pos-tags-of-nltk
 
-(IN, IS_PUNCT, IS_SENT_START, LOWER, OP, ORTH, POS, TAG) = ("IN", "IS_PUNCT", "IS_SENT_START", "LOWER", "OP", "ORTH", "POS", "TAG")
+(IN, IS_PUNCT, IS_SENT_START, LOWER, OP, ORTH, POS, REGEX, TAG) = (
+  "IN", "IS_PUNCT", "IS_SENT_START", "LOWER", "OP", "ORTH", "POS", "REGEX", "TAG"
+)
 
 __all__ = [
   "normalize", "uniq", "fix_grammar",
-  "get_nlp",
+  "get_nlp", "ver1", "noun", "propn", "verb",
 ]
 
 def normalize(text: str) -> str:
@@ -208,3 +210,43 @@ def component(nlp: Language, name: str) -> Callable[[Doc], Doc]:
 
 def hash_skillname(text: str) -> str:
   return hashlib.md5(text.encode()).hexdigest()[:12]
+
+type Pattern = list[dict[str, Any]]
+
+def ver1(word: str) -> Pattern:
+  return [
+    {LOWER: {REGEX: r"^" + word + r"[-\d.]{0,4}$"}}
+  ]
+
+def noun(word: str) -> Pattern:
+  poss = ["NOUN", "PROPN", "ADJ"]
+  if re.search(r"[A-Z]", word):
+    return [
+      {ORTH: word, POS: {IN: poss}}
+    ]
+  else:
+    return [
+      {LOWER: word, POS: {IN: poss}}
+    ]
+
+def propn(word: str) -> Pattern:
+  poss = ["PROPN"]
+  if re.search(r"[A-Z]", word):
+    return [
+      {ORTH: word, POS: {IN: poss}}
+    ]
+  else:
+    return [
+      {LOWER: word, POS: {IN: poss}}
+    ]
+
+def verb(word: str) -> Pattern:
+  poss = ["VERB"]
+  if re.search(r"[A-Z]", word):
+    return [
+      {ORTH: word, POS: {IN: poss}}
+    ]
+  else:
+    return [
+      {LOWER: word, POS: {IN: poss}}
+    ]

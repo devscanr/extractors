@@ -30,6 +30,7 @@ class CategoryExtractor:
     self.nlp.add_pipe("index_tokens_by_sents")
     for label, phrases in LABELED_PHRASES.items():
       for item in phrases:
+        # TODO refactor like in skills
         if isinstance(item, str):
           ruler.add_patterns([{
             "label": label,
