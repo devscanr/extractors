@@ -1,5 +1,5 @@
 from ...utils import IN, LOWER, OP, propn, ver1
-from ..utils import Skill, MaybeSkill, neighbour
+from ..utils import Skill, MaybeSkill, contextual, neighbour
 from .amazon import SKILLS as AMAZON_SKILLS
 from .apache import SKILLS as APACHE_SKILLS
 from .google import SKILLS as GOOGLE_SKILLS
@@ -102,8 +102,9 @@ SKILLS: list[Skill] = [
   Skill("Scikit-Learn", ["scikit=learn", "sklearn"]),
   Skill("SciPy", ["scipy"]),
   Skill("Seaborn", ["seaborn"]),
-  Skill("ShowFlake", ["snowflake"]), # ~ MS Databricks
+  Skill("ShowFlake", ["snowflake"]), # ~ MS Databricks, ~ AWS Redshift
   Skill("Spacy", ["spacy"]),
+  MaybeSkill("Stan", ["stan"], disambiguate=contextual("R", "Python")),
   Skill("TensorFlow", ["tensorflow"]),
 
   # GAME
@@ -414,6 +415,7 @@ SKILLS: list[Skill] = [
   Skill("ASIC", ["asic"]), # ASICs are custom-designed circuits for specific applications, offering high performance and efficiency
   Skill("ARC", [propn("ARC")]), # CPU family
   MaybeSkill("ARC", ["arc"], disambiguate=neighbour(2)), # /
+  Skill("AutoCAD", ["autocad"]),
   Skill("AVR", ["avr"]), # controller family
   Skill("Elbrus-2000", ["elbrus=2000", "e2k"]), # CPU
   Skill("Embox", ["embox"]), # Embox is a configurable RTOS designed for resource constrained and embedded systems
@@ -422,6 +424,7 @@ SKILLS: list[Skill] = [
   Skill("FPGA", ["fpga"]), # FPGAs are reprogrammable devices that provide flexibility and rapid prototyping capabilities
   Skill("i.MX6", ["i.mx=6"]), # platform
   Skill("LabVIEW", ["labview"]),
+  Skill("KiCad", ["kicad=eda", "kicad"]),
   Skill("MicroBlaze", ["microblaze"]), # soft core
   Skill("MIPS", ["mips"]), # CPU architecture
   Skill("MSP430", ["msp=430"]), # controller family
@@ -429,6 +432,14 @@ SKILLS: list[Skill] = [
   Skill("Raspberry-Pi", ["raspberry", "rasp=pi", "raspberry=pi(s)"]), # platform
   Skill("RISC", ["risc", "risc-v"]), # CPU architecture
   Skill("SPARC", ["sparc"]), # platform
+  Skill("Altium-Designer", ["altium=designer"]), # tool
+  Skill("Altium-365", ["altium=365"]), # tool
+  Skill("Autodesk", ["autodesk"]), # company
+  Skill("Autodesk-Fusion", ["autodesk=fusion", "fusion=360"]), # tool
+  Skill("Autodesk-Eagle", ["autodesk=eagle"]), # tool
+  MaybeSkill("Autodesk-Eagle", ["eagle"], disambiguate=contextual("Autodesk", "AutoCAD")), # tool
+  Skill("Touchdesigner", ["touchdesigner"]), # visual development platform
+  Skill("Solidworks", ["solidworks=pcb", "solidworks"]), # CB design tool
   Skill("STM32", ["stm=32"]), # platform
   Skill("Verilog", ["verilog", "sysverilog", "systemverilog"]), # PL
   Skill("VHDL", ["vhdl"]), # PL
@@ -497,6 +508,7 @@ SKILLS: list[Skill] = [
   Skill("SQL", ["sql"]),
   # Skill("XML", ["xml"]),
   Skill("V", ["v", "vlang"]),
+  Skill("Vala", ["vala"]),
   Skill("Vyper", ["vyper"]),
   Skill("Visual-Basic", ["visual=basic", "vb(a)", "vb.net"]),
   Skill("WebAssembly", ["wasm", "web=assembly"]),

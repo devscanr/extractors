@@ -27,6 +27,8 @@ SKILLS: list[Skill] = [
   Skill("Apache-Spark", ["apache=spark", "spark"]), # Replaces MapReduce, much faster (RAM, batched), also ANALYTICS
   Skill("Apache-Storm", ["apache=storm"]), # Like Kafka but for real-time streaming
   MaybeSkill("Apache-Storm", ["storm"], disambiguate=ctx), # /
+  Skill("Apache-ZooKeeper", ["apache=zookeper"]), # centralized service for maintaining configuration information, naming, providing distributed synchronization, and providing group services
+  MaybeSkill("Apache-ZooKeeper", ["zookeper"], disambiguate=ctx), # /
 
   # HADOOP + SECURITY
   Skill("Apache-Ranger", ["apache=ranger"]), # used for deciding who can access what resources on a Hadoop cluster with the help of policies

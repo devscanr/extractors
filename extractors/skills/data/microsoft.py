@@ -45,8 +45,11 @@ SKILLS: list[Skill] = [
   # Azure Pipelines
 
   # DATABASE
-  Skill("Microsoft-SQL", ["microsoft=sql", "ms=sql", "sql=server"]),
+  Skill("Microsoft-SQL", ["microsoft=sql(=server)", "(ms=)sql=server", "ms=sql"]),
   # TODO T-SQL
+  Skill("Microsoft-Sharepoint", ["microsoft=sharepoint", "ms=sharepoint", "sharepoint"]),
+  Skill("Microsoft-365", ["microsoft=365"]),
+  MaybeSkill("Microsoft-365", ["365"], disambiguate=ctx),
 
   # HARDWARE
   Skill("ARM", [propn("arm")]), # CPU family
