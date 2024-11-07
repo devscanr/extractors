@@ -1,14 +1,15 @@
-from ..utils import Skill, MaybeSkill, contextual
+from ..utils import Skill, MaybeSkill, contextual, contextual_or_neighbour
 
 __all__ = ["SKILLS"]
 
 ctx = contextual("Apache")
+ctxn = contextual_or_neighbour(["Apache"], 2)
 
 SKILLS: list[Skill] = [
+  Skill("Apache", ["apache"]), # company (etc)
+
   # HADOOP
   Skill("Apache-Hadoop", ["apache=hadoop", "hadoop"]),
-
-  # VARIOUS
 	Skill("Apache-Ambari", ["apache=ambari", "ambari"]), # running app manager
 	Skill("Apache-Beam", ["apache=beam"]), # running app manager
 	MaybeSkill("Apache-Beam", ["beam"], disambiguate=ctx), # allows you to define data pipelines, but you need to run them on external execution environments (Spark being one such option)
@@ -27,13 +28,13 @@ SKILLS: list[Skill] = [
   Skill("Apache-Storm", ["apache=storm"]), # Like Kafka but for real-time streaming
   MaybeSkill("Apache-Storm", ["storm"], disambiguate=ctx), # /
 
-  # SECURITY
+  # HADOOP + SECURITY
   Skill("Apache-Ranger", ["apache=ranger"]), # used for deciding who can access what resources on a Hadoop cluster with the help of policies
   MaybeSkill("Apache-Ranger", ["ranger"], disambiguate=ctx), # /
   Skill("Apache-Knox", ["apache=knox"]), # decides whether to allow user access to Hadoop cluster or not
   MaybeSkill("Knox", ["knox"], disambiguate=ctx), # /
 
-  # DATABASE
+  # HADOOP + DATABASE
   Skill("Apache-Arrow", ["apache=arrow"]),
   MaybeSkill("Apache-Arrow", ["arrow"], disambiguate=ctx),
   Skill("Apache-Cassandra", ["apache=cassandra", "cassandra"]),
@@ -41,7 +42,7 @@ SKILLS: list[Skill] = [
   Skill("Apache-HDFS", ["apache=hdfs", "hdfs"]), # Hadoop drive FS
   Skill("Apache-HBase", ["apache=hbase", "hbase"]), # Hadoop NoSQl key-value DB
 
-  # INFRASTRUCTURE
+  # HADOOP + INFRASTRUCTURE
   Skill("Apache-Airflow", ["apache=airflow", "airflow"]), # Airflow is an open-source ETL tool for planning, generating, and tracking processes
   Skill("Apache-Oozie", ["apache=oozie", "oozie"]), # Hadoop jobs workflow scheduler (~ GitHub actions)
 ]

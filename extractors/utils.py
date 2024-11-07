@@ -218,6 +218,11 @@ def ver1(word: str) -> Pattern:
     {LOWER: {REGEX: r"^" + word + r"[-\d.]{0,4}$"}}
   ]
 
+# def patt(word: str) -> Pattern:
+#   return [
+#     {ORTH: word}
+#   ]
+
 def noun(word: str) -> Pattern:
   poss = ["NOUN", "PROPN", "ADJ"]
   if re.search(r"[A-Z]", word):

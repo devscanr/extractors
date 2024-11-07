@@ -5,7 +5,8 @@ from spacy.tokens import Doc, Span
 from typing import Any, Callable, cast, Sequence
 from ..patterns import to_patterns2
 from ..utils import get_nlp, hash_skillname, Pattern, uniq
-from .data.all import MaybeSkill, SKILLS, Skill
+from .data import SKILLS
+from .utils import MaybeSkill, Skill
 
 IN, LOWER, ORTH, POS = "IN", "LOWER", "ORTH", "POS"
 
@@ -33,6 +34,8 @@ class SkillExtractor:
         self.disambiguates[label(skill)] = skill.disambiguate
       for item in skill.phrases:
         if isinstance(item, str):
+          if re.search("[A-Z]", item):
+            raise Exception(f"{item!r} contains uppercase character(s), use pattern syntax")
           ruler.add_patterns(from_phrase(skill, item))
         elif isinstance(item, list):
           ruler.add_patterns(from_pattern(skill, item))

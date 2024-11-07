@@ -19,6 +19,13 @@ type Disambiguate = Callable[[Span], bool]
 class MaybeSkill(Skill):
   disambiguate: Disambiguate
 
+def contextual_or_neighbour(skills: list[str], distance: int) -> Disambiguate:
+  fn1 = contextual(*skills)
+  fn2 = neighbour(distance)
+  def disambiguate(ent: Span) -> bool:
+    return fn1(ent) or fn2(ent)
+  return disambiguate
+
 def contextual(*skills: str) -> Disambiguate:
   ctx_skills = set(skills)
   def disambiguate(ent: Span) -> bool:

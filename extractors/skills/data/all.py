@@ -1,30 +1,31 @@
 from ...utils import IN, LOWER, OP, propn, ver1
 from ..utils import Skill, MaybeSkill, neighbour
+from .amazon import SKILLS as AMAZON_SKILLS
 from .apache import SKILLS as APACHE_SKILLS
+from .google import SKILLS as GOOGLE_SKILLS
+from .microsoft import SKILLS as MICROSOFT_SKILLS
 
 __all__ = ["SKILLS"]
 
 SKILLS: list[Skill] = [
+  *AMAZON_SKILLS,
   *APACHE_SKILLS,
+  *GOOGLE_SKILLS,
+  *MICROSOFT_SKILLS,
 
   # ANALYSIS
   Skill("Excel", [propn("excel")]),
-  Skill("Google-Sheets", ["google=sheets"]),
   Skill("Power-BI", ["power=bi"]),
   Skill("Tableau", ["tableau"]),
 
   # CLOUD
-  Skill("Azure", ["azure"]),
-  Skill("AWS", ["aws"]),
   Skill("Cloudflare", ["cloudflare"]),
   Skill("Heroku", ["heroku"]),
-  Skill("Google-Cloud", ["google=cloud", "gcp"]),
   Skill("Netlify", ["netlify"]),
 
   # MOBILE & CROSS-PLATFORM
   # notification, ui, gui, interface, native, web
   # Bluetooth, TCP, USB
-  Skill(".NET", [".net", "dotnet", "dot.net"]),
   Skill("Android", ["android"]),
   Skill("CMake", ["cmake"]),
   Skill("Cocoa", ["cocoa"]),
@@ -52,7 +53,6 @@ SKILLS: list[Skill] = [
   Skill("Retrofit", ["retrofit"]),
   Skill("SDL", ["sdl"]),
   Skill("SFML", ["sfml"]),
-  Skill("Xamarin", ["xamarin"]),
   Skill("Xcode", ["xcode"]),
   # Titanium -- disambiguate
   Skill("VoIP", ["voip"]), # voice over IP
@@ -64,11 +64,7 @@ SKILLS: list[Skill] = [
   Skill("UIKit", ["uikit"]), # framework
 
   # BIGDATA
-
-
-  Skill("Amazon-Redshift", ["amazon=redshift", "aws=redshift", "redshift"]),
   Skill("ELK-Stack", ["elk=stack", "elk"]),
-  Skill("Google-BigQuery", ["google=bigquery"]),
   Skill("Trino", ["trino"]), # also DATA-SCIENCE, ANALYTICS (https://trino.io/ Fast distributed SQL query engine for big data analytics)
 
   # DATABASE
@@ -76,18 +72,15 @@ SKILLS: list[Skill] = [
   Skill("CouchDB", ["couch=db"]),
   Skill("DynamoDB", ["dynamo=db"]),
   Skill("Elasticsearch", ["elastic=search"]),
-  Skill("Firebase", ["firebase"]),
   Skill("MariaDB", ["maria=db"]),
   Skill("Memcached", ["memcache(d)"]),
   Skill("MongoDB", ["mongo=db", "mongo"]),
-  Skill("Microsoft-SQL", ["microsoft=sql", "ms=sql", "sql=server"]),
   Skill("MySQL", ["my=sql"]),
   Skill("Neo4j", ["neo4j", "neo4j=db"]),
   Skill("Oracle", ["oracle=db", "oracle", "plsql"]),
   Skill("PouchDB", ["pouch=db"]),
   Skill("PostgreSQL", ["postgre=sql", "postgres=sql", "postgres", "psql", "pgsql"]),
   Skill("Redis", ["redis"]),
-  Skill("S3", ["aws=s3", "amazon=s3", "s3"]),
   Skill("Supabase", ["supabase"]),
   Skill("SQLite", [ver1("sqlite")]),
 
@@ -121,15 +114,12 @@ SKILLS: list[Skill] = [
   Skill("PyGame", ["pygame"]),
   Skill("Roblox", ["roblox"]),
   Skill("Solar2D", ["solar2d"]),
-  Skill("Unity", ["unity-engine", "unity=platform", "unity=3d", "unity"]),
   Skill("Unreal-Engine", ["unreal=engine", "unreal", "ue-4", "ue-5", "ue4", "ue5"]),
   Skill("ThreeJS", ["three.=js"]),
 
   Skill("OpenGL", ["opengl"]),
 
   # WEB BACKEND
-  Skill("ASP.NET", ["asp.net", "asp"]),
-  Skill("Blazor", ["blazor"]),
   Skill("Bun", ["bun"]),
   Skill("CakePHP", ["cake=php"]),
   Skill("CherryPy", ["cherry=py"]),
@@ -183,14 +173,14 @@ SKILLS: list[Skill] = [
   Skill("HTMX", ["htmx"]),
   Skill("Meteor", ["meteor", "meteor.=js"]),
   Skill("MEAN-Stack", ["mean=stack", propn("mean")]),
-  Skill("MERN-Stack", ["mern=stack", "mern"]),
+  Skill("MERN-Stack", ["mern=stack", propn("mern")]),
   Skill("Ktor", ["ktor"]), # fullstack framework in Kotlin
   Skill("NextJS", ["next.=js", propn("next")]),
   MaybeSkill("NextJS", ["next"], disambiguate=neighbour(1)),
-  Skill("NuxtJS", ["nuxt.=js", "nuxt"]),
+  Skill("NuxtJS", ["nuxt.=js", propn("nuxt")]),
   Skill("NodeJS", ["node.=js", propn("node")]),
   Skill("OpenAPI", ["openapi"]),
-  Skill("REST", [propn("rest")]),
+  Skill("REST", ["rest=api", propn("rest")]),
   Skill("SvelteKit", ["svelte=kit"]),
   Skill("Swagger", ["swagger"]),
 
@@ -211,7 +201,6 @@ SKILLS: list[Skill] = [
   Skill("WordPress", ["wordpress"]),
 
   # INFRASTRUCTURE
-  Skill("Amazon-ECS", ["amazon=ecs", "aws=ecs", "ecs"]),
   Skill("Ansible", ["ansible"]),
   Skill("CircleCI", ["circleci"]),
   Skill("CKA", ["cka"]), # certificate
@@ -323,13 +312,10 @@ SKILLS: list[Skill] = [
 
   # BIGTECH
   Skill("Apple", ["apple"]), # company
-  Skill("Amazon", ["amazon"]), # company
   Skill("AMD", ["amd", "amd=32", "amd=64"]), # company
   Skill("eBay", ["ebay"]), # company
   Skill("Facebook", ["facebook"]), # company TODO meta
   Skill("Intel", ["intel"]), # company
-  Skill("Google", ["google"]), # company TODO alphabet
-  Skill("Microsoft", ["microsoft"]), # company
   Skill("Netflix", ["netflix"]), # company
   Skill("NVidia", ["nvidia"]), # company
   Skill("SalesForce", ["salesforce"]),
@@ -342,6 +328,9 @@ SKILLS: list[Skill] = [
   Skill("GUI", ["gui"]),
   Skill("UI", ["ui", "user=interface"]),
   Skill("API", ["api"]),
+  Skill("IaaS", ["iaas"]),
+  Skill("PaaS", ["paas"]),
+  Skill("SaaS", ["saas"]),
   # Skill("Client", ["client"]),
   # Skill("Server", ["server"]),
   # Skill("REPL", ["repl"]),
@@ -372,10 +361,10 @@ SKILLS: list[Skill] = [
   Skill("Compiler", ["compiler"]),
   Skill("Singleplayer", ["single=player"]),
   Skill("Multiplayer", ["multi=player"]),
-  Skill("Entity-Component-System", ["entity=component=system", "ecs"]),
+  # Skill("Entity-Component-System", ["entity=component=system", "ecs"]), -- conflicts with AWS-ECS
   Skill("Cron", ["cron", "crond", "cronjob"]),
   Skill("IP", ["ip"]),
-  Skill("TCP", ["TCP"]),
+  Skill("TCP", ["tcp"]),
   Skill("HTTP", ["http"]),
   Skill("HTTPS", ["https"]),
   Skill("SSL", ["ssl"]),
@@ -396,6 +385,7 @@ SKILLS: list[Skill] = [
   # Skill("Performance", ["performance"]),
   # Skill("Scalability", ["scalability"]),
   # Skill("Reliability", ["reliability"]),
+  # Skill("Resiliency", ["resiliency"]),
   # Skill("Database", ["database", "db"]),
   # Skill("Deploy", ["deploy"]),
   # Skill("Architecture", ["architecture"]),
@@ -419,14 +409,10 @@ SKILLS: list[Skill] = [
 
   # HARDWARE & EMBEDDED
   # Skill("HPC", ["hpc"]), # high performance computing
-  Skill("Aarch32", ["aarch32", "arm32"]), # CPU architecture
-  Skill("Aarch64", ["aarch64", "arm64"]), # CPU architecture
   Skill("Arduino", ["arduino"]), # controller brand
   Skill("ASIC", ["asic"]), # ASICs are custom-designed circuits for specific applications, offering high performance and efficiency
   Skill("ARC", [propn("ARC")]), # CPU family
   MaybeSkill("ARC", ["arc"], disambiguate=neighbour(2)), # /
-  Skill("ARM", [propn("ARM")]), # CPU family
-  MaybeSkill("ARM", ["arm"], disambiguate=neighbour(2)), # /
   Skill("AVR", ["avr"]), # controller family
   Skill("Elbrus-2000", ["elbrus=2000", "e2k"]), # CPU
   Skill("Embox", ["embox"]), # Embox is a configurable RTOS designed for resource constrained and embedded systems
@@ -450,7 +436,7 @@ SKILLS: list[Skill] = [
   Skill("x64", ["x64"]), # CPU architecture umbrella
   Skill("x86", ["x86", "x86-32", "x86-64", "i286", "i386"]), # CPU architecture
   Skill("Yosys", ["yosys"]), # https://github.com/YosysHQ/yosys
-  Skill("Z80", ["Z=80"]), # CPU brand
+  Skill("Z80", ["z=80"]), # CPU brand
 
   # DESKTOP
   # Skill("Electron", ["electron"]), tons of FP
@@ -652,9 +638,6 @@ SKILLS: list[Skill] = [
 #   // Crypto vs Blockchain?!?!
 #   // Containers?
 #   // should nopCommerce -> eCommerce? But then NodeJS -> js, are there INVALID precedents like that?
-#   // Cloud vs Web, Cloud-Native
-#   //
-#   // "Web" is found in "Amazon Web Services": skills vs topics
 #
 #   /*
 #   UI/UX specific words

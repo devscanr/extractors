@@ -45,6 +45,7 @@ exclude = [
 [tool.ruff.lint]
 select = ["F", "B", "UP", "RUF"]
 ignore = ["E701", "E711", "E712", "E731", "E741", "RUF001", "RUF003"]
+per-file-ignores = {"__init__.py" = ["F403"]}
 
 [tool.pytest.ini_options]
 addopts = "--ignore=ignore"

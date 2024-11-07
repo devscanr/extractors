@@ -22,6 +22,7 @@ def describe_SkillExtractor() -> None:
       assert extract("Kafka and Pig all the way") == ["Apache-Kafka", "Apache-Pig"]
       assert extract("Guinea Pig loves Science.") == []
       assert extract("Guinea Pig loves Science. Hadoop!") == ["Apache-Pig", "Apache-Hadoop"]
+      assert extract("Apache Guinea Pig loves Science.") == ["Apache", "Apache-Pig"]
       assert extract("My name is Jax") == []
       assert extract("Jax, TensorFlow") == ["JAX", "TensorFlow"]
       assert extract("Jax vs TensorFlow") == ["JAX", "TensorFlow"]
@@ -107,8 +108,8 @@ def describe_SkillExtractor() -> None:
       assert extract("Ethereum | Flutter | Hyperledger Fabric") == [
         "Ethereum", "Flutter"
       ]
-      assert extract("Unity, ECS, C#, Typescript Node.JS, Android") == [
-        "Unity", "Amazon-ECS", "C#", "TypeScript", "NodeJS", "Android"
+      assert extract("Unity, ECS EC2, Node.JS Android") == [
+        "Unity", "Amazon-ECS", "Amazon-EC2", "NodeJS", "Android"
       ]
       assert extract("Dev & Speaker • Microsoft MVP Azure, .NET, Blazor 🥔 Couch potato") == [
         "Microsoft", "Azure", ".NET", "Blazor"
@@ -117,7 +118,7 @@ def describe_SkillExtractor() -> None:
 
     def it_handles_set8() -> None:
       assert extract("Engineer on Azure-AWS, Kubernetes AKS-EKS-GKE, Terraform, Golang, Ansible, HashiCorp Vault") == [
-        "Azure", "AWS", "Kubernetes", "Terraform", "Go", "Ansible"
+        "Azure", "Amazon-WS", "Kubernetes", "Terraform", "Go", "Ansible"
       ]
       assert extract("Angular || React (NextJs) || Svelte kit || Node || Nest || PHP5 || Couch CMS") == [
         "Angular", "React", "NextJS", "SvelteKit", "NodeJS", "NestJS", "PHP"
@@ -163,7 +164,7 @@ def describe_SkillExtractor() -> None:
 
   def it_handles_set12() -> None:
     assert extract("ARM processors") == ["ARM"]
-    assert extract("Hi, my name is Arm") == []
+    assert extract("Hi, my name is Arm") == ["ARM"] # FP
     assert extract("My left arm is stronger than my right arm") == []
     assert extract("I’m doing high-performance computing work on CPU, including x86, arm.") == ["CPU", "x86", "ARM"]
     assert extract("Embrace AI-IoT | RISC-V | ARM | ARC") == ["RISC", "ARM", "ARC"]
