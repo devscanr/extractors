@@ -44,10 +44,17 @@ def contextual(*skills: str) -> Disambiguate:
   return disambiguate
 
 def neighbour(distance: int) -> Disambiguate:
+  # TODO next word as "Developer", "Dev", "Engineer" (maybe all DEV & STUDENT roles)
+  # should also disambiguate the skill
   def disambiguate(ent: Span) -> bool:
     doc = ent[0].doc
-    tis = [t.i for t in ent] # indexes of current Entity' tokens
-    otis = [t.i for e in doc.ents for t in e if e != ent] # indexes of other Entities' tokens
+    tis = [
+      t.i for t in ent
+    ] # indexes of current Entity' tokens
+    otis = [
+      t.i for e in doc.ents for t in e
+      if e != ent and (":maybe:" not in e.label_)
+    ] # indexes of other (non-maybe) Entity tokens
     return any(
       True for ti in tis
       if any(abs(oti - ti) <= distance for oti in otis)

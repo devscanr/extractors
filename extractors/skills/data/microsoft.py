@@ -1,4 +1,4 @@
-from ...utils import ver1, propn
+from ...utils import ver1, propn, noun
 from ..utils import Skill, contextual, neighbour, contextual_or_neighbour
 
 __all__ = ["SKILLS"]
@@ -52,7 +52,7 @@ SKILLS: list[Skill] = [
   Skill("Microsoft-365", ["365"], "", disambiguate=ctx), # /
 
   # HARDWARE
-  Skill("ARM", [propn("arm")], ""), # CPU family
+  Skill("ARM", [propn("arm"), noun("ARM")], ""), # CPU family
   Skill("ARM", ["arm"], "", disambiguate=neighbour(2)), # /
   Skill("ARM32", ["aarch32", "arm32"], ""), # CPU
   Skill("ARM64", ["aarch64", "arm64"], ""), # CPU

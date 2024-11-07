@@ -25,7 +25,7 @@ SKILLS: list[Skill] = [
   Skill("Amazon-Glue", ["(amazon=)aws=glue", "amazon=glue"], ""), # batch data ingestion, data pipeline orchestration
   Skill("Amazon-Glue", ["glue"], "", disambiguate=ctx),           # /
   Skill("Amazon-IAM", ["(amazon=)aws=iam", "amazon=iam"], ""), # identity and access management
-  Skill("Amazon-IAM", ["iam"], "", disambiguate=ctx),           # /
+  Skill("Amazon-IAM", ["iam"], "", disambiguate=ctx),          # /
   Skill("Amazon-Lambda", ["(amazon=)aws=lambda", "amazon=lambda"], ""), # lambda
   Skill("Amazon-Lambda", ["lambda"], "", disambiguate=ctx),             # /
   Skill("Amazon-Kinesis", ["(amazon=)aws=kinesis", "amazon=kinesis", "kinesis"], ""), # streaming data ingestion & analytics

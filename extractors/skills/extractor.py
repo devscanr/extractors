@@ -14,6 +14,7 @@ type Disambiguate = Callable[[Span], bool]
 
 class SkillExtractor:
   def __init__(self, name: str = "en_core_web_sm") -> None:
+    self.stacks: dict[str, list[str]] = {}
     self.disambiguates: dict[str, Disambiguate] = {}
     self.nlp = get_nlp(name)
     self.nlp.add_pipe("index_tokens_by_sents")
@@ -30,12 +31,16 @@ class SkillExtractor:
       "phrase_matcher_attr": "LOWER",
     }, name=name))
     for skill in skills:
+      if skill.stack:
+        assert skill.name not in self.disambiguates, f"{skill.name!r} issue: multiple `stack` rules are not supported yet"
+        self.stacks[skill.name] = skill.stack
       if skill.disambiguate:
-        self.disambiguates[label(skill)] = skill.disambiguate
+        l = label(skill)
+        assert l not in self.disambiguates, f"{skill.name!r} issue: multiple `disambiguate` rules are not supported yet"
+        self.disambiguates[l] = skill.disambiguate
       for item in skill.phrases:
         if isinstance(item, str):
-          if re.search("[A-Z]", item):
-            raise Exception(f"{item!r} contains uppercase character(s), use pattern syntax")
+          assert not re.search("[A-Z]", item), f"{item!r} contains uppercase character(s), use pattern syntax"
           ruler.add_patterns(from_phrase(skill, item))
         elif isinstance(item, list):
           ruler.add_patterns(from_pattern(skill, item))
@@ -49,16 +54,26 @@ class SkillExtractor:
     # pprint(list((token, token.pos_, token.dep_) for token in doc if not token.is_punct))
     # print("ents:", list(ent.label_ for ent in doc.ents))
     skills = [
-      skill for ent in doc.ents
-      if (skill := self.ensure_skill(ent))
+      skill
+      for ent in doc.ents
+      for skill in self.get_skill(ent)
     ]
     return uniq(skills)
 
-  def ensure_skill(self, ent: Span) -> str | None:
+  def get_skill(self, ent: Span) -> list[str]:
     if ":maybe:" in ent.label_:
-      is_skill = self.disambiguates[ent.label_](ent)
-      return re.sub(r":maybe:.+$", "", ent.label_) if is_skill else None
-    return ent.label_
+      if self.disambiguates[ent.label_](ent):
+        l = clean(ent.label_)
+        if l in self.stacks:
+          return self.stacks[l]
+        else:
+          return [l]
+      else:
+        return []
+    if ent.label_ in self.stacks:
+      return self.stacks[ent.label_]
+    else:
+      return [ent.label_]
 
 def from_pattern(skill: Skill, pattern: Pattern) -> Pattern:
   return [{
@@ -77,3 +92,6 @@ def label(skill: Skill) -> str:
     return skill.name + ":maybe:" + hash_skillname(skill.name)
   else:
     return skill.name
+
+def clean(label: str) -> str:
+  return re.sub(r":maybe:.+$", "", label)

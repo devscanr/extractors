@@ -1,4 +1,4 @@
-from ...utils import IN, LOWER, OP, propn, ver1
+from ...utils import IN, LOWER, OP, propn, noun, ver1
 from ..utils import Skill, contextual, neighbour
 from .amazon import SKILLS as AMAZON_SKILLS
 from .apache import SKILLS as APACHE_SKILLS
@@ -173,7 +173,7 @@ SKILLS: list[Skill] = [
 
   # WEB FULLSTACK
   Skill("MEAN-Stack", ["mean=stack", propn("mean")], "", stack=["MongoDB", "Express", "Angular", "NodeJS"]),
-  Skill("MERN-Stack", ["mern=stack", propn("mern")], "", stack=["MongoDB", "Express", "React", "NodeJS"]),
+  Skill("MERN-Stack", ["mern=stack", "mern"], "", stack=["MongoDB", "Express", "React", "NodeJS"]),
   Skill("MEVN-Stack", ["mevn=stack", "mevn"], "", stack=["MongoDB", "Express", "VueJS", "NodeJS"]),
   Skill("PERN-Stack", ["pern=stack", "pern"], "", stack=["PostgreSQL", "Express", "React", "NodeJS"]),
 
@@ -187,7 +187,10 @@ SKILLS: list[Skill] = [
   Skill("NuxtJS", ["nuxt.=js", propn("nuxt")], ""),
   Skill("NodeJS", ["node.=js", propn("node")], ""),
   Skill("OpenAPI", ["openapi"], ""),
-  Skill("REST", ["rest=api", propn("rest")], ""),
+  Skill("REST", ["rest=api", propn("rest"), noun("REST")], ""),
+  Skill("REST", ["rest"], "", disambiguate=neighbour(2)),
+  Skill("RPC", ["rpc=api", "rpc"], ""),
+  Skill("tRPC", ["trpc"], ""),
   Skill("SvelteKit", ["svelte=kit"], ""),
   Skill("Swagger", ["swagger"], ""),
 
@@ -539,31 +542,17 @@ SKILLS: list[Skill] = [
 #   // Most skills have versions BUT topics don't @_@
 #   // So it can be a per-table configuration
 #   "ETL": {pattern: "etl", category: "topic", role: "Engineer"},
-#   "FTP": {pattern: "s?ftp", category: "tech"},
-#   "HTTP": {pattern: "http", category: "tech"},
 #   "Native Android": {pattern: "native=android", category: "platform", role: "Engineer"},
 #   "Native iOS": {pattern: "native-ios", category: "platform", role: "Engineer"},
-#   "NetBeans": {pattern: "netbeans", category: "tech"},
 #   "Octave": {pattern: "octave", category: "lang"},
-#   "OpenCV": {pattern: "opencv", category: "tech"},
 #   // "Polygon": {pattern: "polygon", category: "tech", role: "Engineer"},
 #   "Prisma": {pattern: "prisma", category: "tech", role: "Engineer"},
 #   "OpenAPI": {pattern: "open=api", category: "tech"},
 #   "OpenAuth": {pattern: "open=auth2?, oauth2?", category: "tech"},
-#   "REST": {pattern: "rest=api, !REST", category: "tech"},
-#   "tRPC": {pattern: "trpc", category: "tech"},
-#   "RPC": {pattern: "rpc", category: "tech"},
 #   "RxJS": {pattern: "rx.=js, RX", category: "tech", role: "Engineer"},
 #   "Salt": {pattern: "salt", category: "platform", role: "Engineer"},
 #   "Vyper": {pattern: "vyper", category: "lang", role: "Engineer"},
 #   "Web3.js": {pattern: "web3.js", category: "tech"},
-#
-#   "Windows": {pattern: "windows", category: "platform", role: "Engineer"},
-#   "macOS": {pattern: "mac=os", category: "platform", role: "Engineer"},
-#   "Linux": {pattern: "linux, ubuntu", category: "platform", role: "Engineer"},
-#   "Unix": {pattern: "unix", category: "platform", role: "Engineer"},
-#   "iOS": {pattern: "ios", category: "platform", role: "Engineer"},
-#   "Android": {pattern: "android", category: "platform", role: "Engineer"},
 #
 #   // TOPICS ----------------------------------------------------------------------------------------
 #   "Application": {pattern: "application", category: "topic"},

@@ -79,8 +79,11 @@ def describe_SkillExtractor() -> None:
       assert extract("Software Engineer, Tech Lead in Rust, WASM, TypeScript") == [
         "Rust", "WebAssembly", "TypeScript",
       ]
-      assert extract("React | Node JS | REST | MEAN Stack developer") == [
-        "React", "NodeJS", "REST", "MEAN-Stack"
+      assert extract("React | Node JS | REST") == [
+        "React", "NodeJS", "REST",
+      ]
+      assert extract("REST | MEAN Stack developer") == [
+        "REST", "MongoDB", "Express", "Angular", "NodeJS"
       ]
       assert extract("Senior Backend Developer (.NET) at Dow Jones") == [
         ".NET",
@@ -168,6 +171,7 @@ def describe_SkillExtractor() -> None:
     assert extract("My left arm is stronger than my right arm") == []
     assert extract("I’m doing high-performance computing work on CPU, including x86, arm.") == ["CPU", "x86", "ARM"]
     assert extract("Embrace AI-IoT | RISC-V | ARM | ARC") == ["RISC", "ARM", "ARC"]
+    assert extract("PERN afficianado") == ["PostgreSQL", "Express", "React", "NodeJS"]
 
   def it_handles_set13() -> None:
      assert extract("My favorite language is Jax") == []
