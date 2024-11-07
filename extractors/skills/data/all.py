@@ -77,7 +77,7 @@ SKILLS: list[Skill] = [
   Skill("MongoDB", ["mongo=db", "mongo"]),
   Skill("MySQL", ["my=sql"]),
   Skill("Neo4j", ["neo4j", "neo4j=db"]),
-  Skill("Oracle", ["oracle=db", "oracle", "plsql"]),
+  Skill("Oracle", ["oracle=db", "oracle", "pl(/)sql"]), # Oracle Database or Oracle RDBMS TODO split DB and COMPANY
   Skill("PouchDB", ["pouch=db"]),
   Skill("PostgreSQL", ["postgre=sql", "postgres=sql", "postgres", "psql", "pgsql"]),
   Skill("Redis", ["redis"]),
@@ -102,6 +102,7 @@ SKILLS: list[Skill] = [
   Skill("Scikit-Learn", ["scikit=learn", "sklearn"]),
   Skill("SciPy", ["scipy"]),
   Skill("Seaborn", ["seaborn"]),
+  Skill("ShowFlake", ["snowflake"]), # ~ MS Databricks
   Skill("Spacy", ["spacy"]),
   Skill("TensorFlow", ["tensorflow"]),
 
