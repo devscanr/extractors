@@ -1,23 +1,26 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from spacy.tokens import Span
-from typing import Any, Callable
+from typing import Callable
+from ..utils import Pattern
 
-__all__ = ["Skill", "Disambiguate", "MaybeSkill", "contextual", "neighbour"]
+__all__ = ["Skill", "Disambiguate", "contextual", "neighbour"]
+
+type Disambiguate = Callable[[Span], bool]
 
 @dataclass
 class Skill:
   name: str
   phrases: list[
-    str |                # Custom lang (produces exact matches)
-    list[dict[str, Any]] # Spacy pattern
+    str |   # Custom pattern (exact matches)
+    Pattern # Spacy pattern
   ]
-  # categories: list[str] | None = field(default_factory=lambda: [])
+  descr: str
+  stack: list[str] = field(default_factory=lambda: [])
+  # categories: list[str] = field(default_factory=lambda: [])
+  disambiguate: Disambiguate | None = None
 
-type Disambiguate = Callable[[Span], bool]
-
-@dataclass
-class MaybeSkill(Skill):
-  disambiguate: Disambiguate
+# @dataclass
+# class MaybeSkill(Skill):
 
 def contextual_or_neighbour(skills: list[str], distance: int) -> Disambiguate:
   fn1 = contextual(*skills)

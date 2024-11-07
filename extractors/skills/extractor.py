@@ -6,7 +6,7 @@ from typing import Any, Callable, cast, Sequence
 from ..patterns import to_patterns2
 from ..utils import get_nlp, hash_skillname, Pattern, uniq
 from .data import SKILLS
-from .utils import MaybeSkill, Skill
+from .utils import Skill
 
 IN, LOWER, ORTH, POS = "IN", "LOWER", "ORTH", "POS"
 
@@ -20,7 +20,7 @@ class SkillExtractor:
     skills: list[Skill] = []
     mskills: list[Skill] = []
     for skill in SKILLS:
-      is_mskill = isinstance(skill, MaybeSkill)
+      is_mskill = skill.disambiguate is not None
       (skills, mskills)[int(is_mskill)].append(skill)
     self.add_pipe_er("entity_ruler1", skills)
     self.add_pipe_er("entity_ruler2", mskills)
@@ -30,7 +30,7 @@ class SkillExtractor:
       "phrase_matcher_attr": "LOWER",
     }, name=name))
     for skill in skills:
-      if isinstance(skill, MaybeSkill):
+      if skill.disambiguate:
         self.disambiguates[label(skill)] = skill.disambiguate
       for item in skill.phrases:
         if isinstance(item, str):
@@ -73,7 +73,7 @@ def from_phrase(skill: Skill, phrase: str) -> Pattern:
   } for pattern in to_patterns2(phrase)]
 
 def label(skill: Skill) -> str:
-  if isinstance(skill, MaybeSkill):
+  if skill.disambiguate:
     return skill.name + ":maybe:" + hash_skillname(skill.name)
   else:
     return skill.name

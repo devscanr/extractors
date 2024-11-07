@@ -47,7 +47,7 @@ def describe_SkillExtractor() -> None:
         "JavaScript"
       ]
       assert extract("Flutter, Node.js, Angular, React.js, PHP, Apollo Data Graph, OpenAPI, More...") == [
-        "Flutter", "NodeJS", "Angular", "React", "PHP", "OpenAPI"
+        "Flutter", "NodeJS", "Angular", "React", "PHP", "Apollo", "OpenAPI"
       ]
       assert extract("With no desire，at rest and still. All things go right as of their will") == []
 

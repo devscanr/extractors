@@ -7,14 +7,14 @@ ctx = contextual("Google")
 ctxn = contextual_or_neighbour(["Google"], 2)
 
 SKILLS: list[Skill] = [
-  Skill("Google", ["google"]), # company (etc)
+  Skill("Google", ["google"], ""), # company (etc)
 
   # CLOUD
-  Skill("Google-BigQuery", ["google=bigquery"]), # EE data warehouse
-  Skill("Google-Cloud", ["google=cloud", "gcp", "gcs"]),
-  Skill("Firebase", ["google=firebase", "firebase"]),
-  Skill("Google-Sheets", ["google=sheets"]),
-  Skill("Google-BigTable", ["google=bigtable"]), # fast flexible noSQL
+  Skill("Google-BigQuery", ["google=bigquery"], ""), # EE data warehouse
+  Skill("Google-Cloud", ["google=cloud", "gcp", "gcs"], ""),
+  Skill("Firebase", ["google=firebase", "firebase"], ""),
+  Skill("Google-Sheets", ["google=sheets"], ""),
+  Skill("Google-BigTable", ["google=bigtable"], ""), # fast flexible noSQL
 
   # Drive
   # GC Functions
