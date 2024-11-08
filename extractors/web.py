@@ -1,8 +1,11 @@
-from bs4 import BeautifulSoup, Comment, NavigableString, Tag
+from bs4 import BeautifulSoup, Comment, NavigableString, ParserRejectedMarkup, Tag
 from markdown import markdown
 import re
 
-__all__ = ["html2text", "markdown2text"]
+__all__ = [
+  "html2text", "html2text_",
+  "markdown2text", "markdown2text_",
+]
 
 def html2text(html: str) -> str:
   soup = BeautifulSoup(html, features="html.parser")
@@ -36,11 +39,23 @@ def html2text(html: str) -> str:
 
   return "\n\n".join(text for text in texts)
 
+def html2text_(html: str) -> str:
+  try:
+    return html2text(html)
+  except ParserRejectedMarkup:
+    return ""
+
 def markdown2text(md: str) -> str:
   if not md:
     return ""
   html = markdown(md, extensions=["fenced_code"])
   return html2text(html)
+
+def markdown2text_(html: str) -> str:
+  try:
+    return markdown2text(html)
+  except ParserRejectedMarkup:
+    return ""
 
 def is_whitelist_url(href: str) -> bool:
   return re.search(WHITE_DOMAINS_REGEX, href) is not None
