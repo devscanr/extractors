@@ -1,9 +1,10 @@
-from ...utils import IN, LOWER, OP, propn, noun, ver1
-from ..utils import Skill, contextual, neighbour
+from ...utils import IN, LOWER, OP, propn, ver1
+from ..utils import Skill, contextual, neighbour, singleletter
 from .amazon import SKILLS as AMAZON_SKILLS
 from .apache import SKILLS as APACHE_SKILLS
 from .google import SKILLS as GOOGLE_SKILLS
 from .microsoft import SKILLS as MICROSOFT_SKILLS
+from .competences import SKILLS as COMPETENCE_SKILLS
 
 __all__ = ["SKILLS"]
 
@@ -12,6 +13,7 @@ SKILLS: list[Skill] = [
   *APACHE_SKILLS,
   *GOOGLE_SKILLS,
   *MICROSOFT_SKILLS,
+  *COMPETENCE_SKILLS,
 
   # ANALYSIS
   Skill("Excel", [propn("excel")], ""),
@@ -34,6 +36,7 @@ SKILLS: list[Skill] = [
   Skill("Flutter", ["flutter"], ""),
   Skill("GTK", ["gtk", "gtk+"], ""),
   Skill("Ionic", ["ionic"], ""),
+  Skill("Capacitor", ["capacitor"], ""),
   Skill("Jetpack-Compose", ["jetpack=compose", "android=compose"], ""), # just Jetpack is ambiguous
   Skill("iOS", ["ios"], ""), # also SYSTEM
   Skill("iPadOS", ["ipados"], ""), # also SYSTEM
@@ -106,6 +109,7 @@ SKILLS: list[Skill] = [
   Skill("Spacy", ["spacy"], ""),
   Skill("Stan", ["stan"], "", disambiguate=contextual("R", "Python")),
   Skill("TensorFlow", ["tensorflow"], ""),
+  Skill("TensorRT", ["tensorrt"], ""),
 
   # GAME
   Skill("BabylonJS", ["babylon.=js"], "Game and rendering engine packed into a JavaScript framework."),
@@ -117,7 +121,7 @@ SKILLS: list[Skill] = [
   Skill("PyGame", ["pygame"], ""),
   Skill("Roblox", ["roblox"], ""),
   Skill("Solar2D", ["solar2d"], ""),
-  Skill("Unreal-Engine", ["unreal=engine", "unreal", "ue-4", "ue-5", "ue4", "ue5"], ""),
+  Skill("Unreal-Engine", ["unreal=engine", "unreal=script", "unreal", "ue-4", "ue-5", "ue4", "ue5"], ""),
   Skill("ThreeJS", ["three.=js"], ""),
 
   Skill("OpenGL", ["opengl"], ""),
@@ -133,6 +137,7 @@ SKILLS: list[Skill] = [
   Skill("FastAPI", ["fast=api"], ""),
   Skill("Fastify", ["fastify"], ""),
   Skill("Flask", ["flask"], ""),
+  Skill("JVM", ["jvm"], "Java Virtual Machine enables a computer to run Java (Kotlin, etc.) programs."),
   Skill("Hasura", ["hasura"], ""),
   Skill("Koa", ["koa"], ""),
   Skill("Laravel", ["laravel"], ""),
@@ -146,36 +151,46 @@ SKILLS: list[Skill] = [
   Skill("Symfony", ["symfony"], ""),
   Skill("Yii", ["yii"], ""),
 
+  # Skill("ActiveMQ", ["active=mq"], ""), -- Apache
+  Skill("Micronaut", ["micronaut"], ""),
+  Skill("RabbitMQ", ["rabbit=mq"], ""),
+  Skill("Vert-X", ["vert.=x"], ""),
+
   # WEB FRONTEND
   Skill("Angular", ["angular.=js", "angular"], "Web framework for SPA, mobile, PWA development with focus on modularity."),
   Skill("Astro", ["astro.=js", "astro"], "Web framework for content-driven websites. Server-first."),
   Skill("Bootstrap", ["bootstrap"], ""),
   Skill("Chakra-UI", ["chakra=ui", "chakra"], ""),
-  Skill("Chrome", ["chrome"], ""),
   Skill("D3JS", ["d3.=js", "d3"], ""),
   Skill("EmberJS", ["ember.=js", "ember"], ""),
   Skill("Figma", ["figma"], ""),
-  Skill("Firefox", ["firefox"], ""),
   Skill("jQuery", ["jquery"], ""),
   Skill("Material-UI", ["material=ui", "mui", propn("material")], ""),
   Skill("Materialize", ["materialize"], ""),
   Skill("Photoshop", ["photoshop"], ""),
   Skill("React", ["react.=js", "react"], ""),
-  Skill("Safari", ["safari"], ""),
+  Skill("Redux", ["redux.=js", "redux"], ""),
   Skill("SolidJS", ["solid.=js", propn("solid")], ""),
   Skill("Svelte", ["svelte.=js", "svelte"], ""),
   Skill("Tailwind-CSS", ["tailwind.=css", "tailwind"], ""),
-  Skill("Vite", ["vite"], ""),
   Skill("VueJS", ["vue.=js", "vue"], ""),
-  Skill("Webpack", ["webpack"], ""),
-  Skill("WebKit", ["webkit"], ""), # browser engine
+  Skill("VueX", ["vuex"], "State management pattern + library for VueJS applications."),
   # TODO edge, ambiguous
 
   # WEB FULLSTACK
+  Skill("Gulp", ["gulp"], ""),
+  Skill("Vite", ["vite"], ""),
+  Skill("Webpack", ["webpack"], ""),
+
   Skill("MEAN-Stack", ["mean=stack", propn("mean")], "", stack=["MongoDB", "Express", "Angular", "NodeJS"]),
   Skill("MERN-Stack", ["mern=stack", "mern"], "", stack=["MongoDB", "Express", "React", "NodeJS"]),
   Skill("MEVN-Stack", ["mevn=stack", "mevn"], "", stack=["MongoDB", "Express", "VueJS", "NodeJS"]),
   Skill("PERN-Stack", ["pern=stack", "pern"], "", stack=["PostgreSQL", "Express", "React", "NodeJS"]),
+
+  Skill("Chrome", ["chrome"], ""),
+  Skill("Firefox", ["firefox"], ""),
+  Skill("Safari", ["safari"], ""),
+  Skill("WebKit", ["webkit"], ""), # browser engine
 
   Skill("Apollo", ["apollo.=js", "apollo=client", "apollo=server", "apollo"], "GraphQL-centric fullstack tools for web and mobile."),
   Skill("GraphQL", ["graphql"], ""),
@@ -187,10 +202,6 @@ SKILLS: list[Skill] = [
   Skill("NuxtJS", ["nuxt.=js", propn("nuxt")], ""),
   Skill("NodeJS", ["node.=js", propn("node")], ""),
   Skill("OpenAPI", ["openapi"], ""),
-  Skill("REST", ["rest=api", propn("rest"), noun("REST")], ""),
-  Skill("REST", ["rest"], "", disambiguate=neighbour(2)),
-  Skill("RPC", ["rpc=api", "rpc"], ""),
-  Skill("tRPC", ["trpc"], ""),
   Skill("SvelteKit", ["svelte=kit"], ""),
   Skill("Swagger", ["swagger"], ""),
 
@@ -198,7 +209,9 @@ SKILLS: list[Skill] = [
   Skill("Airtable", ["airtable"], ""),
   Skill("Bitrix", ["bitrix", "bitrix24"], ""),
   Skill("Drupal", ["drupal"], ""),
+  Skill("Gatsby", ["gatsby"], ""),
   Skill("Hygraph", ["hygraph", "graph=cms"], ""),
+  Skill("Jekyll", ["jekyll"], ""),
   Skill("Joomla", ["joomla"], ""),
   Skill("Magento", ["magento"], ""),
   Skill("MODx", ["modx"], ""),
@@ -211,27 +224,31 @@ SKILLS: list[Skill] = [
   Skill("WordPress", ["wordpress"], ""),
 
   # INFRASTRUCTURE
+  Skill("Infrastructure", ["infrastructure"], "Competence"),
   Skill("Ansible", ["ansible"], "Automation engine for configuration management, application deployment, and task automation."),
+  # Skill("Dagger", ["dagger"], "Programmable CI/CD engine that runs pipelines in containers."),
   Skill("CircleCI", ["circleci"], ""),
   Skill("CKA", ["cka"], ""), # certificate
   Skill("CKAD", ["ckad"], ""), # certificate
   Skill("CompTIA-ITOps", ["cios"], ""), # certificate
   Skill("MCSA", ["mcsa"], ""), # certificate
-  Skill("Docker", ["docker"], ""),
+  Skill("Docker", ["docker", "dockerfile"], ""),
   Skill("Dokku", ["dokku"], ""), # also Cloud
   Skill("Jenkins", ["jenkins"], ""),
   Skill("Kibana", ["kibana"], ""), # also BIGDATA
   Skill("Kubernetes", ["kubernetes", "k8s", "k3s"], ""),
   Skill("Logstash", ["logstash"], ""), # also BIGDATA
+  Skill("OpenShift", ["openshift"], "Hybrid cloud application platform: a comprehensive set of tools and services to streamline the application lifecycle."),
   Skill("Pulumi", ["pulumi"], ""),
   Skill("Puppet", ["puppet"], ""),
+  Skill("Quarkus", ["quarkus"], ""),
   Skill("Splunk", ["splunk"], ""), # also BIGDATA & SECURITY
   Skill("RHCE", ["rhce"], ""),   # certificate
   Skill("RHCSA", ["rhcsa"], ""), # certificate
   Skill("Terraform", ["terraform"], ""),
   Skill("Vagrant", ["vagrant"], ""),
 
-  # QA-n-AUTOMATION
+  # QA-n-AUTOMATION (tech & platforms)
   Skill("Appium", ["appium"], ""),
   Skill("Cucumber", ["cucumber"], ""),
   Skill("Cypress", ["cypress", "cypress.=js"], ""),
@@ -248,6 +265,12 @@ SKILLS: list[Skill] = [
   Skill("TestNg", ["testng"], ""),
   Skill("WebdriverIO", ["webdriverio"], ""),
 
+  # QA-n-AUTOMATION (topics)
+  Skill("TDD", ["tdd"], ""),
+  Skill("BDD", ["bdd"], ""),
+  Skill("E2E", ["e2e"], ""),
+  Skill("CI/CD", ["ci/cd", "ci"], ""),
+
   # BLOCKCHAIN
   Skill("Arweave", ["arweave"], "A permanent and decentralized web inside an open ledger."),
   Skill("Bitcoin", ["bitcoin"], ""),
@@ -257,6 +280,9 @@ SKILLS: list[Skill] = [
   Skill("Web3js", ["web3.=js"], ""),
   # Skill("SVM", ["svm"], ""), TODO disambiguate Support-Vector-Machine vs Solana-Virtual-Machine
   # Skill("Web3", ["web3"], ""), topic/concept, not a skill
+
+  # MEDIA
+  Skill("FFmpeg", ["ffmpeg"], "Cross-platform solution to record, convert and stream audio and video."),
 
   # NETWORKING
   Skill("CompTIA-Network+", ["network+", "comptia n(etwork)+"], ""), # certificate
@@ -327,6 +353,8 @@ SKILLS: list[Skill] = [
   Skill("eBay", ["ebay"], ""), # company
   Skill("Facebook", ["facebook"], ""), # company TODO meta
   Skill("Intel", ["intel"], ""), # company
+  Skill("Kaggle", ["kaggle"], ""), # company
+  Skill("Mozilla", ["mozilla"], ""), # company
   Skill("Netflix", ["netflix"], ""), # company
   Skill("NVidia", ["nvidia"], ""), # company
   Skill("SalesForce", ["salesforce"], ""),
@@ -337,41 +365,34 @@ SKILLS: list[Skill] = [
   Skill("GPU", ["gpu"], ""),
   Skill("CLI", ["cli"], ""),
   Skill("GUI", ["gui"], ""),
-  Skill("UI", ["ui", "user=interface"], ""),
-  Skill("API", ["api"], ""),
-  Skill("IaaS", ["iaas"], ""),
-  Skill("PaaS", ["paas"], ""),
-  Skill("SaaS", ["saas"], ""),
+
   # Skill("Client", ["client"], ""),
   # Skill("Server", ["server"], ""),
   # Skill("REPL", ["repl"], ""),
   # Skill("Shell", ["shell"], ""), -- too widespread
   # Skill("Terminal", ["terminal"], ""), -- too widespread
   # Skill("Cross-Platform", ["cross=platform"], ""),
-  Skill("TDD", ["tdd"], ""),
-  Skill("BDD", ["bdd"], ""),
-  Skill("Plugin", ["plugin", "plug-in"], ""),
-  Skill("Widget", ["widget"], ""),
-  Skill("Middleware", ["middleware"], ""),
-  Skill("Bindings", ["bindings"], ""),
-  Skill("Engine", ["engine"], ""),
+  # Skill("Plugin", ["plugin", "plug-in"], ""),
+  # Skill("Widget", ["widget"], ""),
+  # Skill("Middleware", ["middleware"], ""),
+  # Skill("Bindings", ["bindings"], ""),
+  # Skill("Engine", ["engine"], ""),
   # Skill("Mobile", ["mobile"], ""),
   # Skill("PC", ["pc"], ""),
   # Skill("Web", ["web"], ""),
   # Skill("IoT", ["iot"], ""),
-  Skill("CI/CD", ["ci/cd"], ""),
   Skill("Voxel", ["voxel"], ""),
   Skill("Pixel", ["pixel"], ""),
   Skill("Sprite", ["sprite"], ""),
   Skill("Texture", ["texture"], ""),
   # Skill("Byte", ["byte"], ""),
-  Skill("Bytecode", ["bytecode"], ""),
+  # Skill("Bytecode", ["bytecode"], ""),
   # Skill("2D", ["2d"], ""), -- too widespread
   # Skill("3D", ["3d"], ""), -- too widespread
-  Skill("Ray-Tracing", ["ray=tracing"], ""),
-  Skill("Compiler", ["compiler"], ""),
-  Skill("Singleplayer", ["single=player"], ""),
-  Skill("Multiplayer", ["multi=player"], ""),
+  # Skill("Ray-Tracing", ["ray=tracing"], ""),
+  # Skill("Compiler", ["compiler"], ""),
+  # Skill("Singleplayer", ["single=player"], ""),
+  # Skill("Multiplayer", ["multi=player"], ""),
   # Skill("Entity-Component-System", ["entity=component=system", "ecs"], ""), -- conflicts with AWS-ECS
   Skill("Cron", ["cron", "crond", "cronjob"], ""),
   Skill("IP", ["ip"], ""),
@@ -382,7 +403,6 @@ SKILLS: list[Skill] = [
   Skill("SSH", ["ssh"], ""),
   Skill("FTP", ["ftp"], ""),
   Skill("SFTP", ["sftp"], ""),
-  Skill("E2E", ["e2e"], ""),
   Skill("RTOS", ["rtos"], ""),
   Skill("GPOS", ["gpos"], ""),
   # Skill("Analysis", ["analysis"], ""),
@@ -416,7 +436,6 @@ SKILLS: list[Skill] = [
   # Skill("Cluster", ["cluster"], ""),
   # Skill("Container", ["container"], ""),
   # Skill("Orchestration", ["orchestration"], ""),
-  # Skill("NLP", ["nlp"], ""),
 
   # HARDWARE & EMBEDDED
   # Skill("HPC", ["hpc"], ""), # high performance computing
@@ -466,7 +485,8 @@ SKILLS: list[Skill] = [
   Skill("Ada", ["ada"], ""),
   Skill("Apex", ["apex"], ""),
   Skill("Assembly", ["assembly"], ""),
-  Skill("C", ["c-lang", "c"], ""),
+  Skill("C", ["c-lang"], ""),
+  Skill("C", ["c"], "", disambiguate=singleletter()),
   Skill("C++", ["c++", "cpp", "c=plus=plus"], ""),
   Skill("C#", ["c#", "csharp"], ""),
   Skill("Clojure", ["clojure", "clojurian"], ""),
@@ -474,7 +494,8 @@ SKILLS: list[Skill] = [
   Skill("Cobol", ["cobol"], ""),
   Skill("Crystal", ["crystal=lang", "crystal"], ""),
   Skill("CSS", [ver1("css")], ""),
-  Skill("D", ["d", "d=lang"], ""),
+  Skill("D", ["d=lang"], ""),
+  Skill("D", ["d"], "", disambiguate=singleletter()),
   Skill("Dart", ["dart"], ""),
   Skill("Delphi", ["delphi"], ""),
   Skill("Elixir", ["elixir"], ""),
@@ -482,6 +503,7 @@ SKILLS: list[Skill] = [
   Skill("Erlang", ["erlang"], ""),
   Skill("Fortran", ["fortran"], ""),
   Skill("F#", ["f#", "f=lang", "fsharp"], ""),
+  Skill("GQL", ["gql"], ""), # TODO Cypher
   Skill("Gleam", ["gleam"], ""),
   Skill("Go", ["golang", propn("go")], ""),
   Skill("Groovy", ["groovy"], ""),
@@ -500,12 +522,13 @@ SKILLS: list[Skill] = [
   Skill("Objective-C", ["objective=c", "objective=c++", "objective=cpp"], ""),
   Skill("Ocaml", ["ocaml"], ""),
   Skill("Odin", ["odin"], ""),
-  Skill("Perl", ["perl"], ""),
+  Skill("Perl", [ver1("perl")], ""),
   Skill("PHP", [ver1("php"), "phper"], ""),
   Skill("PowerShell", ["power=shell"], ""),
   Skill("Prolog", ["prolog"], ""),
   Skill("Python", ["python", "pythonist(a)"], ""),
-  Skill("R", ["r=lang", "r"], ""),
+  Skill("R", ["r=lang"], ""),
+  Skill("R", ["r"], "", disambiguate=singleletter()),
   Skill("Ruby", ["ruby=lang", "ruby", "rubyist", "rubist"], ""),
   Skill("Rust", ["rust", "rustacean"], ""),
   Skill("SASS", ["sass", "scss"], ""),
@@ -516,7 +539,8 @@ SKILLS: list[Skill] = [
   Skill("Shell", ["shell", "bash", "zsh"], ""),
   Skill("SQL", ["sql"], ""),
   # Skill("XML", ["xml"], ""),
-  Skill("V", ["v", "vlang"], ""),
+  Skill("V", ["vlang"], ""),
+  Skill("V", ["v"], "", disambiguate=singleletter()),
   Skill("Vala", ["vala"], ""),
   Skill("Vyper", ["vyper"], ""),
   Skill("Visual-Basic", ["visual=basic", "vb(a)", "vb.net"], ""),
@@ -526,6 +550,7 @@ SKILLS: list[Skill] = [
   # UNSORTED
   Skill("Blender", ["blender"], ""),
   Skill("CompTIA-A+", ["comptia a+"], ""), # certificate for tech. support and IT ops
+  Skill("RxJS", ["rxjs"], ""),
 ]
 
 # // SECURITY TOOLS
@@ -534,14 +559,10 @@ SKILLS: list[Skill] = [
 # // John the Ripper: 210 repos, 7 ysers
 #
 # export const rawSkillTable: Dict<SkillRow> = {
-#   ".NET": {pattern: "asp.net, dotnet=core, dotnet, .net=core, .net", category: "platform", role: "Engineer"},
-#   // .NET is a general-purpose platform for Windows development
-#   // TODO ASP.NET is a framework for web service (backend) development, a part of .NET platform
 #   "Chef": {pattern: "chef", category: "platform", role: "Engineer"},
 #   // should we add new char like "css𝐕" or should we consume numbers after EACH term?
 #   // Most skills have versions BUT topics don't @_@
 #   // So it can be a per-table configuration
-#   "ETL": {pattern: "etl", category: "topic", role: "Engineer"},
 #   "Native Android": {pattern: "native=android", category: "platform", role: "Engineer"},
 #   "Native iOS": {pattern: "native-ios", category: "platform", role: "Engineer"},
 #   "Octave": {pattern: "octave", category: "lang"},
@@ -551,11 +572,9 @@ SKILLS: list[Skill] = [
 #   "OpenAuth": {pattern: "open=auth2?, oauth2?", category: "tech"},
 #   "RxJS": {pattern: "rx.=js, RX", category: "tech", role: "Engineer"},
 #   "Salt": {pattern: "salt", category: "platform", role: "Engineer"},
-#   "Vyper": {pattern: "vyper", category: "lang", role: "Engineer"},
 #   "Web3.js": {pattern: "web3.js", category: "tech"},
 #
 #   // TOPICS ----------------------------------------------------------------------------------------
-#   "Application": {pattern: "application", category: "topic"},
 #   "Security": {pattern: "cyber=security, cyber=sec, it=security, security", category: "topic"},
 #   "Performance": {pattern: "performance", category: "topic"},
 #   "Scalability": {pattern: "scalability", category: "topic"},
@@ -578,24 +597,8 @@ SKILLS: list[Skill] = [
 #   "3D": {pattern: "3d", category: "topic"},
 #   // "Font": {pattern: "fonts?", category: "topic"}, // disambiguate?
 #   "Animation": {pattern: "animation, motion", category: "topic"},
-#   "Automation": {pattern: "automation", category: "topic", role: "Engineer"},
-#   "Backend": {pattern: "back=end, !BE", category: "topic", role: "Engineer"},
-#   "Blockchain": {pattern: "block=chain, smart=contract", category: "topic", role: "Engineer"},
-#   "Cloud": {pattern: "cloud=native, cloud", category: "topic", role: "Engineer"},
-#   "DevOps": {pattern: "", category: "topic", role: "Engineer"},
-#   "Fullstack": {pattern: "full=stack", category: "topic", role: "Engineer"},
-#   "Mobile": {pattern: "mobile", category: "topic"},
 #   "Game": {pattern: "!game", category: "topic"},
 #   "Graphic": {pattern: "graphics?", category: "topic", role: "Designer"},
-#   "Software": {pattern: "software, !SW", category: "topic", role: "Engineer"},
-#   "Hardware": {pattern: "hardware", category: "topic", role: "Engineer"},
-#   "Firmware": {pattern: "firmware", category: "topic", role: "Engineer"},
-#   "Frontend": {pattern: "front=end, !FE", category: "topic", role: "Engineer"},
-#   "QA": {pattern: "", category: "topic", role: "Engineer"},
-#   "Embedded": {pattern: "embedded", category: "topic", role: "Engineer"},
-#   "IoT": {pattern: "iot", category: "topic", role: "Engineer"},
-#   "Computer Vision": {pattern: "computer=vision", category: "topic"},
-#   "AI": {pattern: "artifical=intelligence, ai", category: "topic"},
 #   "Level": {pattern: "level", category: "topic"},
 #   "Enterprise": {pattern: "enterprise", category: "topic"},
 #   "CMS": {pattern: "cms", category: "topic", role: "Engineer"},
@@ -611,9 +614,6 @@ SKILLS: list[Skill] = [
 #   "Science": {pattern: "science", category: "topic", role: "Scientist"},
 #
 #   // Role-agnostic (multi-role) topics
-#   "Data": {pattern: "big=data, data", category: "topic"},
-#   "Database": {pattern: "database=design, databases?", category: "topic"},
-#   "Infrastructure": {pattern: "infrastructure", category: "topic"}, // role: "Engineer" / "Architect"
 #   "Manual": {pattern: "manual", category: "topic"},
 #   "Marketing": {pattern: "marketing", category: "topic"},
 #   "R&D": {pattern: "r ?& ?d", category: "topic"},
@@ -626,12 +626,6 @@ SKILLS: list[Skill] = [
 #   "Project": {pattern: "!Projects?", category: "topic"},
 #   "Solution": {pattern: "!Solutions?", category: "topic"},
 #   "Team": {pattern: "!Teams?", category: "topic"},
-#   "Data Science": {pattern: "data=science, DS", category: "topic"},
-#   "Computer Science": {pattern: "computer=science, CS", category: "topic"},
-#   "Statistics": {pattern: "statistics", category: "topic"},
-#   "Machine Learning": {pattern: "machine=learning, ML", category: "topic"},
-#   "Deep Learning": {pattern: "deep=learning", category: "topic"},
-#   "NLP": {pattern: "natural=language=processing, nlp", category: "topic"},
 #   "Functional Programming": {pattern: "functional=programming, fp", category: "topic"},
 #   "Object Oriented Programming": {pattern: "object=oriented=programming, oop", category: "topic"},
 #   "Tech": {pattern: "tech, technical", category: "topic"},
@@ -662,21 +656,8 @@ SKILLS: list[Skill] = [
 #   image, img, gif, jpg, jpeg, png, woff
 #   svg
 #   canvas
-#   bundler (webpack, vite)
 #
-#   BACKEND specific words
-#   orm
-#   ActiveRecord
-#   migration
-#   KV store
-#
-#   WEB specific words
-#   mime, header
-#   upload, download
-#   HTTPs?, s?FTP
-#
-#
-#   OS specific words
+# OS specific words
 #   stdin, stdout, terminal, filesystem, socket, stream, thread, process
 #   cli, command line, shell, runtime, schedule
 #
@@ -714,10 +695,8 @@ SKILLS: list[Skill] = [
 #   coding skills, application ideas
 #
 #   TODO
-#   RabbitMQ, CQRS
-#   Kafka
+#   CQRS
 #   ecommerce
-#   infrastructure
 #   Vulnerability
 #   scanner
 #   auth0, aws cognito, firebase auth

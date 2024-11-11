@@ -47,4 +47,5 @@ SKILLS: list[Skill] = [
   # HADOOP + INFRASTRUCTURE
   Skill("Apache-Airflow", ["apache=airflow", "airflow"], ""), # Airflow is an open-source ETL tool for planning, generating, and tracking processes
   Skill("Apache-Oozie", ["apache=oozie", "oozie"], ""), # Hadoop jobs workflow scheduler (~ GitHub actions)
+  Skill("Apache-ActiveMQ", ["apache=active=mq", "active=mq"], ""), # Hadoop jobs workflow scheduler (~ GitHub actions)
 ]

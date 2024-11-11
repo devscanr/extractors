@@ -9,7 +9,7 @@ SKILLS: list[Skill] = [
   Skill("Amazon", ["amazon"], ""), # company (etc)
 
   # AWS
-  Skill("Amazon-WS", ["amazon=web=services", "aws"], ""),
+  Skill("Amazon-WebServices", ["amazon=web=services", "aws"], ""),
   Skill("Amazon-Athena", ["(amazon=)aws=athena", "amazon=athena"], ""), # analytics, ML + SQL over S3
   Skill("Amazon-Athena", ["athena"], "", disambiguate=ctx),             # /
   Skill("Amazon-Aurora", ["(amazon=)aws=aurora", "amazon=aurora"], ""), # managed DB
@@ -21,6 +21,7 @@ SKILLS: list[Skill] = [
   Skill("Amazon-EC2", ["(amazon=)aws=ec2", "amazon=ec2", "ec2"], ""), # elastic compute cloud
   Skill("Amazon-ECS", ["(amazon=)aws=ecs", "amazon=ecs", "ecs"], ""), # elastic container services
   Skill("Amazon-EBS", ["(amazon=)aws=ebs", "amazon=ebs", "ebs"], ""), # elastic block store
+  Skill("Amazon-EKS", ["(amazon=)aws=eks", "amazon=eks", "eks"], ""), # elastic kubernetes service
   Skill("Amazon-ElastiCache", ["(amazon=)aws=elasticache", "amazon=elasticache", "elasticache"], ""), # caching
   Skill("Amazon-Glue", ["(amazon=)aws=glue", "amazon=glue"], ""), # batch data ingestion, data pipeline orchestration
   Skill("Amazon-Glue", ["glue"], "", disambiguate=ctx),           # /
@@ -28,6 +29,8 @@ SKILLS: list[Skill] = [
   Skill("Amazon-IAM", ["iam"], "", disambiguate=ctx),          # /
   Skill("Amazon-Lambda", ["(amazon=)aws=lambda", "amazon=lambda"], ""), # lambda
   Skill("Amazon-Lambda", ["lambda"], "", disambiguate=ctx),             # /
+  Skill("Amazon-KMS", ["(amazon=)aws=kms", "amazon=kms"], ""), # streaming data ingestion & analytics
+  Skill("Amazon-KMS", ["kms"], "", disambiguate=ctx),          # /
   Skill("Amazon-Kinesis", ["(amazon=)aws=kinesis", "amazon=kinesis", "kinesis"], ""), # streaming data ingestion & analytics
   Skill("Amazon-Neptune", ["(amazon=)aws=neptune", "amazon=neptune", "neptune"], ""), # graph db
   Skill("Amazon-SNS", ["(amazon=)aws=sns", "amazon=sns", "sns"], ""), # simple notification service

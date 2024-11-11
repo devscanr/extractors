@@ -317,7 +317,7 @@ def describe_Categorizer() -> None:
       """) == Cats("Dev", is_lead=True)
       assert cats("""
         Specializing generalist. CS PhD, student of life. Lover of words and hyperbole. Remote.
-      """) == Cats(is_remote=True)
+      """) == Cats("Dev", is_remote=True)
       assert cats("music student java elasticsearch ai subversion git node").role == "Student"
       assert cats("Back-End Developer | Information Systems bachelor").role == "Dev"
       assert cats("CS Bachelor student at USI").role == "Student"

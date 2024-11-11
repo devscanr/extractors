@@ -18,6 +18,8 @@ SKILLS: list[Skill] = [
   Skill("Blazor", ["blazor"], ".NET-based framework to create fullstack apps"),
   Skill("Unity", ["unity-engine", "unity=platform", "unity=3d", propn("unity")], ""), # gamedev engine
   Skill("Unity", ["unity"], "", disambiguate=ctxn), # /
+  Skill("WCF", ["wcf"], ""),
+  Skill("WPF", ["wpf"], ""),
   Skill("Xamarin", ["xamarin"], ""), # used for cross-platform mobile app development
 
   # SUSPENDED
@@ -25,11 +27,12 @@ SKILLS: list[Skill] = [
   # Entity Framework -- ORM for .NET
 
   # AZURE
-  Skill("Azure", ["azure"], ""),
+  Skill("Microsoft-Azure", ["microsoft=azure", "azure"], ""),
   Skill("Azure-Databricks", ["azure=databricks"], ""), # uses Apache-Spark | unified, open analytics platform for building, deploying, sharing, and maintaining EE data
-  Skill("Azure-Data-Explorer", ["azure=data=explorer", propn("adx")], ""), # big data platform optimized for analytical queries
+  Skill("Azure-DataExplorer", ["azure=data=explorer", propn("adx")], ""), # big data platform optimized for analytical queries
   Skill("Azure-CosmosDB", ["azure=cosmosdb"], ""), # noSQL + relational DB
   Skill("Azure-IoT", ["azure=iot"], ""), # IoT platform
+  Skill("Azure-Kubernetes", ["azure=kubernetes=service", "azure=ks", "aks"], ""), # ~ Amazon-EKS
   Skill("Azure-Relay", ["azure=relay"], ""), # enables to securely expose services that run in corporate network to the public cloud
   Skill("Azure-SQL", ["azure=sql"], ""), # Managed Cloud Database Service
   Skill("Azure-Synapse", ["azure=synapse"], ""), # service that brings together enterprise data warehousing and bigdata analytics

@@ -29,10 +29,10 @@ def describe_SkillExtractor() -> None:
 
     def it_handles_set1() -> None:
       assert extract("Self-employed web engineer. #Rust #Wasm #Go #TypeScript #React #REST") == [
-        "Rust", "WebAssembly", "Go", "TypeScript", "React", "REST"
+        "Web", "Rust", "WebAssembly", "Go", "TypeScript", "React", "REST"
       ]
       assert extract("I like Python, JS/TS, Go, Postgres, Kubernetes, Docker, DevOps.") == [
-        "Python", "JavaScript", "TypeScript", "Go", "PostgreSQL", "Kubernetes", "Docker"
+        "Python", "JavaScript", "TypeScript", "Go", "PostgreSQL", "Kubernetes", "Docker", "DevOps",
       ]
       assert extract("working with React, Node, Go, and the rest") == [
         "React", "NodeJS", "Go"
@@ -44,7 +44,7 @@ def describe_SkillExtractor() -> None:
         ".NET", "OAuth", "SAML"
       ]
       assert extract("≫ IdMaaS, mBaaS / JavaScript ≫ Frontend, IoT Edge. 静岡 → 新潟 → 東京 → 広島") == [
-        "JavaScript"
+        "JavaScript", "Frontend", "IoT"
       ]
       assert extract("Flutter, Node.js, Angular, React.js, PHP, Apollo Data Graph, OpenAPI, More...") == [
         "Flutter", "NodeJS", "Angular", "React", "PHP", "Apollo", "OpenAPI"
@@ -53,7 +53,7 @@ def describe_SkillExtractor() -> None:
 
     def it_handles_set3() -> None:
       assert extract("Fullstack web developer with focus on front end services. Experienced with React/React Native, PHP, MySQL, GraphQL, Angularjs, Prisma, Expo") == [
-        "React", "React-Native", "PHP", "MySQL", "GraphQL", "Angular", # "Prisma"
+        "Fullstack", "Web", "React", "React-Native", "PHP", "MySQL", "GraphQL", "Angular", # "Prisma"
       ]
       assert extract("A Full Stack developer with expertise in ASP.Net (Legacy, Core), Angular, Ionic, NativeScript, nopCommerce and more...") == [
         "ASP.NET", "Angular", "Ionic", "Native-Script"
@@ -65,7 +65,7 @@ def describe_SkillExtractor() -> None:
 
     def it_handles_set4() -> None:
       assert extract("Web & Blockchain Developer 🎨React(Next), Vue(Nuxt), Angular, 🎄Laravel, Node.js, Django 🎗React Native") == [
-        "React", "NextJS", "VueJS", "NuxtJS", "Angular", "Laravel", "NodeJS", "Django", "React-Native"
+        "Web", "Blockchain", "React", "NextJS", "VueJS", "NuxtJS", "Angular", "Laravel", "NodeJS", "Django", "React-Native"
       ]
       assert extract("NumPy, SciPy, Numba, Conda, PyData, NumFocus, Anaconda, Quansight, OpenTeams") == [
         "NumPy", "SciPy", "Numba", "Anaconda"
@@ -77,7 +77,7 @@ def describe_SkillExtractor() -> None:
 
     def it_handles_set5() -> None:
       assert extract("Software Engineer, Tech Lead in Rust, WASM, TypeScript") == [
-        "Rust", "WebAssembly", "TypeScript",
+        "Software", "Rust", "WebAssembly", "TypeScript",
       ]
       assert extract("React | Node JS | REST") == [
         "React", "NodeJS", "REST",
@@ -86,14 +86,14 @@ def describe_SkillExtractor() -> None:
         "REST", "MongoDB", "Express", "Angular", "NodeJS"
       ]
       assert extract("Senior Backend Developer (.NET) at Dow Jones") == [
-        ".NET",
+        "Backend", ".NET",
       ]
       assert extract("cosmologist | @conda-forge core | @conda steering (emeritus)") == []
       assert extract("Ce qui mérite d'être") == []
 
     def it_handles_set6() -> None:
       assert extract("Go/Python/Java, Web/K8S") == [
-        "Go", "Python", "Java", "Kubernetes"
+        "Go", "Python", "Java", "Web", "Kubernetes"
       ]
       assert extract("NIT Robocon Member 🥰 Arduino / OpenSiv3D / Qt / WindowsAPI / C / C++ / Roblox") == [
         "Arduino", "Qt", "C", "C++", "Roblox"
@@ -115,13 +115,16 @@ def describe_SkillExtractor() -> None:
         "Unity", "Amazon-ECS", "Amazon-EC2", "NodeJS", "Android"
       ]
       assert extract("Dev & Speaker • Microsoft MVP Azure, .NET, Blazor 🥔 Couch potato") == [
-        "Microsoft", "Azure", ".NET", "Blazor"
+        "Microsoft", "Microsoft-Azure", ".NET", "Blazor"
       ]
       assert extract("far better rest I go to than I have ever known") == []
 
     def it_handles_set8() -> None:
-      assert extract("Engineer on Azure-AWS, Kubernetes AKS-EKS-GKE, Terraform, Golang, Ansible, HashiCorp Vault") == [
-        "Azure", "Amazon-WS", "Kubernetes", "Terraform", "Go", "Ansible"
+      assert extract("Engineer on Azure-AWS, Kubernetes AKS-EKS-GKE") == [
+        "Microsoft-Azure", "Amazon-WebServices", "Kubernetes", "Azure-Kubernetes", "Amazon-EKS", "Google-Kubernetes"
+      ]
+      assert extract("Terraform, Golang, Ansible, HashiCorp Vault") == [
+        "Terraform", "Go", "Ansible"
       ]
       assert extract("Angular || React (NextJs) || Svelte kit || Node || Nest || PHP5 || Couch CMS") == [
         "Angular", "React", "NextJS", "SvelteKit", "NodeJS", "NestJS", "PHP"
@@ -138,7 +141,7 @@ def describe_SkillExtractor() -> None:
         "Java", "C#", "Microsoft", "JavaScript", "Jupyter", "Python", "Ruby"
       ]
       assert extract("Learning ReactJS & Next.js to become a proficient frontender") == [
-        "React", "NextJS"
+        "React", "NextJS", "Frontend"
       ]
       assert extract("Power BI, my-sql-manager, Dotnet, Django/Python") == [
         "Power-BI", "MySQL", ".NET", "Django", "Python"
@@ -163,14 +166,15 @@ def describe_SkillExtractor() -> None:
       assert extract("C#,C++,Firebase,Unity") == ["C#", "C++", "Firebase", "Unity"]
       assert extract("R, Matlab, Tableau") == ["R", "Matlab", "Tableau"]
       assert extract("Pulumi, Kotlin, PowerShell | Postgres") == ["Pulumi", "Kotlin", "PowerShell", "PostgreSQL"]
-      assert extract("MariaDB for backend | Scss for the FE") == ["MariaDB", "SASS"]
+      assert extract("MariaDB for backend | Scss for the FE") == ["MariaDB", "Backend", "SASS", "Frontend"]
+      assert extract("To be or not to BE") == [] # no FP!
 
   def it_handles_set12() -> None:
     assert extract("ARM processors") == ["ARM"]
     assert extract("Hi, my name is Arm") == ["ARM"] # FP
     assert extract("My left arm is stronger than my right arm") == []
-    assert extract("I’m doing high-performance computing work on CPU, including x86, arm.") == ["CPU", "x86", "ARM"]
-    assert extract("Embrace AI-IoT | RISC-V | ARM | ARC") == ["RISC", "ARM", "ARC"]
+    assert extract("I’m doing high-performance computing work on CPU, including x86, arm.") == ["Performance", "CPU", "x86", "ARM"]
+    assert extract("Embrace AI-IoT | RISC-V | ARM | ARC") == ["AI", "IoT", "RISC", "ARM", "ARC"]
     assert extract("PERN afficianado") == ["PostgreSQL", "Express", "React", "NodeJS"]
 
   def it_handles_set13() -> None:
@@ -181,7 +185,19 @@ def describe_SkillExtractor() -> None:
      assert extract("JAX @NVIDIA") == ["JAX"]
      assert extract("Scientist @ JAX") == ["JAX"]
      assert extract("I like learning | JAX | Google Brain") == ["JAX", "Google"]
-     assert extract("Software Engineer at Google DeepMind working on JAX/Flax") == ["Google", "JAX", "Flax"]
+     assert extract("Software Engineer at Google DeepMind working on JAX/Flax") == ["Software", "Google", "JAX", "Flax"]
      assert extract("Jax + Haiku fan. Self-attention for the win") == [] # known FN
      assert extract("Julia, GraalVM, LLVM, NVidia, CNCF, Program Synthesis, 3D-QSAR") == ["Julia", "LLVM", "NVidia"]
      assert extract("Sample for UE5's CommonConversation Feature") == ["Unreal-Engine"]
+
+  def it_handles_set14() -> None:
+    assert extract("I learn v.") == [] # v. is a special case in Spacy, like v.1 for version...
+    assert extract("I learn v lang") == ["V"]
+    assert extract("I learn v-lang") == ["V"]
+    assert extract("I learn v-language") == ["V"]
+    assert extract("I learn v-stuff") == []
+    assert extract("V-JEPA") == []
+    assert extract("I learn c lang") == ["C"]
+    assert extract("I learn stuff-c") == []
+    assert extract("C. Objective-C. C++") == ["C", "Objective-C", "C++"]
+    assert extract("Ph.D. candidate, interested in software security") == ["Software", "Security"]

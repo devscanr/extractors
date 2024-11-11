@@ -1,10 +1,10 @@
 from dataclasses import dataclass
 import re
 from spacy.pipeline import EntityRuler
-from spacy.tokens import Doc, Span, Token
+from spacy.tokens import Doc, Token
 from typing import Any, cast, Literal, Sequence
 from ..patterns import to_patterns2
-from ..utils import get_nlp
+from ..utils import get_cons_heads, get_nlp, get_preceding, get_root, is_word
 from .data import LABELED_PHRASES
 
 __all__ = ["Categorized", "CategoryExtractor", "Role"]
@@ -263,71 +263,3 @@ HEAD_MARKERS = {
   "growth", "research", "security", "sre", "swe",
   "technology", "training",
 }
-
-# def get_prev_word(doc: Doc, token: Token, hops: int=None) -> Token | None:
-#   h = 0
-#   i = token.i - 1
-#   while i >= 0 and i >= token.sent.start and (hops and h < hops):
-#     curr_token = doc[i]
-#     if is_word(curr_token):
-#       return curr_token
-#     i -= 1
-#     h += 1
-#   return None
-
-# def get_right_propns(doc: Doc, token: Token) -> list[Token]:
-#   result: list[Token] = []
-#   i = token.i + 1
-#   while i < token.sent.end:
-#     curr_token = doc[i]
-#     if curr_token.pos_ == "PROPN":
-#       result.append(curr_token)
-#     else:
-#       break
-#     i += 1
-#   return result
-
-def get_preceding(token: Token) -> list[Token]:
-  return list(token.doc[token.sent.start : token.i])
-
-def get_consequent(token: Token) -> list[Token]:
-  return list(token.doc[token.i+1 : token.sent.end])
-
-# def next_word(doc: Doc, token: Token) -> Token | None:
-#   j = token.i + 1
-#   return doc[j].lower_ if doc[j] and is_word(doc[j]) else None
-
-# def get_consequent_nouns(token: Token) -> list[Token]:
-#   res = []
-#   for cons in get_consequent(token):
-#     if cons.pos_ in {"NOUN", "PROPN", "ADJ"}:
-#       res.append(cons)
-#     else:
-#       break
-#   return res
-
-def get_heads(_token: Token) -> list[Token]:
-  token = _token
-  tokens: list[Token] = []
-  while token != token.head:
-    token = token.head
-    tokens.append(token)
-  return tokens
-
-def get_cons_heads(_token: Token) -> list[Token]:
-  token = _token
-  tokens: list[Token] = []
-  while token != token.head:
-    token = token.head
-    if token.i > _token.i:
-      tokens.append(token)
-  return tokens
-
-def is_word(token: Token) -> bool:
-  return not token.is_punct and not token.is_space
-
-def get_root(sent: Span) -> Token | None:
-  for token in sent:
-    if token.dep_ == "ROOT":
-      return token
-  return None

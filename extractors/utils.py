@@ -4,7 +4,7 @@ from pathlib import Path
 import re
 import spacy
 from spacy import Language
-from spacy.tokens import Doc, Token
+from spacy.tokens import Doc, Span, Token
 from typing import Any, Callable, Generator, cast, Iterable
 
 # RESOURCES
@@ -158,22 +158,30 @@ def get_nlp(name: str | Path = "en_core_web_sm") -> Language:
   nlp.tokenizer.prefix_search = prefix_regex.search # type: ignore
 
   suffixes = list(nlp.Defaults.suffixes or [])
-  suffixes.extend(["-", "="])
+  suffixes.extend(["-", "=", "[.]"])
   suffix_regex = spacy.util.compile_suffix_regex(suffixes)
   nlp.tokenizer.suffix_search = suffix_regex.search # type: ignore
 
   infixes = list(nlp.Defaults.infixes or [])
-  infixes.append(r"(?<=[a-zA-Z_])[(](?=[a-zA-Z_])")
-  infixes.append(r"(?<=[#+a-zA-Z_])[,](?=[#+a-zA-Z_])")
+  infixes.append(r"[,()\[\]]")
+  # infixes.append(r"(?<=[0-9a-zA-Z_()\[\]])[()\[\]](?=[0-9a-zA-Z_()\[\]])")
+  # infixes.append(r"(?<=[#+0-9a-zA-Z_])[,](?=[#0-9+a-zA-Z_])")
   infixes.append(r"(?<=[a-zA-Z])[+](?=[a-zA-Z])")
   infix_finditer = spacy.util.compile_infix_regex(infixes)
   nlp.tokenizer.infix_finditer = infix_finditer.finditer # type: ignore
+
+  # rules_ = {}
+  # for orth, exc in nlp.tokenizer.rules.items():
+  #   if orth in {"c.", "r."}:
+  #     continue
+  #   rules_[orth] = exc
+  # nlp.tokenizer.rules = rules_
 
   # Tokenizer exceptions
   def token_match(token: str) -> bool | None:
     KNOWN_SUFFIXES = (".js", ".py")
     tokenl = token.lower()
-    if tokenl in {"c#", "ex."} or tokenl.endswith(KNOWN_SUFFIXES):
+    if tokenl in {"c#", "ex.", "ph.d"} or tokenl.endswith(KNOWN_SUFFIXES):
       return True
     return False
   nlp.tokenizer.token_match = token_match # type: ignore
@@ -256,3 +264,71 @@ def verb(word: str) -> Pattern:
     return [
       {LOWER: word, POS: {IN: poss}}
     ]
+
+# def get_prev_word(doc: Doc, token: Token, hops: int=None) -> Token | None:
+#   h = 0
+#   i = token.i - 1
+#   while i >= 0 and i >= token.sent.start and (hops and h < hops):
+#     curr_token = doc[i]
+#     if is_word(curr_token):
+#       return curr_token
+#     i -= 1
+#     h += 1
+#   return None
+
+# def get_right_propns(doc: Doc, token: Token) -> list[Token]:
+#   result: list[Token] = []
+#   i = token.i + 1
+#   while i < token.sent.end:
+#     curr_token = doc[i]
+#     if curr_token.pos_ == "PROPN":
+#       result.append(curr_token)
+#     else:
+#       break
+#     i += 1
+#   return result
+
+def get_preceding(token: Token) -> list[Token]:
+  return list(token.doc[token.sent.start : token.i])
+
+def get_consequent(token: Token) -> list[Token]:
+  return list(token.doc[token.i+1 : token.sent.end])
+
+# def next_word(doc: Doc, token: Token) -> Token | None:
+#   j = token.i + 1
+#   return doc[j].lower_ if doc[j] and is_word(doc[j]) else None
+
+# def get_consequent_nouns(token: Token) -> list[Token]:
+#   res = []
+#   for cons in get_consequent(token):
+#     if cons.pos_ in {"NOUN", "PROPN", "ADJ"}:
+#       res.append(cons)
+#     else:
+#       break
+#   return res
+
+def get_heads(_token: Token) -> list[Token]:
+  token = _token
+  tokens: list[Token] = []
+  while token != token.head:
+    token = token.head
+    tokens.append(token)
+  return tokens
+
+def get_cons_heads(_token: Token) -> list[Token]:
+  token = _token
+  tokens: list[Token] = []
+  while token != token.head:
+    token = token.head
+    if token.i > _token.i:
+      tokens.append(token)
+  return tokens
+
+def is_word(token: Token) -> bool:
+  return not token.is_punct and not token.is_space
+
+def get_root(sent: Span) -> Token | None:
+  for token in sent:
+    if token.dep_ == "ROOT":
+      return token
+  return None

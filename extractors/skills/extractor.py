@@ -1,4 +1,3 @@
-# from pprint import pprint
 import re
 from spacy.pipeline import EntityRuler
 from spacy.tokens import Doc, Span
@@ -51,7 +50,10 @@ class SkillExtractor:
 
   def extract(self, text_or_doc: str | Doc) -> list[str]:
     doc = self.nlp(text_or_doc) if isinstance(text_or_doc, str) else text_or_doc
-    # pprint(list((token, token.pos_, token.dep_) for token in doc if not token.is_punct))
+    # print(">>>", self.nlp.tokenizer.explain(text_or_doc))
+    # for token in doc:
+    #   print(token, token.pos_)
+      # pprint(list((token, token.pos_, token.dep_) for token in doc if not token.is_punct))
     # print("ents:", list(ent.label_ for ent in doc.ents))
     skills = [
       skill

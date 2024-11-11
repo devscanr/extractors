@@ -1,7 +1,7 @@
 from dataclasses import dataclass, field
-from spacy.tokens import Span
+from spacy.tokens import Span, Token
 from typing import Callable
-from ..utils import Pattern
+from ..utils import Pattern, get_consequent, get_preceding
 
 __all__ = ["Skill", "Disambiguate", "contextual", "neighbour"]
 
@@ -32,6 +32,7 @@ def contextual_or_neighbour(skills: list[str], distance: int) -> Disambiguate:
 def contextual(*skills: str) -> Disambiguate:
   ctx_skills = set(skills)
   def disambiguate(ent: Span) -> bool:
+    # TODO consider only words within the same paragraph
     doc = ent[0].doc
     skill = ent[0].ent_type_
     other_skills = [ent.label_ for ent in doc.ents if ent.label_ != skill]
@@ -60,3 +61,19 @@ def neighbour(distance: int) -> Disambiguate:
       if any(abs(oti - ti) <= distance for oti in otis)
     )
   return disambiguate
+
+def singleletter() -> Disambiguate:
+  def disambiguate(ent: Span) -> bool:
+    # doc = ent[0].doc
+    prec = get_preceding(ent[0])
+    cons = get_consequent(ent[-1])
+    # Avoid highly ambiguos cases, at the cost of some FNs:
+    if gets(prec, -1) == "-":
+      return False # foo-c, bar-v
+    if gets(cons, 0) == "-" and gets(cons, 1) not in {"lang", "language"}:
+      return False # c-foo, v-bar
+    return True
+  return disambiguate
+
+def gets(tokens: list[Token], index: int) -> str:
+  return tokens[index].lower_ if -len(tokens) <= index < len(tokens) else ""
