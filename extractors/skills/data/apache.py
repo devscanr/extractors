@@ -8,6 +8,8 @@ ctxn = contextual_or_neighbour(["Apache"], 2)
 SKILLS: list[Skill] = [
   Skill("Apache", ["apache"], ""), # company (etc)
 
+  Skill("Apache-Maven", ["apache=maven", "maven"], ""),
+
   # HADOOP
   Skill("Apache-Hadoop", ["apache=hadoop", "hadoop"], ""),
 	Skill("Apache-Ambari", ["apache=ambari", "ambari"], ""), # running app manager
@@ -48,4 +50,7 @@ SKILLS: list[Skill] = [
   Skill("Apache-Airflow", ["apache=airflow", "airflow"], ""), # Airflow is an open-source ETL tool for planning, generating, and tracking processes
   Skill("Apache-Oozie", ["apache=oozie", "oozie"], ""), # Hadoop jobs workflow scheduler (~ GitHub actions)
   Skill("Apache-ActiveMQ", ["apache=active=mq", "active=mq"], ""), # Hadoop jobs workflow scheduler (~ GitHub actions)
+
+  # Apache-Drill
+  # Apache-Kylin
 ]

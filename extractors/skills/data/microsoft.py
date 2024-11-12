@@ -9,6 +9,15 @@ ctxn = contextual_or_neighbour(["Microsoft"], 2)
 SKILLS: list[Skill] = [
   Skill("Microsoft", ["microsoft"], ""), # company (etc)
 
+  Skill("Excel", [propn("excel")], ""),
+
+  Skill("Power-Platform", ["power=platform"], ""),
+  Skill("Power-Apps", ["power=apps"], ""),
+  Skill("Power-Automate", ["power=automate"], ""),
+  Skill("Power-BI", ["power=bi"], ""),
+  Skill("Power-Pivot", ["power=pivot"], ""),
+  Skill("Power-Query", ["power=query"], ""),
+
   # .NET
   Skill(".NET", [ver1(".net"), "dotnet", "dot.net"], "Cross-platform, open source dev. platform."),
 

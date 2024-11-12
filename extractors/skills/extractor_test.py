@@ -53,7 +53,7 @@ def describe_SkillExtractor() -> None:
 
     def it_handles_set3() -> None:
       assert extract("Fullstack web developer with focus on front end services. Experienced with React/React Native, PHP, MySQL, GraphQL, Angularjs, Prisma, Expo") == [
-        "Fullstack", "Web", "React", "React-Native", "PHP", "MySQL", "GraphQL", "Angular", # "Prisma"
+        "Fullstack", "Web", "React", "React-Native", "PHP", "MySQL", "GraphQL", "Angular", "Prisma"
       ]
       assert extract("A Full Stack developer with expertise in ASP.Net (Legacy, Core), Angular, Ionic, NativeScript, nopCommerce and more...") == [
         "ASP.NET", "Angular", "Ionic", "Native-Script"
@@ -127,7 +127,7 @@ def describe_SkillExtractor() -> None:
         "Terraform", "Go", "Ansible"
       ]
       assert extract("Angular || React (NextJs) || Svelte kit || Node || Nest || PHP5 || Couch CMS") == [
-        "Angular", "React", "NextJS", "SvelteKit", "NodeJS", "NestJS", "PHP"
+        "Angular", "React", "NextJS", "SvelteKit", "NodeJS", "NestJS", "PHP", "CMS"
       ]
       assert extract("Full-stack developer Vue, Nuxt, Wordpress+GraphQL") == [
         "VueJS", "NuxtJS", "WordPress", "GraphQL"
@@ -163,7 +163,7 @@ def describe_SkillExtractor() -> None:
     def it_handles_set11() -> None:
       assert extract("Keen user of d3.js, and Raspberry Pi's.") == ["D3JS", "Raspberry-Pi"]
       assert extract("Arduino addict. Java programmer in real life") == ["Arduino", "Java"]
-      assert extract("C#,C++,Firebase,Unity") == ["C#", "C++", "Firebase", "Unity"]
+      assert extract("C#,C++,Firebase,Unity") == ["C#", "C++", "Google-Firebase", "Unity"]
       assert extract("R, Matlab, Tableau") == ["R", "Matlab", "Tableau"]
       assert extract("Pulumi, Kotlin, PowerShell | Postgres") == ["Pulumi", "Kotlin", "PowerShell", "PostgreSQL"]
       assert extract("MariaDB for backend | Scss for the FE") == ["MariaDB", "Backend", "SASS", "Frontend"]
@@ -173,7 +173,7 @@ def describe_SkillExtractor() -> None:
     assert extract("ARM processors") == ["ARM"]
     assert extract("Hi, my name is Arm") == ["ARM"] # FP
     assert extract("My left arm is stronger than my right arm") == []
-    assert extract("I’m doing high-performance computing work on CPU, including x86, arm.") == ["Performance", "CPU", "x86", "ARM"]
+    assert extract("I’m doing high-performance computing work on CPU, including x86, arm.") == ["CPU", "x86", "ARM"]
     assert extract("Embrace AI-IoT | RISC-V | ARM | ARC") == ["AI", "IoT", "RISC", "ARM", "ARC"]
     assert extract("PERN afficianado") == ["PostgreSQL", "Express", "React", "NodeJS"]
 
@@ -201,3 +201,12 @@ def describe_SkillExtractor() -> None:
     assert extract("I learn stuff-c") == []
     assert extract("C. Objective-C. C++") == ["C", "Objective-C", "C++"]
     assert extract("Ph.D. candidate, interested in software security") == ["Software", "Security"]
+
+  def it_handles_set15() -> None:
+    assert extract("Android(Kotlin) | iOS(Swift) | Spring Boot(Java) | Python(Django)") == [
+      "Android", "Kotlin", "iOS", "Swift", "Spring", "Java", "Python", "Django"
+    ]
+    assert extract("ClickHouse, linux, perl, python, C++, kafka") == [
+      "ClickHouse", "Linux", "Perl", "Python", "C++", "Apache-Kafka"
+    ]
+    assert extract("Software Eng @ClickHouse") == ["Software"]

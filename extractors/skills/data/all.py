@@ -1,9 +1,10 @@
-from ...utils import IN, LOWER, OP, propn, ver1
-from ..utils import Skill, contextual, neighbour, singleletter
+from ...utils import IN, LOWER, OP, literal, propn, ver1
+from ..utils import Skill, contextual, contextual_or_neighbour, neighbour, singleletter
 from .amazon import SKILLS as AMAZON_SKILLS
 from .apache import SKILLS as APACHE_SKILLS
 from .google import SKILLS as GOOGLE_SKILLS
 from .microsoft import SKILLS as MICROSOFT_SKILLS
+from .yandex import SKILLS as YANDEX_SKILLS
 from .competences import SKILLS as COMPETENCE_SKILLS
 
 __all__ = ["SKILLS"]
@@ -13,17 +14,30 @@ SKILLS: list[Skill] = [
   *APACHE_SKILLS,
   *GOOGLE_SKILLS,
   *MICROSOFT_SKILLS,
+  *YANDEX_SKILLS,
   *COMPETENCE_SKILLS,
 
   # ANALYSIS
-  Skill("Excel", [propn("excel")], ""),
-  Skill("Power-BI", ["power=bi"], ""),
   Skill("Tableau", ["tableau"], ""),
 
   # CLOUD
   Skill("Cloudflare", ["cloudflare"], ""),
   Skill("Heroku", ["heroku"], ""),
   Skill("Netlify", ["netlify"], ""),
+
+  # TOOLS (should mostly be discouraged in UI)
+  Skill("Confluence", ["confluence"], ""),
+  Skill("GitHub", ["github"], ""),
+  Skill("GitLab", ["gitlab"], ""),
+  Skill("Jira", ["jira"], ""),
+  Skill("Photoshop", ["photoshop"], ""),
+  Skill("Postman", ["postman"], ""),
+  Skill("Swagger", ["swagger"], ""),
+  # Hubstaff
+  # Skill("Zoom", ["zoom"], ""),
+
+  # ARCHITECTURE
+  # SOA
 
   # MOBILE & CROSS-PLATFORM
   # notification, ui, gui, interface, native, web
@@ -66,26 +80,35 @@ SKILLS: list[Skill] = [
   Skill("SwiftUI", ["swiftui"], ""), # framework
   Skill("UIKit", ["uikit"], ""), # framework
 
-  # BIGDATA
-  Skill("ELK-Stack", ["elk=stack", "elk"], ""),
-  Skill("Trino", ["trino"], ""), # also DATA-SCIENCE, ANALYTICS (https://trino.io/ Fast distributed SQL query engine for big data analytics)
-
-  # DATABASE
+  # DATABASE, DWH
   Skill("CouchBase", ["couchbase"], ""),
   Skill("CouchDB", ["couch=db"], ""),
   Skill("DynamoDB", ["dynamo=db"], ""),
   Skill("Elasticsearch", ["elastic=search"], ""),
+  Skill("Greenplum", ["greenplum"], ""),
   Skill("MariaDB", ["maria=db"], ""),
   Skill("Memcached", ["memcache(d)"], ""),
-  Skill("MongoDB", ["mongo=db", "mongo"], ""),
-  Skill("MySQL", ["my=sql"], ""),
+  Skill("MongoDB", ["mongo=db", ver1("mongo")], ""),
+  Skill("MySQL", ["my-sql", "my sql", ver1("mysql")], ""),
   Skill("Neo4j", ["neo4j", "neo4j=db"], ""),
   Skill("Oracle", ["oracle=db", "oracle", "pl(/)sql"], ""), # Oracle Database or Oracle RDBMS TODO split DB and COMPANY
   Skill("PouchDB", ["pouch=db"], ""),
-  Skill("PostgreSQL", ["postgre=sql", "postgres=sql", "postgres", "psql", "pgsql"], ""),
+  Skill("Presto", ["presto"], ""),
+  Skill("PostgreSQL", ["postgre=sql", "postgres=sql", ver1("postgres"), "psql", "pgsql"], ""),
   Skill("Redis", ["redis"], ""),
+  Skill("ScyllaDB", ["scylladb"], ""),
   Skill("Supabase", ["supabase"], ""),
   Skill("SQLite", [ver1("sqlite")], ""),
+  Skill("Trino", ["trino"], ""), # also ANALYTICS (https://trino.io/ Fast distributed SQL query engine for big data analytics)
+
+  # ORM
+  Skill("Django-ORM", ["django=orm"], ""),
+  Skill("Drizzle", ["drizzle=orm", "drizzle"], ""),
+  Skill("Hibernate", ["hibernate"], ""),
+  Skill("Prisma", ["prisma=orm", "prisma"], ""), # Popular word, some FPs
+  Skill("Sequelize", ["sequelize"], ""),
+  Skill("SQLAlchemy", ["sql=alchemy"], ""),
+  Skill("TypeORM", ["type=orm"], ""),
 
   # DATA SCIENCE
   Skill("Anaconda", ["anaconda", "miniconda", "conda"], ""),
@@ -101,7 +124,7 @@ SKILLS: list[Skill] = [
   Skill("Pandas", ["pandas"], ""),
   Skill("PyTorch", ["pytorch"], ""),
   Skill("Keras", ["keras"], ""),
-  Skill("RAPIDS", [propn("rapids")], ""), # also BIGDATA, GAMEDEV (`https://rapids.ai/`)
+  Skill("RAPIDS", [propn("rapids")], ""), # also GAMEDEV (`https://rapids.ai/`)
   Skill("Scikit-Learn", ["scikit=learn", "sklearn"], ""),
   Skill("SciPy", ["scipy"], ""),
   Skill("Seaborn", ["seaborn"], ""),
@@ -113,7 +136,7 @@ SKILLS: list[Skill] = [
 
   # GAME
   Skill("BabylonJS", ["babylon.=js"], "Game and rendering engine packed into a JavaScript framework."),
-  Skill("CUDA", ["cuda"], ""), # also ROBOTICS, EMBEDDED, BIGDATA (GPU computing, NVIDIA)
+  Skill("CUDA", ["cuda"], ""), # also ROBOTICS, EMBEDDED (GPU computing, NVIDIA)
   Skill("Godot", ["godot=engine", "godot", "gd=script"], ""),
   Skill("Phaser", ["phaser.=js", "phaser"], ""),
   Skill("PixiJS", ["pixi.=js", "pixi"], ""),
@@ -132,7 +155,7 @@ SKILLS: list[Skill] = [
   Skill("CherryPy", ["cherry=py"], ""),
   Skill("CodeIgniter", ["code=igniter"], ""),
   Skill("Deno", ["deno"], ""),
-  Skill("Django", ["django"], ""),
+  Skill("Django", ["django", "drf"], ""), # django-rest-framework
   Skill("Express", ["express.=js", "express"], ""),
   Skill("FastAPI", ["fast=api"], ""),
   Skill("Fastify", ["fastify"], ""),
@@ -147,9 +170,12 @@ SKILLS: list[Skill] = [
   Skill("Ruby-on-Rails", ["ruby=on=rails", "rails", "ror"], ""),
   Skill("SailsJS", ["sails.=js"], ""),
   Skill("SMTP", ["smtp"], ""),
-  Skill("Spring", ["spring"], ""),
-  Skill("Symfony", ["symfony"], ""),
-  Skill("Yii", ["yii"], ""),
+  Skill("Spring", [
+    ver1("spring"), "spring=framework", "spring=boot", "spring=cloud",
+    "spring=mvc", "spring=security", "spring=webflux"
+  ], ""),
+  Skill("Symfony", [ver1("symfony")], ""),
+  Skill("Yii", [ver1("yii")], ""),
 
   # Skill("ActiveMQ", ["active=mq"], ""), -- Apache
   Skill("Micronaut", ["micronaut"], ""),
@@ -167,18 +193,22 @@ SKILLS: list[Skill] = [
   Skill("jQuery", ["jquery"], ""),
   Skill("Material-UI", ["material=ui", "mui", propn("material")], ""),
   Skill("Materialize", ["materialize"], ""),
-  Skill("Photoshop", ["photoshop"], ""),
+  Skill("NgRx", ["ngrx"], "Reactive state management for Angular apps inspired by Redux."),
+  Skill("Pinia", ["pinia"], ""),
   Skill("React", ["react.=js", "react"], ""),
   Skill("Redux", ["redux.=js", "redux"], ""),
+  Skill("Remix", ["remix.=js", "remix"], ""),
+  Skill("RiotJS", ["riot.=js"], ""),
   Skill("SolidJS", ["solid.=js", propn("solid")], ""),
   Skill("Svelte", ["svelte.=js", "svelte"], ""),
   Skill("Tailwind-CSS", ["tailwind.=css", "tailwind"], ""),
-  Skill("VueJS", ["vue.=js", "vue"], ""),
+  Skill("VueJS", ["vue.=js", ver1("vue")], ""),
   Skill("VueX", ["vuex"], "State management pattern + library for VueJS applications."),
   # TODO edge, ambiguous
 
   # WEB FULLSTACK
   Skill("Gulp", ["gulp"], ""),
+  Skill("Vaadin", ["vaadin"], ""),
   Skill("Vite", ["vite"], ""),
   Skill("Webpack", ["webpack"], ""),
 
@@ -186,6 +216,7 @@ SKILLS: list[Skill] = [
   Skill("MERN-Stack", ["mern=stack", "mern"], "", stack=["MongoDB", "Express", "React", "NodeJS"]),
   Skill("MEVN-Stack", ["mevn=stack", "mevn"], "", stack=["MongoDB", "Express", "VueJS", "NodeJS"]),
   Skill("PERN-Stack", ["pern=stack", "pern"], "", stack=["PostgreSQL", "Express", "React", "NodeJS"]),
+  Skill("LAMP-Stack", ["lamp=stack", propn("LAMP")], "", stack=["Linux", "MySQL", "PHP"]), # Apache
 
   Skill("Chrome", ["chrome"], ""),
   Skill("Firefox", ["firefox"], ""),
@@ -193,7 +224,6 @@ SKILLS: list[Skill] = [
   Skill("WebKit", ["webkit"], ""), # browser engine
 
   Skill("Apollo", ["apollo.=js", "apollo=client", "apollo=server", "apollo"], "GraphQL-centric fullstack tools for web and mobile."),
-  Skill("GraphQL", ["graphql"], ""),
   Skill("HTMX", ["htmx"], ""),
   Skill("Meteor", ["meteor", "meteor.=js"], ""),
   Skill("Ktor", ["ktor"], ""), # fullstack framework in Kotlin
@@ -201,11 +231,15 @@ SKILLS: list[Skill] = [
   Skill("NextJS", ["next"], "", disambiguate=neighbour(1)), # /
   Skill("NuxtJS", ["nuxt.=js", propn("nuxt")], ""),
   Skill("NodeJS", ["node.=js", propn("node")], ""),
-  Skill("OpenAPI", ["openapi"], ""),
   Skill("SvelteKit", ["svelte=kit"], ""),
-  Skill("Swagger", ["swagger"], ""),
 
   # LOW-CODE
+  Skill("1C", ["1c"], ""), # ??
+  Skill("Bitrix", [
+    "bitrix",
+    "1c=bitrix", "bitrix=1c", "1с-битрикс", "битрикс-1с",
+    "bitrix=24", "битрикс=24",
+  ], ""), # so rare it makes sense to merge them...
   Skill("Airtable", ["airtable"], ""),
   Skill("Bitrix", ["bitrix", "bitrix24"], ""),
   Skill("Drupal", ["drupal"], ""),
@@ -215,15 +249,14 @@ SKILLS: list[Skill] = [
   Skill("Joomla", ["joomla"], ""),
   Skill("Magento", ["magento"], ""),
   Skill("MODx", ["modx"], ""),
-  Skill("Power-Apps", ["power=apps"], ""),
-  Skill("Power-Automate", ["power=automate"], ""),
-  Skill("Power-Platform", ["power=platform"], ""),
   Skill("Shopify", ["shopify"], ""),
   Skill("Strapi", ["strapi"], ""),
   Skill("WooCommerce", ["woo=commerce"], ""),
   Skill("WordPress", ["wordpress"], ""),
 
   # INFRASTRUCTURE
+  Skill("Celery", ["celery"], ""),
+  Skill("ELK-Stack", ["elk=stack", "elk"], "", stack=["Elasticsearch", "Logstash", "Kibana"]), # , "Beats"
   Skill("Infrastructure", ["infrastructure"], "Competence"),
   Skill("Ansible", ["ansible"], "Automation engine for configuration management, application deployment, and task automation."),
   # Skill("Dagger", ["dagger"], "Programmable CI/CD engine that runs pipelines in containers."),
@@ -233,30 +266,40 @@ SKILLS: list[Skill] = [
   Skill("CompTIA-ITOps", ["cios"], ""), # certificate
   Skill("MCSA", ["mcsa"], ""), # certificate
   Skill("Docker", ["docker", "dockerfile"], ""),
+  Skill("Docker-Compose", ["docker=compose"], ""),
+  Skill("Docker-Swarm", ["docker=swarm"], ""),
   Skill("Dokku", ["dokku"], ""), # also Cloud
+  Skill("GitHub-Actions", ["github=actions"], ""),
+  Skill("GitLab-CI", ["gitlab=ci"], ""),
+  Skill("Grafana", ["grafana"], ""),
+  Skill("Jaeger", ["jaeger"], "Distributed tracing platform. CNCF."),
   Skill("Jenkins", ["jenkins"], ""),
-  Skill("Kibana", ["kibana"], ""), # also BIGDATA
+  Skill("Kibana", ["kibana"], ""),
   Skill("Kubernetes", ["kubernetes", "k8s", "k3s"], ""),
-  Skill("Logstash", ["logstash"], ""), # also BIGDATA
+  Skill("Logstash", ["logstash"], ""),
   Skill("OpenShift", ["openshift"], "Hybrid cloud application platform: a comprehensive set of tools and services to streamline the application lifecycle."),
+  Skill("Prometheus", ["prometheus"], ""),
   Skill("Pulumi", ["pulumi"], ""),
   Skill("Puppet", ["puppet"], ""),
   Skill("Quarkus", ["quarkus"], ""),
-  Skill("Splunk", ["splunk"], ""), # also BIGDATA & SECURITY
+  Skill("Splunk", ["splunk"], ""), # also SECURITY
   Skill("RHCE", ["rhce"], ""),   # certificate
   Skill("RHCSA", ["rhcsa"], ""), # certificate
+  Skill("TeamCity", ["teamcity"], ""),
   Skill("Terraform", ["terraform"], ""),
   Skill("Vagrant", ["vagrant"], ""),
 
   # QA-n-AUTOMATION (tech & platforms)
   Skill("Appium", ["appium"], ""),
+  Skill("Codeception", ["codeception"], ""),
   Skill("Cucumber", ["cucumber"], ""),
   Skill("Cypress", ["cypress", "cypress.=js"], ""),
-  Skill("Jasmine", ["jasmine"], ""),
+  Skill("Jasmine", ["jasmine"], "", disambiguate=contextual_or_neighbour(["Jest", "Karma", "QA"], 2)),
   Skill("Jest", ["jest"], ""),
   Skill("JUnit", ["junit"], ""),
+  Skill("Karma", ["karma"], "", disambiguate=contextual_or_neighbour(["Jasmine", "Jest", "QA"], 2)),
+  Skill("PHPUnit", ["php=unit"], ""),
   Skill("Playwright", ["playwright"], ""),
-  Skill("Postman", ["postman"], ""),
   Skill("Protractor", ["protractor"], ""),
   Skill("PyTest", ["pytest"], ""),
   Skill("Selenium", ["selenium"], ""),
@@ -268,7 +311,10 @@ SKILLS: list[Skill] = [
   # QA-n-AUTOMATION (topics)
   Skill("TDD", ["tdd"], ""),
   Skill("BDD", ["bdd"], ""),
-  Skill("E2E", ["e2e"], ""),
+  Skill("E2E-Testing", ["e2e=testing", "e2e"], ""),
+  Skill("Unit-Testing", ["unit=testing", "unit=test(s)"], ""),
+  Skill("Integration-Testing", ["integration=testing", "integration=test(s)"], ""),
+  Skill("Functional-Testing", ["functional=testing", "functional=test(s)"], ""),
   Skill("CI/CD", ["ci/cd", "ci"], ""),
 
   # BLOCKCHAIN
@@ -293,8 +339,9 @@ SKILLS: list[Skill] = [
   Skill("MQTT", ["mqtt"], ""),      # IoT messaging standard, also CLOUD
   Skill("Nmap", ["nmap"], ""),             # also SECURITY
   Skill("Netcat", ["netcat", "ncat"], ""), # also SECURITY
-  Skill("Zigbee", ["zigbee"], ""), # protocol spec. also EMBEDDED
+  Skill("Proxyman", ["proxyman"], ""),   # also SECURITY
   Skill("Wireshark", ["wireshark"], ""),   # also SECURITY
+  Skill("Zigbee", ["zigbee"], ""), # protocol spec. also EMBEDDED
 
   # SECURITY
   Skill("Burp-Suite", ["burp=suite"], "Proprietary vulnerability scanning, penetration testing, and webapp security platform."),
@@ -395,10 +442,6 @@ SKILLS: list[Skill] = [
   # Skill("Multiplayer", ["multi=player"], ""),
   # Skill("Entity-Component-System", ["entity=component=system", "ecs"], ""), -- conflicts with AWS-ECS
   Skill("Cron", ["cron", "crond", "cronjob"], ""),
-  Skill("IP", ["ip"], ""),
-  Skill("TCP", ["tcp"], ""),
-  Skill("HTTP", ["http"], ""),
-  Skill("HTTPS", ["https"], ""),
   Skill("SSL", ["ssl"], ""),
   Skill("SSH", ["ssh"], ""),
   Skill("FTP", ["ftp"], ""),
@@ -417,7 +460,6 @@ SKILLS: list[Skill] = [
   # Skill("Scalability", ["scalability"], ""),
   # Skill("Reliability", ["reliability"], ""),
   # Skill("Resiliency", ["resiliency"], ""),
-  # Skill("Database", ["database", "db"], ""),
   # Skill("Deploy", ["deploy"], ""),
   # Skill("Architecture", ["architecture"], ""),
   # Skill("Integration", ["integration"], ""),
@@ -479,12 +521,11 @@ SKILLS: list[Skill] = [
   Skill("Z80", ["z=80"], ""), # CPU brand
 
   # DESKTOP
-  # Skill("Electron", ["electron"], ""), tons of FP
+  Skill("ElectronJS", ["electron=js"], ""), # tons of FPs for just "electron"
 
   # LANGUAGES
   Skill("Ada", ["ada"], ""),
   Skill("Apex", ["apex"], ""),
-  Skill("Assembly", ["assembly"], ""),
   Skill("C", ["c-lang"], ""),
   Skill("C", ["c"], "", disambiguate=singleletter()),
   Skill("C++", ["c++", "cpp", "c=plus=plus"], ""),
@@ -511,8 +552,10 @@ SKILLS: list[Skill] = [
   Skill("HTML", [ver1("html")], ""),
   Skill("Java", [ver1("java")], ""),
   Skill("JavaScript", ["java=script", "js"], ""),
+  Skill("JSON", ["json", "json5"], ""),
   Skill("Julia", ["julia"], ""),
   Skill("Kotlin", ["kotlin"], ""),
+  Skill("LESS", [literal("LESS")], ""),
   Skill("Lisp", ["lisp"], ""),
   Skill("Lua", ["lua"], ""),
   Skill("Nim", ["nim"], ""),
@@ -526,7 +569,7 @@ SKILLS: list[Skill] = [
   Skill("PHP", [ver1("php"), "phper"], ""),
   Skill("PowerShell", ["power=shell"], ""),
   Skill("Prolog", ["prolog"], ""),
-  Skill("Python", ["python", "pythonist(a)"], ""),
+  Skill("Python", [ver1("python"), "pythonist(a)"], ""),
   Skill("R", ["r=lang"], ""),
   Skill("R", ["r"], "", disambiguate=singleletter()),
   Skill("Ruby", ["ruby=lang", "ruby", "rubyist", "rubist"], ""),
@@ -537,8 +580,7 @@ SKILLS: list[Skill] = [
   Skill("Swift", ["swift"], ""),
   Skill("TypeScript", ["type=script", "ts"], ""),
   Skill("Shell", ["shell", "bash", "zsh"], ""),
-  Skill("SQL", ["sql"], ""),
-  # Skill("XML", ["xml"], ""),
+  Skill("XML", ["xml"], ""),
   Skill("V", ["vlang"], ""),
   Skill("V", ["v"], "", disambiguate=singleletter()),
   Skill("Vala", ["vala"], ""),
@@ -551,6 +593,8 @@ SKILLS: list[Skill] = [
   Skill("Blender", ["blender"], ""),
   Skill("CompTIA-A+", ["comptia a+"], ""), # certificate for tech. support and IT ops
   Skill("RxJS", ["rxjs"], ""),
+  Skill("Git", ["git"], ""),
+  Skill("SVN", ["svn"], ""),
 ]
 
 # // SECURITY TOOLS
@@ -568,7 +612,6 @@ SKILLS: list[Skill] = [
 #   "Octave": {pattern: "octave", category: "lang"},
 #   // "Polygon": {pattern: "polygon", category: "tech", role: "Engineer"},
 #   "Prisma": {pattern: "prisma", category: "tech", role: "Engineer"},
-#   "OpenAPI": {pattern: "open=api", category: "tech"},
 #   "OpenAuth": {pattern: "open=auth2?, oauth2?", category: "tech"},
 #   "RxJS": {pattern: "rx.=js, RX", category: "tech", role: "Engineer"},
 #   "Salt": {pattern: "salt", category: "platform", role: "Engineer"},

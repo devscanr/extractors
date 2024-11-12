@@ -13,7 +13,7 @@ SKILLS: list[Skill] = [
   Skill("Google-BigQuery", ["google=bigquery", "bigquery"], ""), # EE data warehouse
   Skill("Google-Cloud", ["google=cloud", "gcp"], ""),
   Skill("Google-Cloud", ["gc"], "", disambiguate=contextual("AWS", "Azure")),
-  Skill("Firebase", ["google=firebase", "firebase"], ""),
+  Skill("Google-Firebase", ["google=firebase", "firebase"], ""),
   Skill("Google-CloudStorage", ["google=cloud=storage", "gcs"], ""),
   Skill("Google-Sheets", ["google=sheets"], ""),
   Skill("Google-BigTable", ["google=bigtable"], ""), # fast flexible noSQL
