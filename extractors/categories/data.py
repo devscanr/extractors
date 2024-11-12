@@ -14,6 +14,7 @@ LABELED_PHRASES: LabeledPhrases = {
     ("coding", "VERB"),
     ("developing", "VERB"),
     ("programming", "VERB"),
+    "dba", # DB admin
     "dev",
     "dev=op(s)",
     "developer",
@@ -37,6 +38,7 @@ LABELED_PHRASES: LabeledPhrases = {
     "scientist",
     "sec",
     "sec=op(s)",
+    "sde",
     "swe",
     "tester",
   ],
