@@ -179,9 +179,10 @@ def get_nlp(name: str | Path = "en_core_web_sm") -> Language:
 
   # Tokenizer exceptions
   def token_match(token: str) -> bool | None:
+    KNOWN_PREFIXES = ("@",)
     KNOWN_SUFFIXES = (".js", ".py")
-    tokenl = token.lower()
-    if tokenl in {"c#", "ex.", "ph.d"} or tokenl.endswith(KNOWN_SUFFIXES):
+    lower = token.lower()
+    if lower in {"c#", "ex.", "ph.d"} or lower.startswith(KNOWN_PREFIXES) or lower.endswith(KNOWN_SUFFIXES):
       return True
     return False
   nlp.tokenizer.token_match = token_match # type: ignore
@@ -231,6 +232,12 @@ def ver1(word: str) -> Pattern:
 #   return [
 #     {ORTH: word}
 #   ]
+
+def literal(word: str) -> Pattern:
+  # TODO support spaces and other punct
+  return [
+    {ORTH: word}
+  ]
 
 def noun(word: str) -> Pattern:
   poss = ["NOUN", "PROPN", "ADJ"]
