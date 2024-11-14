@@ -117,8 +117,9 @@ SKILLS: list[Skill] = [
   Skill("IPython", ["ipython"], ""), # interactive shell
   Skill("JAX", [propn("JAX")], ""), # TensorFlow alternative
   Skill("JAX", ["jax"], "", disambiguate=neighbour(2)), # /
-  Skill("Jupyter", ["jupyter=lab", "jupyter=notebook(s)", "jupyter"], ""),
+  Skill("Jupyter", ["jupyter=lab", "jupyter-notebook(s)", "jupyter"], ""),
   Skill("Matplotlib", ["matplotlib"], ""),
+  Skill("NLTK", ["nltk"], ""),
   Skill("Numba", [[{LOWER: "numba"}, {OP: "!", LOWER: {IN: ["1", "one", "wan"]}}]], ""),
   Skill("NumPy", ["numpy"], ""),
   Skill("Pandas", ["pandas"], ""),
@@ -167,12 +168,12 @@ SKILLS: list[Skill] = [
   Skill("NestJS", ["nest.=js", propn("nest")], ""),
   Skill("Nginx", ["nginx"], ""),
   Skill("Phoenix", ["phoenix"], ""),
-  Skill("Ruby-on-Rails", ["ruby=on=rails", "rails", "ror"], ""),
+  Skill("Ruby-on-Rails", ["ruby-on-rails", "rails", "ror"], ""),
   Skill("SailsJS", ["sails.=js"], ""),
   Skill("SMTP", ["smtp"], ""),
   Skill("Spring", [
-    ver1("spring"), "spring=framework", "spring=boot", "spring=cloud",
-    "spring=mvc", "spring=security", "spring=webflux"
+    ver1("spring"), "spring-framework", "spring-boot", "spring-cloud",
+    "spring-mvc", "spring-security", "spring-webflux"
   ], ""),
   Skill("Symfony", [ver1("symfony")], ""),
   Skill("Yii", [ver1("yii")], ""),
@@ -308,15 +309,6 @@ SKILLS: list[Skill] = [
   Skill("TestNg", ["testng"], ""),
   Skill("WebdriverIO", ["webdriverio"], ""),
 
-  # QA-n-AUTOMATION (topics)
-  Skill("TDD", ["tdd"], ""),
-  Skill("BDD", ["bdd"], ""),
-  Skill("E2E-Testing", ["e2e=testing", "e2e"], ""),
-  Skill("Unit-Testing", ["unit=testing", "unit=test(s)"], ""),
-  Skill("Integration-Testing", ["integration=testing", "integration=test(s)"], ""),
-  Skill("Functional-Testing", ["functional=testing", "functional=test(s)"], ""),
-  Skill("CI/CD", ["ci/cd", "ci"], ""),
-
   # BLOCKCHAIN
   Skill("Arweave", ["arweave"], "A permanent and decentralized web inside an open ledger."),
   Skill("Bitcoin", ["bitcoin"], ""),
@@ -349,8 +341,8 @@ SKILLS: list[Skill] = [
   Skill("CISA", ["cisa"], ""),   # certificate
   Skill("CISM", ["cism"], ""),   # certificate
   Skill("CISSP", ["ciss", "cissp"], ""), # certificate
-  Skill("CompTIA-PenTest+", ["pentest+", "comptia p(entest)+"], ""), # certificate
-  Skill("CompTIA-Security+", ["security+", "comptia s(ecurity)+"], ""), # certificate
+  Skill("CompTIA-PenTest+", ["pentest+", "comptia-p(entest)+"], ""), # certificate
+  Skill("CompTIA-Security+", ["security+", "comptia-s(ecurity)+"], ""), # certificate
   Skill("GIAC-CIH", ["gcih"], ""),   # certificate
   Skill("GIAC-SEC", ["gsec"], ""),   # certificate
   Skill("GIAC-REM", ["grem"], ""),   # certificate
@@ -440,7 +432,7 @@ SKILLS: list[Skill] = [
   # Skill("Compiler", ["compiler"], ""),
   # Skill("Singleplayer", ["single=player"], ""),
   # Skill("Multiplayer", ["multi=player"], ""),
-  # Skill("Entity-Component-System", ["entity=component=system", "ecs"], ""), -- conflicts with AWS-ECS
+  # Skill("Entity-Component-System", ["entity-component-system", "ecs"], ""), -- conflicts with AWS-ECS
   Skill("Cron", ["cron", "crond", "cronjob"], ""),
   Skill("SSL", ["ssl"], ""),
   Skill("SSH", ["ssh"], ""),
@@ -452,8 +444,6 @@ SKILLS: list[Skill] = [
   # Skill("Analytics", ["analytics"], ""),
   # Skill("Network", ["network"], ""),
   # Skill("Networking", ["networking"], ""),
-  # Skill("Machine-Learning", ["machine=learning", "ML", "ai/ml"], ""),
-  # Skill("Deep-Learning", ["deep=learning"], ""),
   # Skill("Embedded", ["embedded"], ""),
   # Skill("Security", ["security", "appsec", "infosec", "cybersec"], ""),
   # Skill("Performance", ["performance"], ""),
@@ -505,11 +495,11 @@ SKILLS: list[Skill] = [
   Skill("Altium-Designer", ["altium=designer"], ""), # tool
   Skill("Altium-365", ["altium=365"], ""), # tool
   Skill("Autodesk", ["autodesk"], ""), # company
-  Skill("Autodesk-Fusion", ["autodesk=fusion", "fusion=360"], ""), # tool
-  Skill("Autodesk-Eagle", ["autodesk=eagle"], ""), # tool
+  Skill("Autodesk-Fusion", ["autodesk-fusion", "fusion=360"], ""), # tool
+  Skill("Autodesk-Eagle", ["autodesk-eagle"], ""), # tool
   Skill("Autodesk-Eagle", ["eagle"], "", disambiguate=contextual("Autodesk", "AutoCAD")), # /
   Skill("Touchdesigner", ["touchdesigner"], ""), # visual development platform
-  Skill("Solidworks", ["solidworks=pcb", "solidworks"], ""), # CB design tool
+  Skill("Solidworks", ["solidworks-pcb", "solidworks"], ""), # CB design tool
   Skill("STM32", ["stm=32"], ""), # platform
   Skill("Verilog", ["verilog", "sysverilog", "systemverilog"], ""), # PL
   Skill("VHDL", ["vhdl"], ""), # PL
@@ -533,7 +523,7 @@ SKILLS: list[Skill] = [
   Skill("Clojure", ["clojure", "clojurian"], ""),
   Skill("ClojureScript", ["clojure=script"], ""),
   Skill("Cobol", ["cobol"], ""),
-  Skill("Crystal", ["crystal=lang", "crystal"], ""),
+  Skill("Crystal", ["crystal-lang", "crystal"], ""),
   Skill("CSS", [ver1("css")], ""),
   Skill("D", ["d=lang"], ""),
   Skill("D", ["d"], "", disambiguate=singleletter()),
@@ -658,27 +648,17 @@ SKILLS: list[Skill] = [
 #
 #   // Role-agnostic (multi-role) topics
 #   "Manual": {pattern: "manual", category: "topic"},
-#   "Marketing": {pattern: "marketing", category: "topic"},
 #   "R&D": {pattern: "r ?& ?d", category: "topic"},
 #   "Sales": {pattern: "sales", category: "topic"}, // another problematic word @_@
 #   "System": {pattern: "systems?", category: "topic"},
-#   "Web": {pattern: "web", category: "topic"},
 #   "Typography": {pattern: "typography", category: "topic"},
 #   "Startup": {pattern: "startups?", category: "topic"},
 #   "Product": {pattern: "!Products?", category: "topic"},
 #   "Project": {pattern: "!Projects?", category: "topic"},
 #   "Solution": {pattern: "!Solutions?", category: "topic"},
 #   "Team": {pattern: "!Teams?", category: "topic"},
-#   "Functional Programming": {pattern: "functional=programming, fp", category: "topic"},
-#   "Object Oriented Programming": {pattern: "object=oriented=programming, oop", category: "topic"},
-#   "Tech": {pattern: "tech, technical", category: "topic"},
+#   "Functional Programming": {pattern: "functional-programming, fp", category: "topic"},
 #   "Crypto": {pattern: "crypto, defi, web=3", category: "topic"}, // crypto enthusiast = crypto-currencies + decentralized finance (DeFi)
-#   "E-Commerce": {pattern: "e=commerce", category: "topic"},
-#
-#   "API": {pattern: "api", category: "topic"},
-#   "E2E": {pattern: "end=to=end, e2e", category: "topic"},
-#   "TDD": {pattern: "tdd", category: "topic"},
-#   "BDD": {pattern: "bdd", category: "topic"},
 #   // Crypto vs Blockchain?!?!
 #   // Containers?
 #   // should nopCommerce -> eCommerce? But then NodeJS -> js, are there INVALID precedents like that?

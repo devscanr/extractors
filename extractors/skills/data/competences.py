@@ -4,60 +4,66 @@ from ..utils import Skill, neighbour
 __all__ = ["SKILLS"]
 
 SKILLS: list[Skill] = [
-  # MANAGEMENT
-  Skill("Agile", ["agile", "kanban", "scrum"], ""),
+  # OTHER
+  Skill("Business", ["business"], "Competence"),
+  Skill("Marketing", ["marketing"], "Competence"),
+  Skill("Education", ["edtech"], "Competence"), # differentiate from own education and self-education
+  Skill("Finance", ["finance", "fintech"], "Competence"),
 
   # SOFTWARE ENGINEERING
-  Skill("TDD", ["tdd"], ""),
-  Skill("BDD", ["ddd"], ""),
-  Skill("DDD", ["ddd"], ""),
-  Skill("FP", ["fp", "фп"], ""),
-  Skill("OOP", ["oop", literal("SOLID"), "ооп"], ""),
+  Skill("Agile", ["agile", "kanban", "scrum"], "Competence"),
+  Skill("TDD", ["tdd"], "Competence"),
+  Skill("BDD", ["ddd"], "Competence"),
+  Skill("DDD", ["ddd"], "Competence"),
+  Skill("FP", ["fp", "фп"], "Competence"),
+  Skill("OOP", ["oop", literal("SOLID"), "ооп"], "Competence"),
   # YAGNI, DRY, KISS, MVC
 
   Skill("Backend", ["back=end(er)", noun("BE")], "Competence"),   # not detected as PROPN, needs to be retrained
-  Skill("API", ["api"], ""),
-  Skill("ORM", ["orm"], ""),
-  Skill("REST", ["rest=api", propn("rest"), noun("REST")], ""),
-  Skill("REST", ["rest"], "", disambiguate=neighbour(2)),
-  Skill("RPC", ["rpc=api", "rpc"], ""),
-  Skill("SOAP", ["soap"], ""),
-  Skill("gRPC", ["grpc"], ""),
-  Skill("SSG", ["ssg"], ""),
-  Skill("SSR", ["ssr"], ""),
-  Skill("tRPC", ["trpc"], ""),
+  Skill("API", ["api"], "Competence"),
+  Skill("ORM", ["orm"], "Competence"),
+  Skill("REST", ["rest=api", propn("rest"), noun("REST")], "Competence"),
+  Skill("REST", ["rest"], "Competence", disambiguate=neighbour(2)),
+  Skill("RPC", ["rpc=api", "rpc"], "Competence"),
+  Skill("SOAP", ["soap"], "Competence"),
+  Skill("gRPC", ["grpc"], "Competence"),
+  Skill("SSG", ["ssg"], "Competence"),
+  Skill("SSR", ["ssr"], "Competence"),
+  Skill("tRPC", ["trpc"], "Competence"),
 
   # FRONTEND
   Skill("Frontend", ["front=end(er)", noun("FE")], "Competence"), # not detected as PROPN, needs to be retrained
   # BEM, БЭМ
-  Skill("DOM", ["dom"], ""),
-  Skill("UI/UX", ["ui", "ux", "user=interface", "user=experience"], ""),
-  Skill("Browser", ["browser"], ""),
-  Skill("DevTools", ["dev=tools"], ""),
-  Skill("MPA", ["mpa"], ""),
-  Skill("SPA", ["spa"], ""),
-  Skill("OpenAPI", ["openapi"], ""),
-  Skill("IP", ["ip"], ""),
-  Skill("TCP", ["tcp"], ""),
-  Skill("HTTP", ["http"], ""),
-  Skill("HTTPS", ["https"], ""),
-  Skill("WebSocket", ["websocket", "ws"], ""),
+  Skill("DOM", ["dom"], "Competence"),
+  Skill("UI/UX", ["ui", "ux", "user-interface", "user-experience"], "Competence"),
+  Skill("Browser", ["browser"], "Competence"),
+  Skill("DevTools", ["dev=tools"], "Competence"),
+  Skill("MPA", ["mpa"], "Competence"),
+  Skill("SPA", ["spa"], "Competence"),
+  Skill("OpenAPI", ["openapi"], "Competence"),
+  Skill("IP", ["ip"], "Competence"),
+  Skill("TCP", ["tcp"], "Competence"),
+  Skill("HTTP", ["http"], "Competence"),
+  Skill("HTTPS", ["https"], "Competence"),
+  Skill("WebSocket", ["websocket", "ws"], "Competence"),
 
   Skill("Web", ["web", "webdev"], "Competence"),
   Skill("Fullstack", ["fullstack(er)"], "Competence"),
 
   Skill("Blockchain", ["blockchain"], "Competence"),
+  Skill("dApps", ["decentralized-application(s)", "dapp(s)"], "Competence"),
+  Skill("DeFi", ["decentralized-finance", "de=fi"], "Competence"),
   Skill("Web3", ["web3"], "Competence"),
-  Skill("dApp", ["dapp(s)"], "Competence"),
   Skill("Crypto", ["crypto"], "Competence"),
+  Skill("P2P", ["peer=2=peer", "peer=to=peer", "p2p"], "Competence"),
 
   # LOW-CODE
   Skill("Low-Code", ["low=code", "no=code"], "Competence"),
-  Skill("CMS", ["cms"], "Competence"),
+  Skill("CMS", ["content-management-system", "cms"], "Competence"),
   Skill("CRM", ["crm"], "Competence"),
-  Skill("IaaS", ["iaas"], ""), # INFRASTRUCTURE
-  Skill("PaaS", ["paas"], ""), # INFRASTRUCTURE
-  Skill("SaaS", ["saas"], ""),
+  Skill("IaaS", ["iaas"], "Competence"), # INFRASTRUCTURE
+  Skill("PaaS", ["paas"], "Competence"), # INFRASTRUCTURE
+  Skill("SaaS", ["saas"], "Competence"),
 
   # MOBILE
   Skill("Mobile", ["mobile", "mobiledev"], "Competence"),
@@ -65,45 +71,62 @@ SKILLS: list[Skill] = [
 
   # Skill("Game", ["game", "gamedev"], "Competence"),
 
-  # DATABASE, QUERY-LANGUAGES
-  Skill("Database", ["database(s)"], ""),
-  Skill("SQL", ["sql"], ""),
-  Skill("NoSQL", ["nosql"], ""),
-  Skill("GraphQL", ["graphql"], ""),
+  # DATABASE
+  Skill("Database", ["database(s)"], "Competence"),
 
-  # PL UMBRELLAS
-  Skill("Assembly", ["assembly"], ""),
+  # PL/QL UMBRELLAS
+  Skill("Assembly", ["assembly"], "Competence"),
+  Skill("GraphQL", ["graphql"], "Competence"),
+  Skill("SQL", ["sql"], "Competence"),
+  Skill("NoSQL", ["nosql"], "Competence"),
 
   # INFRASTRUCTURE
   Skill("Infrastructure", ["infrastructure"], "Competence"),
+  Skill("CI/CD", ["continuous-integration", "ci/cd", "ci"], "Competence"),
   Skill("Cloud", ["cloud"], "Competence"),
-  Skill("Ops", ["ops"], "Competence"), # TODO operations
-  Skill("DataOps", ["dataops"], "Competence"),
-  Skill("DevOps", ["devops"], "Competence"),
-  Skill("MlOps", ["mlops"], "Competence"),
-  Skill("SecOps", ["secops"], "Competence"),
-  Skill("Orchestration", ["orchestration"], ""),
+  Skill("Operations", ["ops"], "Competence"), # TODO operations
+  Skill("DataOps", ["dataops"], "Competence", stack=["ETL", "Automation", "Operations"]),
+  Skill("DevOps", ["devops"], "Competence", stack=["Infrastructure", "Automation", "Operations"]),
+  Skill("MlOps", ["mlops"], "Competence", stack=["Machine-Learning", "Automation", "Operations"]),
+  Skill("SecOps", ["secops"], "Competence", stack=["Security", "Automation", "Operations"]),
+  Skill("Orchestration", ["orchestration"], "Competence"),
   # Deploy
 
+  # QA & AUTOMATION -- Skill("QA", ["qa"], "Competence"),
+  Skill("QA", ["quality-assurance", "qa"], "Competence", stack=["Automation", "Testing"]),
   Skill("Automation", ["automation"], "Competence"),
-  Skill("QA", ["qa"], "Competence"),
-
-  Skill("ETL", ["etl", "elt"], "Competence"),
-  Skill("DWH", ["dwh"], "Competence"),
-
+  Skill("E2E-Testing", ["e2e-testing", "e2e=test(s)", "e2e"], "Competence"),
+  Skill("Unit-Testing", ["unit-testing", "unit=test(s)"], "Competence"),
+  Skill("Integration-Testing", ["integration-testing", "integration=test(s)"], "Competence"),
+  Skill("Functional-Testing", ["functional-testing", "functional=test(s)"], "Competence"),
+  Skill("Load-Testing", ["load=testing", "load=test(s)"], "Competence"),
+  Skill("Testing", ["testing"], "Competence"),
   # Skill("Accessibility", ["accessibility", "accessible"], "Competence"),
   # Skill("Performance", ["performance", "performant"], "Competence"),
-  Skill("Security", ["security", "secure"], "Competence"),
   # Skill("Reliability", ["realibility", "reliable"], "Competence"),
   # Skill("Resilience", ["resilience", "resilient"], "Competence"),
   # Skill("Scalability", ["scalability", "scalable", ], "Competence"),
   # Skill("Observability", ["observability", "observable"], "Competence"),
   # Skill("Usability", ["usability", "usable"], "Competence"),
 
+  Skill("ETL", ["etl", "elt"], "Competence"),
+  Skill("DWH", ["dwh"], "Competence"),
+
+  # SECURITY
+  Skill("Security", ["security"], "Competence"), # "secure"?
+  Skill("App-Security", ["app=sec(urity)"], "Competence"),
+  Skill("Cyber-Security", ["cyber=sec(urity)"], "Competence"),
+  Skill("Data-Protection", ["data-protection"], "Competence"),
+  Skill("Data-Security", ["data=sec(urity)"], "Competence"),
+  Skill("Information-Security", ["information-sec(urity)", "info=sec(urity)"], "Competence"),
+  Skill("Network-Security", ["network-security"], "Competence"),
+  Skill("Penetration-Testing", ["penetration-testing", "penetration-test(s)", "penetration-tester"], "Competence"),
+  Skill("Vulnerability-Testing", ["vulnerability-testing", "vulnerability-test(s)"], "Competence"),
+
   Skill("Network", ["network"], "Competence"), # TODO networking
 
   Skill("Robotics", ["robotics"], "Competence"),
-  Skill("Computer-Vision", ["computer=vision"], "Competence"),
+  Skill("Computer-Vision", ["computer-vision"], "Competence"),
 
   Skill("Decentralized", ["decentralized"], "Competence"),
   Skill("Distributed", ["distributed"], "Competence"),
@@ -113,14 +136,20 @@ SKILLS: list[Skill] = [
   # Replication, Partitioning | Enterprise, large-scale
   # Big Data  Data-heavy, logic-heavy
 
-  Skill("AI", ["artificial=intelligence", "ai"], "Competence"),
+  Skill("AI", ["artificial-intelligence", "ai"], "Competence"),
   Skill("Big-Data", ["big=data"], "Competence"),
+  # Skill("Data", ["data"], "Competence"), -- too many different meanings, better not to include
+  Skill("Data-Extraction", ["data=extraction"], "Competence"),
   Skill("Data-Mining", ["data=mining"], "Competence"),
-  # Scraping # Data-Extraction
-  Skill("Machine-Learning", ["machine=learning"], "Competence"),
-  Skill("Deep-Learning", ["deep=learning"], "Competence"),
-  Skill("Natural-Language-Processing", ["natural=language=processing", "nlp"], "Competence"),
-  Skill("Large-Language-Models", ["large=language=model(s)", "llm"], "Competence"),
+  Skill("Data-Visualization", ["data-visualization", "data=viz"], "Competence"),
+  # Scraping
+  Skill("Machine-Learning", ["machine-learning", "ml"], "Competence"),
+  Skill("Deep-Learning", ["deep=learning", "dl"], "Competence"), # not sure about FPs
+  Skill("Neural-Networks", ["(deep=)neural-networks", "nn"], "Competence"), # not sure about FPs
+  Skill("Natural-Language-Processing", ["natural-language-processing", "nlp"], "Competence"),
+  Skill("Large-Language-Models", ["large-language-model(s)", "llm"], "Competence"),
+  Skill("Large-Language-Models", ["large-language-model(s)", "llm"], "Competence"),
+  Skill("Multimodal-Large-Language-Models", ["multimodal-large-language-model(s)", "mllm"], "Competence"),
   # Motion-Prediction
   # Sensor-Fusion
 
@@ -138,8 +167,8 @@ SKILLS: list[Skill] = [
   Skill("Statistics", ["statisics"], "Science"),
 
   # Analysis
-  Skill("Analysis", ["analysis"], ""),
-  Skill("Analytics", ["analytics"], ""),
+  Skill("Analysis", ["analysis", "analyst"], "Competence"),
+  Skill("Analytics", ["analytics"], "Competence"),
 ]
 
 # Non-skills (words that look like skills but are not, might be useful to help with them in UI)

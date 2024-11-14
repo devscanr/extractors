@@ -14,9 +14,11 @@ def to_patterns2(phrase: str) -> list[str]:
 def to_patterns(phrase: str) -> list[str]:
   if not phrase:
     return []
-  dotequal_i = phrase.find(".=")
-  equal_i = phrase.find("=")
-  if 0 <= dotequal_i and (equal_i == -1 or dotequal_i < equal_i):
+  dotequal_i, equal_i, dash_i = phrase.find(".="), phrase.find("="), phrase.find("-")
+  l = len(phrase)
+  first_cc = min(l, l, *[i for i in [dotequal_i, equal_i, dash_i] if i != -1])
+  if first_cc == dotequal_i:
+    # Handling ".="s
     head, tail = phrase[0:dotequal_i], phrase[dotequal_i + 2:]
     tail_patterns = to_patterns(tail)
     return [
@@ -25,38 +27,37 @@ def to_patterns(phrase: str) -> list[str]:
       head + "-" + pattern for pattern in tail_patterns
     ] + [
       head + " " + pattern for pattern in tail_patterns
-    ] + (
-      [
-        head + pattern[0] + pattern[1:]
-        for pattern in tail_patterns
-      ]
-      if "=" in tail
-      else [
-        head + tail
-      ]
-    )
-  elif 0 <= equal_i and (dotequal_i == -1 or equal_i < dotequal_i):
+    ] + [
+      head + pattern for pattern in tail_patterns
+    ]
+  elif first_cc == equal_i:
+    # Handling "="s
     head, tail = phrase[0:equal_i], phrase[equal_i + 1:]
     tail_patterns = to_patterns(tail)
     return [
       head + "-" + pattern for pattern in tail_patterns
     ] + [
       head + " " + pattern for pattern in tail_patterns
-    ] + (
-      [
-        head + pattern[0] + pattern[1:]
-        for pattern in tail_patterns
-      ]
-      if "=" in tail
-      else [
-        head + tail
-      ]
-    )
+    ] + [
+      head + pattern for pattern in tail_patterns
+    ]
+  elif first_cc == dash_i:
+    # Handling "-"s
+    head, tail = phrase[0:dash_i], phrase[dash_i + 1:]
+    tail_patterns = to_patterns(tail)
+    return [
+      head + "-" + pattern for pattern in tail_patterns
+    ] + [
+      head + " " + pattern for pattern in tail_patterns
+    ]
   else:
     return [phrase]
 
 # print(
-#   to_patterns2("free=lance(r)"),
-#   to_patterns2("free=lancing"),
+#   # to_patterns2("free-lance(r)"),
+#   to_patterns2("(amazon-)aws=elasticache"),
+#   # to_patterns2("php"),
+#   # to_patterns2("my=free=lancer"),
+#   # to_patterns2("free=lancing"),
 #   # to_patterns2("node.=js(er)")
 # )

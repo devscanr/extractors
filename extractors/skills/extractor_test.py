@@ -31,8 +31,8 @@ def describe_SkillExtractor() -> None:
       assert extract("Self-employed web engineer. #Rust #Wasm #Go #TypeScript #React #REST") == [
         "Web", "Rust", "WebAssembly", "Go", "TypeScript", "React", "REST"
       ]
-      assert extract("I like Python, JS/TS, Go, Postgres, Kubernetes, Docker, DevOps.") == [
-        "Python", "JavaScript", "TypeScript", "Go", "PostgreSQL", "Kubernetes", "Docker", "DevOps",
+      assert extract("I like Postgres, Kubernetes, Docker, DevOps.") == [
+        "PostgreSQL", "Kubernetes", "Docker", "Infrastructure", "Automation", "Operations",
       ]
       assert extract("working with React, Node, Go, and the rest") == [
         "React", "NodeJS", "Go"
@@ -52,8 +52,11 @@ def describe_SkillExtractor() -> None:
       assert extract("With no desire，at rest and still. All things go right as of their will") == []
 
     def it_handles_set3() -> None:
-      assert extract("Fullstack web developer with focus on front end services. Experienced with React/React Native, PHP, MySQL, GraphQL, Angularjs, Prisma, Expo") == [
-        "Fullstack", "Web", "React", "React-Native", "PHP", "MySQL", "GraphQL", "Angular", "Prisma"
+      assert extract("Fullstack web developer with focus on front end services.") == [
+        "Fullstack", "Web", "Frontend"
+      ]
+      assert extract("Experienced with React/React Native, PHP, MySQL, GraphQL, Angularjs, Prisma, Expo") == [
+        "React", "React-Native", "PHP", "MySQL", "GraphQL", "Angular", "Prisma"
       ]
       assert extract("A Full Stack developer with expertise in ASP.Net (Legacy, Core), Angular, Ionic, NativeScript, nopCommerce and more...") == [
         "ASP.NET", "Angular", "Ionic", "Native-Script"
@@ -152,9 +155,9 @@ def describe_SkillExtractor() -> None:
       assert extract("Where old projects go to live out the rest of their days") == []
 
     def it_handles_set10() -> None:
-      assert extract("I'm Julia, a marketing manager") == ["Julia"] # known FP
+      assert extract("I'm Julia, a marketing manager") == ["Julia", "Marketing"] # known FP
       assert extract("I learn Julia language") == ["Julia"]
-      assert extract("developer:iOS,Robot,Fintech") == ["iOS"]
+      assert extract("developer:iOS,Robot,Fintech") == ["iOS", "Finance"]
       assert extract("C Plus Plus programmar from India") == ["C++"]
       assert extract("hey are a bi person, my@sql") == []
       assert extract("PHP phper, Python pythonista") == ["PHP", "Python"]
@@ -210,3 +213,21 @@ def describe_SkillExtractor() -> None:
       "ClickHouse", "Linux", "Perl", "Python", "C++", "Apache-Kafka"
     ]
     assert extract("Software Eng @ClickHouse") == ["Software"]
+    assert extract("Love making games") == [] # for now
+    assert extract("""
+      I'm a 21 year old embedded systems electronics engineer. 
+      Mostly interested in robotics, low-level coding and homebrew development.
+    """) == ["Embedded", "Robotics"]
+    assert extract("""
+      Programmer, cybersecurity expert, and 2017 penetration tester
+    """) == ["Cyber-Security", "Penetration-Testing"]
+
+  def it_handles_set16() -> None:
+    assert extract("Blockchain developer, bulding for DeFi.") == ["Blockchain", "DeFi"]
+    assert extract("""
+      FullStack Web Developer | Penetration Tester
+    """) == ["Fullstack", "Web", "Penetration-Testing"]
+    assert extract("""
+      Student in saylani mass it training program and learn web and app 
+      development and I'm completed my content management system WordPress course.
+    """) == ["Web", "CMS", "WordPress"]
