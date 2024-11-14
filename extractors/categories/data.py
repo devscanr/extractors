@@ -126,6 +126,7 @@ LABELED_PHRASES: LabeledPhrases = {
     "new to",
     "noob",
     "novice",
+    "rookie",
     "sophomore",
     "student",
     ("study", "VERB"),

@@ -327,6 +327,7 @@ def describe_Categorizer() -> None:
       assert cats("Biotech student and sometimes software developer.").role == "Student"
       assert cats("Software developer and sometimes biotech student.").role == "Dev"
       assert cats("Everlasting student · Freelance · Life lover") == Cats(is_freelancer=True)
+      assert cats("rookie front-end developer").role == "Student"
       assert cats("""
         Professor of the Practice in Computer Science, Program Director
         for the Fundamentals of Computing Undergraduate Certificate Program
