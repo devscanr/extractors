@@ -15,7 +15,7 @@ SKILLS: list[Skill] = [
   Skill("OOP", ["oop", literal("SOLID"), "ооп"], ""),
   # YAGNI, DRY, KISS, MVC
 
-  Skill("Backend", ["backend(er)", noun("BE")], "Competence"),   # not detected as PROPN, needs to be retrained
+  Skill("Backend", ["back=end(er)", noun("BE")], "Competence"),   # not detected as PROPN, needs to be retrained
   Skill("API", ["api"], ""),
   Skill("ORM", ["orm"], ""),
   Skill("REST", ["rest=api", propn("rest"), noun("REST")], ""),
@@ -28,7 +28,7 @@ SKILLS: list[Skill] = [
   Skill("tRPC", ["trpc"], ""),
 
   # FRONTEND
-  Skill("Frontend", ["frontend(er)", noun("FE")], "Competence"), # not detected as PROPN, needs to be retrained
+  Skill("Frontend", ["front=end(er)", noun("FE")], "Competence"), # not detected as PROPN, needs to be retrained
   # BEM, БЭМ
   Skill("DOM", ["dom"], ""),
   Skill("UI/UX", ["ui", "ux", "user=interface", "user=experience"], ""),
