@@ -84,15 +84,16 @@ SKILLS: list[Skill] = [
   Skill("Infrastructure", ["infrastructure"], "Competence"),
   Skill("CI/CD", ["continuous-integration", "ci/cd", "ci"], "Competence"),
   Skill("Cloud", ["cloud"], "Competence"),
-  Skill("Operations", ["ops"], "Competence"), # TODO operations
-  Skill("DataOps", ["dataops"], "Competence", stack=["ETL", "Automation", "Operations"]),
-  Skill("DevOps", ["devops"], "Competence", stack=["Infrastructure", "Automation", "Operations"]),
-  Skill("MlOps", ["mlops"], "Competence", stack=["Machine-Learning", "Automation", "Operations"]),
-  Skill("SecOps", ["secops"], "Competence", stack=["Security", "Automation", "Operations"]),
+  Skill("DataOps", ["data=ops"], "Competence", stack=["ETL", "Automation", "Operations"]),
+  Skill("DevOps", ["dev=ops"], "Competence", stack=["Infrastructure", "Automation", "Operations"]),
+  Skill("DevSecOps", ["dev=sec=ops", "sec=dev=ops"], "Competence", stack=["Infrastructure", "Security", "Automation", "Operations"]),
+  Skill("ITOps", ["itops"], "Competence", stack=["Infrastructure", "Operations"]),
+  Skill("MlOps", ["ml=ops"], "Competence", stack=["Machine-Learning", "Automation", "Operations"]),
+  Skill("SecOps", ["sec=ops"], "Competence", stack=["Security", "Automation", "Operations"]),
+  Skill("Operations", ["operations", "ops"], "Competence"),
   Skill("Orchestration", ["orchestration"], "Competence"),
-  # Deploy
 
-  # QA & AUTOMATION -- Skill("QA", ["qa"], "Competence"),
+  # QA & AUTOMATION
   Skill("QA", ["quality-assurance", "qa"], "Competence", stack=["Automation", "Testing"]),
   Skill("Automation", ["automation"], "Competence"),
   Skill("E2E-Testing", ["e2e-testing", "e2e=test(s)", "e2e"], "Competence"),
