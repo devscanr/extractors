@@ -228,11 +228,6 @@ def ver1(word: str) -> Pattern:
     {LOWER: {REGEX: r"^" + word + r"[-\d.]{0,4}$"}}
   ]
 
-# def patt(word: str) -> Pattern:
-#   return [
-#     {ORTH: word}
-#   ]
-
 def literal(word: str) -> Pattern:
   # TODO support spaces and other punct
   return [
@@ -272,47 +267,17 @@ def verb(word: str) -> Pattern:
       {LOWER: word, POS: {IN: poss}}
     ]
 
-# def get_prev_word(doc: Doc, token: Token, hops: int=None) -> Token | None:
-#   h = 0
-#   i = token.i - 1
-#   while i >= 0 and i >= token.sent.start and (hops and h < hops):
-#     curr_token = doc[i]
-#     if is_word(curr_token):
-#       return curr_token
-#     i -= 1
-#     h += 1
-#   return None
-
-# def get_right_propns(doc: Doc, token: Token) -> list[Token]:
-#   result: list[Token] = []
-#   i = token.i + 1
-#   while i < token.sent.end:
-#     curr_token = doc[i]
-#     if curr_token.pos_ == "PROPN":
-#       result.append(curr_token)
-#     else:
-#       break
-#     i += 1
-#   return result
-
-def get_preceding(token: Token) -> list[Token]:
+def get_prec_tokens(token: Token) -> list[Token]:
   return list(token.doc[token.sent.start : token.i])
 
-def get_consequent(token: Token) -> list[Token]:
+def get_prec_words(token: Token) -> list[Token]:
+  return [token for token in token.doc[token.sent.start : token.i] if is_word(token)]
+
+def get_cons_tokens(token: Token) -> list[Token]:
   return list(token.doc[token.i+1 : token.sent.end])
 
-# def next_word(doc: Doc, token: Token) -> Token | None:
-#   j = token.i + 1
-#   return doc[j].lower_ if doc[j] and is_word(doc[j]) else None
-
-# def get_consequent_nouns(token: Token) -> list[Token]:
-#   res = []
-#   for cons in get_consequent(token):
-#     if cons.pos_ in {"NOUN", "PROPN", "ADJ"}:
-#       res.append(cons)
-#     else:
-#       break
-#   return res
+def get_cons_words(token: Token) -> list[Token]:
+  return [token for token in token.doc[token.i+1 : token.sent.end] if is_word(token)]
 
 def get_heads(_token: Token) -> list[Token]:
   token = _token

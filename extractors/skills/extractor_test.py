@@ -59,7 +59,7 @@ def describe_SkillExtractor() -> None:
         "React", "React-Native", "PHP", "MySQL", "GraphQL", "Angular", "Prisma"
       ]
       assert extract("A Full Stack developer with expertise in ASP.Net (Legacy, Core), Angular, Ionic, NativeScript, nopCommerce and more...") == [
-        "ASP.NET", "Angular", "Ionic", "Native-Script"
+        "Fullstack", "ASP.NET", "Angular", "Ionic", "Native-Script"
       ]
       assert extract("#Python #Jupyter #pandas #docker") == [
         "Python", "Jupyter", "Pandas", "Docker"
@@ -133,7 +133,7 @@ def describe_SkillExtractor() -> None:
         "Angular", "React", "NextJS", "SvelteKit", "NodeJS", "NestJS", "PHP", "CMS"
       ]
       assert extract("Full-stack developer Vue, Nuxt, Wordpress+GraphQL") == [
-        "VueJS", "NuxtJS", "WordPress", "GraphQL"
+        "Fullstack", "VueJS", "NuxtJS", "WordPress", "GraphQL"
       ]
       assert extract("I'm learning #go and #rest") == ["Go", "REST"]
       assert extract("I'm learning the rest as I go on") == []
@@ -141,7 +141,7 @@ def describe_SkillExtractor() -> None:
 
     def it_handles_set9() -> None:
       assert extract("FULL STACK JAVA | NETBEANS | C# | MICROSOFT MANAGEMENT STUDIO | JAVASCRIPT | VISUAL CODE | JUPYTER NOTEBOOK | PYTHON & RUBY") == [
-        "Java", "C#", "Microsoft", "JavaScript", "Jupyter", "Python", "Ruby"
+        "Fullstack", "Java", "C#", "Microsoft", "JavaScript", "Jupyter", "Python", "Ruby"
       ]
       assert extract("Learning ReactJS & Next.js to become a proficient frontender") == [
         "React", "NextJS", "Frontend"
@@ -231,3 +231,57 @@ def describe_SkillExtractor() -> None:
       Student in saylani mass it training program and learn web and app 
       development and I'm completed my content management system WordPress course.
     """) == ["Web", "CMS", "WordPress"]
+
+  def it_handles_set17() -> None:
+    assert extract("NVIDIA Technologies for game and application developers") == ["NVidia"]
+    assert extract("Open source continuous integration for games") == ["CI/CD"]
+    assert extract("Game developer.") == ["Game"]
+    assert extract("Game Server Programmer :)") == ["Game"]
+    assert extract("I'm a JS / TS specialist focused on web and game development.") == [
+      "JavaScript", "TypeScript", "Web", "Game"
+    ]
+    assert extract("Game-related tidbits + bytes found on GitHub") == ["GitHub"]
+    assert extract("Working on a Game Engine") == ["Game"]
+    assert extract("Game Security & Realtime Rendering") == ["Game", "Security"]
+    assert extract("game of game") == []
+    assert extract("Like world and game") == []
+    assert extract("Father, hacker, blogger, gamer, & nerd. Bounty Hunter") == []
+
+  def it_handles_set18() -> None:
+    assert extract("3D game engine development amateur") == ["Game"]
+    assert extract("Deep Learning Student | Game Dev") == ["Deep-Learning", "Game"]
+    assert extract("Game Hacking") == ["Game"]
+    assert extract("ex-game developer") == ["Game"]
+    assert extract("Like world and game") == []
+    assert extract("Gaming the game is Gabe's game.") == []
+    assert extract("Computational Game Theory Research") == []
+
+  def it_handles_set19() -> None:
+    assert extract("CS-sophomore | Game-dev (Unity & C#)") == ["Game", "Unity", "C#"]
+    assert extract("Game assets, software and games") == ["Game", "Software"]
+    assert extract("JavaScript, the BEST game") == ["JavaScript"]
+    assert extract("I'm a Professional C++ Game and Software Developer from New York.") == ["C++", "Game", "Software"]
+    assert extract("Gamedev and shite") == ["Game"]
+    assert extract("The Game") == []
+
+  def it_handles_set20() -> None:
+    assert extract("I love to research malware, viruses, and other types of malicious files.") == ["Malware"]
+    assert extract("CS PhD student at Stony Brook University, new to Distributed System.") == ["Distributed", "System"]
+    assert extract("Building Distributed SQL Database") == ["Distributed", "SQL", "Database"]
+    assert extract("Computer science student with an interest in data science.") == ["Data"]
+    assert extract("Dive into the world of sophistication with U-Glam NYC, your quintessential destination for luxury jewelry, headbands, and pearls.Based in the heart of New York.") == [
+      # empty
+    ]
+    assert extract("Salesforce Guru") == ["SalesForce"]
+    assert extract("Aspiring Machine Learning / Data Engineer") == ["Machine-Learning", "Data"]
+    assert extract("Healthcare data analyst freelancer looking to help clients use their data to the fullest.") == [
+      "Data", "Analysis"
+    ]
+
+  def it_handles_set21() -> None:
+    assert extract("data-backed decision making: statistical analysis, Computational Fluid Dynamics") == ["Data", "Analysis"]
+    assert extract("Campaign Lead, Data Scientist, Statistician") == ["Data", "Statistics"]
+
+# TODO "Graphic Designer | Visual Designer"
+# interested in data science, neuroscience, and machine learning
+# All About Quantum Computer

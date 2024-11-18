@@ -1,7 +1,7 @@
 from dataclasses import dataclass, field
 from spacy.tokens import Span, Token
 from typing import Callable
-from ..utils import Pattern, get_consequent, get_preceding
+from ..utils import Pattern, get_cons_tokens, get_prec_tokens
 
 __all__ = ["Skill", "Disambiguate", "contextual", "neighbour"]
 
@@ -65,12 +65,12 @@ def neighbour(distance: int) -> Disambiguate:
 def singleletter() -> Disambiguate:
   def disambiguate(ent: Span) -> bool:
     # doc = ent[0].doc
-    prec = get_preceding(ent[0])
-    cons = get_consequent(ent[-1])
+    prec_tokens = get_prec_tokens(ent[0])
+    cons_tokens = get_cons_tokens(ent[-1])
     # Avoid highly ambiguos cases, at the cost of some FNs:
-    if gets(prec, -1) == "-":
+    if gets(prec_tokens, -1) == "-":
       return False # foo-c, bar-v
-    if gets(cons, 0) == "-" and gets(cons, 1) not in {"lang", "language"}:
+    if gets(cons_tokens, 0) == "-" and gets(cons_tokens, 1) not in {"lang", "language"}:
       return False # c-foo, v-bar
     return True
   return disambiguate

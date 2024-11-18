@@ -1,7 +1,48 @@
-from ...utils import literal, noun, propn
-from ..utils import Skill, neighbour
+from spacy.tokens import Span
+from ...utils import get_cons_words, literal, noun, propn
+from ..utils import Disambiguate, Skill, neighbour
 
 __all__ = ["SKILLS"]
+
+GAMEDEV_MARKERS = {
+  "design", "designer",
+  "art", "artist",
+  "development", "dev", "developer",
+  "engineering", "eng", "engineer",
+  "programming", "programmer",
+  "hacker", "hacking", "tester", "testing",
+  "assets", "engine", "security",
+  "research", "researcher" # like "game AI researcher"
+}
+
+NON_GAMEDEV_MARKERS = {"theory"}
+
+DATASCIENCE_MARKERS = {
+  "analysis", "analyst",
+  "backed",
+  "science", "scientist",
+  "research", "researcher",
+  "engineering", "eng", "engineer",
+  "security", "protection",
+  "professional", "specialist", "generalist"
+}
+
+def gamedev() -> Disambiguate:
+  def disambiguate(ent: Span) -> bool:
+    cons_words = [token.lower_ for token in get_cons_words(ent[-1])]
+    if any(True for word in cons_words if word in GAMEDEV_MARKERS):
+      if not any(True for word in cons_words if word in NON_GAMEDEV_MARKERS):
+        return True
+    return False
+  return disambiguate
+
+def datascience() -> Disambiguate:
+  def disambiguate(ent: Span) -> bool:
+    cons_words = [token.lower_ for token in get_cons_words(ent[-1])]
+    if any(True for word in cons_words if word in DATASCIENCE_MARKERS):
+      return True
+    return False
+  return disambiguate
 
 SKILLS: list[Skill] = [
   # OTHER
@@ -45,10 +86,11 @@ SKILLS: list[Skill] = [
   Skill("TCP", ["tcp"], "Competence"),
   Skill("HTTP", ["http"], "Competence"),
   Skill("HTTPS", ["https"], "Competence"),
+  Skill("WebGL", ["webgl"], "Competence"),
   Skill("WebSocket", ["websocket", "ws"], "Competence"),
 
   Skill("Web", ["web", "webdev"], "Competence"),
-  Skill("Fullstack", ["fullstack(er)"], "Competence"),
+  Skill("Fullstack", ["full=stack(er)"], "Competence"),
 
   Skill("Blockchain", ["blockchain"], "Competence"),
   Skill("dApps", ["decentralized-application(s)", "dapp(s)"], "Competence"),
@@ -69,7 +111,9 @@ SKILLS: list[Skill] = [
   Skill("Mobile", ["mobile", "mobiledev"], "Competence"),
   Skill("Cross-Platform", ["cross=platform"], "Competence"),
 
-  # Skill("Game", ["game", "gamedev"], "Competence"),
+  # GAMEDEV
+  Skill("Game", ["gamedev"], "Competence"),
+  Skill("Game", ["game(s)"], "Competence", disambiguate=gamedev()),
 
   # DATABASE
   Skill("Database", ["database(s)"], "Competence"),
@@ -139,10 +183,10 @@ SKILLS: list[Skill] = [
 
   Skill("AI", ["artificial-intelligence", "ai"], "Competence"),
   Skill("Big-Data", ["big=data"], "Competence"),
-  # Skill("Data", ["data"], "Competence"), -- too many different meanings, better not to include
+  Skill("Data", ["data"], "Competence", disambiguate=datascience()),
   Skill("Data-Extraction", ["data=extraction"], "Competence"),
   Skill("Data-Mining", ["data=mining"], "Competence"),
-  Skill("Data-Visualization", ["data-visualization", "data=viz"], "Competence"),
+  Skill("Data-Visualization", ["data-visualization", "data=viz"], "Competence"), # FN for "Data Analysis and Visualization", needs a disambig. item
   # Scraping
   Skill("Machine-Learning", ["machine-learning", "ml"], "Competence"),
   Skill("Deep-Learning", ["deep=learning", "dl"], "Competence"), # not sure about FPs
@@ -156,6 +200,7 @@ SKILLS: list[Skill] = [
 
   Skill("Software", ["software"], "Competence"),
   Skill("Hardware", ["hardware"], "Competence"),
+  Skill("Malware", ["malware"], "Competence"),
   Skill("Firmware", ["firmware"], "Competence"),
   Skill("Embedded", ["embedded"], "Competence"),
   Skill("System", ["system"], "Competence"),
@@ -163,9 +208,11 @@ SKILLS: list[Skill] = [
   Skill("IoT", ["iot"], "Competence"),
 
   # Sciences
-  Skill("Biochemistry", ["biochemistry"], "Science"),
+  Skill("Biochemistry", ["bio=chemistry"], "Science"),
+  Skill("Bioinformatics", ["bio=informatics", "bio=informatician"], "Science"),
   Skill("Informatics", ["informatics"], "Science"),
-  Skill("Statistics", ["statisics"], "Science"),
+  Skill("Statistics", ["statisics", "statistician"], "Science"),
+  # neuroscience
 
   # Analysis
   Skill("Analysis", ["analysis", "analyst"], "Competence"),

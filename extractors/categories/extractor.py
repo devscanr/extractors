@@ -4,7 +4,7 @@ from spacy.pipeline import EntityRuler
 from spacy.tokens import Doc, Token
 from typing import Any, cast, Literal, Sequence
 from ..patterns import to_patterns2
-from ..utils import get_cons_heads, get_nlp, get_preceding, get_root, is_word
+from ..utils import get_cons_heads, get_nlp, get_prec_words, get_root, is_word
 from .data import LABELED_PHRASES
 
 __all__ = ["Categorized", "CategoryExtractor", "Role"]
@@ -85,7 +85,7 @@ class CategoryExtractor:
 
 def check_dev(label: str, token: Token) -> Literal["Student", "Dev", "Nondev", None]:
   if label in {"DEV", "NONDEV"}:
-    preceding = [token.lower_ for token in get_preceding(token)]
+    prec_words = [token.lower_ for token in get_prec_words(token)]
     subtree = [
       tok.lower_ for tok in token.head.subtree
       if is_word(tok)
@@ -119,7 +119,7 @@ def check_dev(label: str, token: Token) -> Literal["Student", "Dev", "Nondev", N
     if label == "NONDEV" and token.lower_ == "head":
       if j < sent.end and sent[j + 1].lower_ in {"@", "at", "of"}:
         return "Nondev"
-      if any(True for word in preceding if word in HEAD_MARKERS):
+      if any(True for word in prec_words if word in HEAD_MARKERS):
         return "Nondev"
       return None
     # ---
@@ -217,7 +217,7 @@ def check_lead(label: str, token: Token) -> bool:
 
 def check_remote(label: str, token: Token) -> bool:
   if label == "REMOTE":
-    preceding = [token.lower_ for token in get_preceding(token)]
+    prec_words = [token.lower_ for token in get_prec_words(token)]
     cons_heads = get_cons_heads(token)
     sent = token.sent
     j = token._.i
@@ -225,7 +225,7 @@ def check_remote(label: str, token: Token) -> bool:
       return True
     elif token.head.lower_ in REMOTE_JOB_MARKERS:
       return True
-    elif preceding[-2:] == ["open", "to"]:
+    elif prec_words[-2:] == ["open", "to"]:
       return True
     elif len(cons_heads) and cons_heads[-1].lower_ in REMOTE_JOB_MARKERS:
       return True

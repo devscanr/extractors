@@ -107,8 +107,7 @@ LABELED_PHRASES: LabeledPhrases = {
     "vp",
   ],
   "STUDENT": [
-    "alumni",
-    "alumnus",
+    "alumni", "alumnus", "alum",
     "beginner",
     "graduate",
     "bachelor",

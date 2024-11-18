@@ -630,7 +630,6 @@ SKILLS: list[Skill] = [
 #   "3D": {pattern: "3d", category: "topic"},
 #   // "Font": {pattern: "fonts?", category: "topic"}, // disambiguate?
 #   "Animation": {pattern: "animation, motion", category: "topic"},
-#   "Game": {pattern: "!game", category: "topic"},
 #   "Graphic": {pattern: "graphics?", category: "topic", role: "Designer"},
 #   "Level": {pattern: "level", category: "topic"},
 #   "Enterprise": {pattern: "enterprise", category: "topic"},
