@@ -57,7 +57,11 @@ SKILLS: list[Skill] = [
   # Azure Pipelines
 
   # DATABASE
-  Skill("Microsoft-SQL", ["microsoft-sql(=server)", "(ms=)sql=server", "ms=sql"], ""),
+  Skill("Microsoft-SQL", [
+    "microsoft-sql(=server)", "(ms=)sql=server", "ms=sql",
+    "(sql=server=)management=studio",
+    "(microsoft=)management=studio",
+  ], ""),
   # TODO T-SQL
   Skill("Microsoft-Sharepoint", ["microsoft-sharepoint", "ms=sharepoint", "sharepoint"], ""),
   Skill("Microsoft-365", ["microsoft=365"], ""),

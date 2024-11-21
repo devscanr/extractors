@@ -26,7 +26,7 @@ SKILLS: list[Skill] = [
   Skill("Netlify", ["netlify"], ""),
 
   # TOOLS (should mostly be discouraged in UI)
-  Skill("Confluence", ["confluence"], ""),
+  Skill("Confluence", ["confluence"], ""), # FP, exclude "confluence of" pattern
   Skill("GitHub", ["github"], ""),
   Skill("GitLab", ["gitlab"], ""),
   Skill("Jira", ["jira"], ""),
@@ -89,12 +89,16 @@ SKILLS: list[Skill] = [
   Skill("MariaDB", ["maria=db"], ""),
   Skill("Memcached", ["memcache(d)"], ""),
   Skill("MongoDB", ["mongo=db", ver1("mongo")], ""),
-  Skill("MySQL", ["my-sql", "my sql", ver1("mysql")], ""),
+  Skill("MySQL", ["my-sql", "my sql", ver1("mysql"), "(my=)sql=manager"], ""),
   Skill("Neo4j", ["neo4j", "neo4j=db"], ""),
   Skill("Oracle", ["oracle=db", "oracle", "pl(/)sql"], ""), # Oracle Database or Oracle RDBMS TODO split DB and COMPANY
   Skill("PouchDB", ["pouch=db"], ""),
   Skill("Presto", ["presto"], ""),
-  Skill("PostgreSQL", ["postgre=sql", "postgres=sql", ver1("postgres"), "psql", "pgsql"], ""),
+  Skill("PostgreSQL", [
+    "postgre=sql", "postgres=sql", ver1("postgres"),
+    "pgadmin",
+    "psql", "pgsql"
+  ], ""),
   Skill("Redis", ["redis"], ""),
   Skill("ScyllaDB", ["scylladb"], ""),
   Skill("Supabase", ["supabase"], ""),
@@ -132,6 +136,7 @@ SKILLS: list[Skill] = [
   Skill("ShowFlake", ["snowflake"], ""), # ~ MS Databricks, ~ AWS Redshift
   Skill("Spacy", ["spacy"], ""),
   Skill("Stan", ["stan"], "", disambiguate=contextual("R", "Python")),
+  Skill("Stata", ["stata"], ""),
   Skill("TensorFlow", ["tensorflow"], ""),
   Skill("TensorRT", ["tensorrt"], ""),
 
@@ -161,6 +166,7 @@ SKILLS: list[Skill] = [
   Skill("FastAPI", ["fast=api"], ""),
   Skill("Fastify", ["fastify"], ""),
   Skill("Flask", ["flask"], ""),
+  Skill("Jakarta-EE", ["jakarta(=ee)", "java-ee", "j2ee", "java-platform"], ""),
   Skill("JVM", ["jvm"], "Java Virtual Machine enables a computer to run Java (Kotlin, etc.) programs."),
   Skill("Hasura", ["hasura"], ""),
   Skill("Koa", ["koa"], ""),
@@ -177,6 +183,15 @@ SKILLS: list[Skill] = [
   ], ""),
   Skill("Symfony", [ver1("symfony")], ""),
   Skill("Yii", [ver1("yii")], ""),
+
+#   Key Components of J2EE:
+#
+# Java Servlets: Server-side Java programs that handle requests and responses, enabling dynamic web content generation.
+# JavaServer Pages (JSP): A technology that allows for the creation of dynamic web pages using HTML and Java code.
+# Enterprise JavaBeans (EJB): A server-side component architecture that allows for the development of scalable, transactional, and multi-user applications.
+# Java Message Service (JMS): A messaging standard that allows applications to communicate asynchronously.
+# Java Naming and Directory Interface (JNDI): An API that provides naming and directory functionality to applications, allowing them to look up resources like databases and EJBs.
+# Java Transaction API (JTA): A specification that allows for the management of transactions across multiple resources.
 
   # Skill("ActiveMQ", ["active=mq"], ""), -- Apache
   Skill("Micronaut", ["micronaut"], ""),
@@ -377,7 +392,7 @@ SKILLS: list[Skill] = [
   Skill("Linux", ["linux"], ""), # also CROSS-PLATFORM
   Skill("MacOS", ["macos", "osx"], ""), # also CROSS-PLATFORM
   Skill("Ubuntu", ["ubuntu"], ""),
-  Skill("Unix", ["unix"], ""),   # also CROSS-PLATFORM
+  Skill("Unix", ["unix", "*nix"], ""),   # also CROSS-PLATFORM
   Skill("Windows", ["windows", "win32", "win64"], ""), # also CROSS-PLATFORM
 
   Skill("Clang", ["clang"], ""),
@@ -405,27 +420,10 @@ SKILLS: list[Skill] = [
   Skill("CLI", ["cli"], ""),
   Skill("GUI", ["gui"], ""),
 
-  # Skill("Client", ["client"], ""),
-  # Skill("Server", ["server"], ""),
-  # Skill("REPL", ["repl"], ""),
-  # Skill("Shell", ["shell"], ""), -- too widespread
-  # Skill("Terminal", ["terminal"], ""), -- too widespread
-  # Skill("Cross-Platform", ["cross=platform"], ""),
-  # Skill("Plugin", ["plugin", "plug-in"], ""),
-  # Skill("Widget", ["widget"], ""),
-  # Skill("Middleware", ["middleware"], ""),
-  # Skill("Bindings", ["bindings"], ""),
-  # Skill("Engine", ["engine"], ""),
-  # Skill("Mobile", ["mobile"], ""),
-  # Skill("PC", ["pc"], ""),
-  # Skill("Web", ["web"], ""),
-  # Skill("IoT", ["iot"], ""),
   Skill("Voxel", ["voxel"], ""),
   Skill("Pixel", ["pixel"], ""),
   Skill("Sprite", ["sprite"], ""),
   Skill("Texture", ["texture"], ""),
-  # Skill("Byte", ["byte"], ""),
-  # Skill("Bytecode", ["bytecode"], ""),
   # Skill("2D", ["2d"], ""), -- too widespread
   # Skill("3D", ["3d"], ""), -- too widespread
   # Skill("Ray-Tracing", ["ray=tracing"], ""),
@@ -440,27 +438,17 @@ SKILLS: list[Skill] = [
   Skill("SFTP", ["sftp"], ""),
   Skill("RTOS", ["rtos"], ""),
   Skill("GPOS", ["gpos"], ""),
-  # Skill("Analysis", ["analysis"], ""),
-  # Skill("Analytics", ["analytics"], ""),
   # Skill("Network", ["network"], ""),
   # Skill("Networking", ["networking"], ""),
   # Skill("Embedded", ["embedded"], ""),
   # Skill("Security", ["security", "appsec", "infosec", "cybersec"], ""),
-  # Skill("Performance", ["performance"], ""),
   # Skill("Scalability", ["scalability"], ""),
-  # Skill("Reliability", ["reliability"], ""),
   # Skill("Resiliency", ["resiliency"], ""),
   # Skill("Deploy", ["deploy"], ""),
   # Skill("Architecture", ["architecture"], ""),
   # Skill("Integration", ["integration"], ""),
-  # Skill("QA", ["qa"], ""),
-  # Skill("Testing", ["testing"], ""),
-  # Skill("Automation", ["automation"], ""),
   # Skill("Scraping", ["scraping"], ""),
   # Skill("Mining", ["mining"], ""), # ambiguous (Data-mining vs Crypto-mining)
-  # Skill("Software", ["software"], ""),
-  # Skill("Hardware", ["hardware"], ""),
-  # Skill("Firmware", ["firmware"], ""),
   # Skill("Algorithm", ["algorithm(s)"], ""),
   # Skill("Science", ["science"], ""),
   # Skill("CMS", ["cms"], ""),
@@ -540,7 +528,7 @@ SKILLS: list[Skill] = [
   Skill("Groovy", ["groovy"], ""),
   Skill("Haskell", ["haskell"], ""),
   Skill("HTML", [ver1("html")], ""),
-  Skill("Java", [ver1("java")], ""),
+  Skill("Java", [ver1("java"), "java-se"], ""),
   Skill("JavaScript", ["java=script", "js"], ""),
   Skill("JSON", ["json", "json5"], ""),
   Skill("Julia", ["julia"], ""),

@@ -14,11 +14,14 @@ GAMEDEV_MARKERS = {
   "assets", "engine", "security",
   "research", "researcher" # like "game AI researcher"
 }
+# "creating|making|developing games" -- left side
 
 NON_GAMEDEV_MARKERS = {"theory"}
 
-DATASCIENCE_MARKERS = {
-  "analysis", "analyst",
+DATA_MARKERS = {
+  "ai",
+  "analysis", "analytics", "analyst",
+  "architecture",
   "backed",
   "science", "scientist",
   "research", "researcher",
@@ -39,25 +42,19 @@ def gamedev() -> Disambiguate:
 def datascience() -> Disambiguate:
   def disambiguate(ent: Span) -> bool:
     cons_words = [token.lower_ for token in get_cons_words(ent[-1])]
-    if any(True for word in cons_words if word in DATASCIENCE_MARKERS):
+    if any(True for word in cons_words if word in DATA_MARKERS):
       return True
     return False
   return disambiguate
 
 SKILLS: list[Skill] = [
-  # OTHER
-  Skill("Business", ["business"], "Competence"),
-  Skill("Marketing", ["marketing"], "Competence"),
-  Skill("Education", ["edtech"], "Competence"), # differentiate from own education and self-education
-  Skill("Finance", ["finance", "fintech"], "Competence"),
-
   # SOFTWARE ENGINEERING
   Skill("Agile", ["agile", "kanban", "scrum"], "Competence"),
   Skill("TDD", ["tdd"], "Competence"),
   Skill("BDD", ["ddd"], "Competence"),
   Skill("DDD", ["ddd"], "Competence"),
-  Skill("FP", ["fp", "фп"], "Competence"),
-  Skill("OOP", ["oop", literal("SOLID"), "ооп"], "Competence"),
+  Skill("FP", ["functional progamming", "fp", "фп"], "Competence"),
+  Skill("OOP", ["object=oriented( programming)", "oop", literal("SOLID"), "ооп"], "Competence"),
   # YAGNI, DRY, KISS, MVC
 
   Skill("Backend", ["back=end(er)", noun("BE")], "Competence"),   # not detected as PROPN, needs to be retrained
@@ -89,7 +86,7 @@ SKILLS: list[Skill] = [
   Skill("WebGL", ["webgl"], "Competence"),
   Skill("WebSocket", ["websocket", "ws"], "Competence"),
 
-  Skill("Web", ["web", "webdev"], "Competence"),
+  Skill("Web", ["web", "website(s)", "webdev"], "Competence"),
   Skill("Fullstack", ["full=stack(er)"], "Competence"),
 
   Skill("Blockchain", ["blockchain"], "Competence"),
@@ -128,27 +125,19 @@ SKILLS: list[Skill] = [
   Skill("Infrastructure", ["infrastructure"], "Competence"),
   Skill("CI/CD", ["continuous-integration", "ci/cd", "ci"], "Competence"),
   Skill("Cloud", ["cloud"], "Competence"),
-  Skill("DataOps", ["data=ops"], "Competence", stack=["ETL", "Automation", "Operations"]),
-  Skill("DevOps", ["dev=ops"], "Competence", stack=["Infrastructure", "Automation", "Operations"]),
-  Skill("DevSecOps", ["dev=sec=ops", "sec=dev=ops"], "Competence", stack=["Infrastructure", "Security", "Automation", "Operations"]),
-  Skill("ITOps", ["itops"], "Competence", stack=["Infrastructure", "Operations"]),
-  Skill("MlOps", ["ml=ops"], "Competence", stack=["Machine-Learning", "Automation", "Operations"]),
-  Skill("SecOps", ["sec=ops"], "Competence", stack=["Security", "Automation", "Operations"]),
-  Skill("Operations", ["operations", "ops"], "Competence"),
   Skill("Orchestration", ["orchestration"], "Competence"),
 
   # QA & AUTOMATION
   Skill("QA", ["quality-assurance", "qa"], "Competence", stack=["Automation", "Testing"]),
-  Skill("Automation", ["automation"], "Competence"),
   Skill("E2E-Testing", ["e2e-testing", "e2e=test(s)", "e2e"], "Competence"),
   Skill("Unit-Testing", ["unit-testing", "unit=test(s)"], "Competence"),
   Skill("Integration-Testing", ["integration-testing", "integration=test(s)"], "Competence"),
   Skill("Functional-Testing", ["functional-testing", "functional=test(s)"], "Competence"),
   Skill("Load-Testing", ["load=testing", "load=test(s)"], "Competence"),
   Skill("Testing", ["testing"], "Competence"),
-  # Skill("Accessibility", ["accessibility", "accessible"], "Competence"),
-  # Skill("Performance", ["performance", "performant"], "Competence"),
-  # Skill("Reliability", ["realibility", "reliable"], "Competence"),
+  Skill("Accessibility", ["accessibility", "accessible"], "Competence"),
+  Skill("Performance", ["performance", "performant"], "Competence"),
+  Skill("Reliability", ["reliability", "reliable"], "Competence"),
   # Skill("Resilience", ["resilience", "resilient"], "Competence"),
   # Skill("Scalability", ["scalability", "scalable", ], "Competence"),
   # Skill("Observability", ["observability", "observable"], "Competence"),
@@ -160,7 +149,7 @@ SKILLS: list[Skill] = [
   # SECURITY
   Skill("Security", ["security"], "Competence"), # "secure"?
   Skill("App-Security", ["app=sec(urity)"], "Competence"),
-  Skill("Cyber-Security", ["cyber=sec(urity)"], "Competence"),
+  Skill("Cyber-Security", ["cyber=sec(urity)", "cyber=defence"], "Competence"),
   Skill("Data-Protection", ["data-protection"], "Competence"),
   Skill("Data-Security", ["data=sec(urity)"], "Competence"),
   Skill("Information-Security", ["information-sec(urity)", "info=sec(urity)"], "Competence"),
@@ -181,6 +170,9 @@ SKILLS: list[Skill] = [
   # Replication, Partitioning | Enterprise, large-scale
   # Big Data  Data-heavy, logic-heavy
 
+  Skill("Computer-Science", ["comp=sci(ence)", "computer=sci(ence)", "comp(uter)=scientist", literal("CS")], "Competence", stack=["Computer", "Science"]),
+  Skill("Data-Science", ["data=sci(ence)", "data=scientist", literal("DS")], "Competence", stack=["Data", "Science"]),
+
   Skill("AI", ["artificial-intelligence", "ai"], "Competence"),
   Skill("Big-Data", ["big=data"], "Competence"),
   Skill("Data", ["data"], "Competence", disambiguate=datascience()),
@@ -199,25 +191,102 @@ SKILLS: list[Skill] = [
   # Sensor-Fusion
 
   Skill("Software", ["software"], "Competence"),
+  Skill("SDLC", ["sdlc"], "Competence", stack=["Software", "Engineering"]),
   Skill("Hardware", ["hardware"], "Competence"),
   Skill("Malware", ["malware"], "Competence"),
   Skill("Firmware", ["firmware"], "Competence"),
+
+  # STACK ROLES
+  Skill("Programmer", ["programming", "coding", "programmer", "coder"], "Competence", stack=["Software", "Engineering"]),
+  Skill("SDE", [literal("SDE")], "Competence", stack=["Software", "Engineering"]),
+  Skill("SWE", [literal("SWE")], "Competence", stack=["Software", "Engineering"]),
+  Skill("SRE", [literal("SRE")], "Competence", stack=["Reliability", "Engineering"]),
+  Skill("DataOps", ["data=ops"], "Competence", stack=["ETL", "Automation", "Operations"]),
+  Skill("DevOps", ["dev=ops"], "Competence", stack=["Infrastructure", "Automation", "Operations"]),
+  Skill("DevSecOps", ["dev=sec=ops", "sec=dev=ops"], "Competence", stack=["Infrastructure", "Security", "Automation", "Operations"]),
+  Skill("ITOps", ["itops"], "Competence", stack=["Infrastructure", "Operations"]),
+  Skill("MlOps", ["ml=ops"], "Competence", stack=["Machine-Learning", "Automation", "Operations"]),
+  Skill("SecOps", ["sec=ops"], "Competence", stack=["Security", "Automation", "Operations"]),
+
+  # UNFINISHED
   Skill("Embedded", ["embedded"], "Competence"),
-  Skill("System", ["system"], "Competence"),
-
+  Skill("System", ["system(s)"], "Competence"), # TODO many FPs, should be disambiguated like Data
   Skill("IoT", ["iot"], "Competence"),
+  Skill("Open-Source", ["open=source", "oss"], "Competence"),
 
-  # Sciences
-  Skill("Biochemistry", ["bio=chemistry"], "Science"),
-  Skill("Bioinformatics", ["bio=informatics", "bio=informatician"], "Science"),
-  Skill("Informatics", ["informatics"], "Science"),
-  Skill("Statistics", ["statisics", "statistician"], "Science"),
-  # neuroscience
+  # PRACTICES
+  Skill("Administration", ["administration", "admin(istrator)"], "Competence"),
+  Skill("Automation", ["automation", "automated"], "Competence"),
+  Skill("Design", ["design"], "Competence"), # FPs in company names, not sure how to avoid
+  Skill("Engineering", ["engineering", "engineer", "development", "developer"], "Competence"),
+  Skill("Hacking", ["hacking", "hacker"], "Competence"),
+  Skill("Leadership", ["leadership", "leader", "lead"], "Competence"),
+  Skill("Management", ["management", "manager"], "Competence"),
+  Skill("Operations", ["operations", "ops"], "Competence"),
+  Skill("Recruitment", ["staffing", "recruitment", "recruiter"], "Competence"),
+  Skill("Research", ["research", "researcher"], "Competence"),
+  Skill("Visualization", ["visualization", "visualizer"], "Competence"),
 
-  # Analysis
-  Skill("Analysis", ["analysis", "analyst"], "Competence"),
-  Skill("Analytics", ["analytics"], "Competence"),
+  # INDUSTRIES -- I think that maybe INDUSTRIES and SCIENCES should be separated from SKILLS
+  Skill("Advertisement", ["advertising", "advertisement"], "Competence"),
+  # Academy (doc, post-doc, etc)
+  Skill("Architecture", ["architecture", "architect"], "Competence"),
+  Skill("Business", ["business", "entrepreneurship", "entrepreneur"], "Competence"),
+  Skill("Computer", ["computer", "computing"], "Competence"),
+  Skill("Ecology", ["ecology", "ecologist"], "Competence"),
+  Skill("Education", ["edtech", "educator", "dean", "prof(essor)", "teacher"], "Competence"), # how to differentiate from "(my) Education:"
+  Skill("Energy", ["energy"], "Competence"), # FPs
+  # Environment, Environmental
+  Skill("Finance", ["finance", "fintech", "financial"], "Competence"),
+  Skill("Graphic", ["graphic", "graphical"], "Competence"),
+  Skill("Health", ["health(care)"], "Competence"),
+  Skill("Psychology", ["psychology"], "Competence"),
+  Skill("Marketing", ["marketing"], "Competence"),
+  Skill("Medicine", ["medicine", "medical"], "Competence"),
+  Skill("Music", ["music(al)", "musician"], "Competence"),
+  Skill("Sport", ["sport", "basketball"], "Competence"),
+  Skill("Startup", ["startup"], "Competence"),
+  # Travel
+
+  # SCIENCES
+  Skill("Analysis", ["analysis", "analytics", "analytical", "analyst"], "Competence"),
+  Skill("Biochemistry", ["bio=chemistry"], "Competence"),
+  Skill("Bioinformatics", ["bio=informatics", "bio=informatician"], "Competence"),
+  Skill("Biology", ["biology", "biologist"], "Competence"),
+  Skill("Economics", ["economics", "economist"], "Competence"),
+  Skill("Electronics", ["electronic(s)"], "Competence"),
+  Skill("Informatics", ["informatics"], "Competence"),
+  Skill("Mathematics", ["mathematics", "mathematical", "math", "mathematician"], "Competence"),
+  Skill("Physics", ["physics", "physical", "physicist"], "Competence"),
+  Skill("Science", ["sci", "science", "scientific", "scientist", literal("B.S"), literal("M.S")], "Competence"),
+  Skill("Statistics", ["statiscal", "statistics", "statistician"], "Competence"),
 ]
 
 # Non-skills (words that look like skills but are not, might be useful to help with them in UI)
 # SOTA: state of the art
+# Self-Driving car
+# neuroscience, neuroscientist +1
+# transportation industry
+# digital illustration
+# cognitive science, cog-sci
+# "5 yrs teaching FinTech and Market Operations. 30 yrs PMO Digital Transformations of Wall St. Investment Banks
+# Talend
+# Crucible
+# Involved with VNFs, Cloud, etc
+# I automate the web and moble-web; making bots and working in the cloud. Lately, I have been hired to make some anti-bots.
+# Trade Settlements Analyst
+# A tech-savvy story teller who loves to tell stories, not verbally, but through data.
+# BI, business intelligence
+# I am a LINUX/UNIX Administratory
+# Biomedical Engineer
+# Interest in Bioinformatics/Biostatistics
+# has worked as a Director, Cinematographer, Sound Mixer, Videographer, Editor, and Producer for 10 years.
+# analytical
+# sales
+# Site Reliability
+# implementation of COTS software
+# CPA turned developer
+# Information Science != Informatics (1st is broader)
+# "Python, STATA, SQL, R, SPSS, NVivo.", -- STATA? SPSS? NVivo?
+# Information Technology
+# data extraction/modeling, visualization (Tableau, Power BI)
