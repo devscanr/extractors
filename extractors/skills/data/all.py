@@ -2,20 +2,24 @@ from ...utils import IN, LOWER, OP, literal, propn, ver1
 from ..utils import Skill, contextual, contextual_or_neighbour, neighbour, singleletter
 from .amazon import SKILLS as AMAZON_SKILLS
 from .apache import SKILLS as APACHE_SKILLS
+from .apple import SKILLS as APPLE_SKILLS
 from .google import SKILLS as GOOGLE_SKILLS
 from .microsoft import SKILLS as MICROSOFT_SKILLS
 from .yandex import SKILLS as YANDEX_SKILLS
 from .competences import SKILLS as COMPETENCE_SKILLS
+from .large import SKILLS as LARGE_SKILLS
 
 __all__ = ["SKILLS"]
 
 SKILLS: list[Skill] = [
   *AMAZON_SKILLS,
   *APACHE_SKILLS,
+  *APPLE_SKILLS,
   *GOOGLE_SKILLS,
   *MICROSOFT_SKILLS,
   *YANDEX_SKILLS,
   *COMPETENCE_SKILLS,
+  *LARGE_SKILLS,
 
   # ANALYSIS
   Skill("Tableau", ["tableau"], ""),
@@ -47,19 +51,11 @@ SKILLS: list[Skill] = [
   Skill("Cocoa", ["cocoa"], ""),
   Skill("Cordova", ["cordova", "phonegap"], ""),
   Skill("Dagger2", ["dagger2"], ""),
-  Skill("Flutter", ["flutter"], ""),
   Skill("GTK", ["gtk", "gtk+"], ""),
   Skill("Ionic", ["ionic"], ""),
   Skill("Capacitor", ["capacitor"], ""),
   Skill("Jetpack-Compose", ["jetpack=compose", "android=compose"], ""), # just Jetpack is ambiguous
-  Skill("iOS", ["ios"], ""), # also SYSTEM
-  Skill("iPadOS", ["ipados"], ""), # also SYSTEM
-  Skill("tvOS", ["tvos"], ""), # also SYSTEM
-  Skill("watchOS", ["watchos"], ""), # also SYSTEM
-  Skill("iMac", ["imac"], ""),
-  Skill("iPad", ["ipad"], ""),
-  Skill("iPhone", ["iphone"], ""),
-  Skill("iWatch", ["iwatch"], ""),
+
   Skill("Lottie", ["lottie"], ""),
   Skill("Onsen UI", ["onsen", "onsen=ui"], ""),
   Skill("Native-Script", ["native=script"], ""),
@@ -75,10 +71,6 @@ SKILLS: list[Skill] = [
   Skill("VoIP", ["voip"], ""), # voice over IP
   Skill("Vue-Native", ["vue=native"], ""),
   Skill("WebRTC", ["webrtc"], ""), # web real-time communication
-
-  Skill("AppKit", ["appkit"], ""), # framework
-  Skill("SwiftUI", ["swiftui"], ""), # framework
-  Skill("UIKit", ["uikit"], ""), # framework
 
   # DATABASE, DWH
   Skill("CouchBase", ["couchbase"], ""),
@@ -117,10 +109,7 @@ SKILLS: list[Skill] = [
   # DATA SCIENCE
   Skill("Anaconda", ["anaconda", "miniconda", "conda"], ""),
   Skill("Beautiful-Soup", ["beautiful=soup"], ""),
-  Skill("Flax", ["flax"], ""), # NN for Jax
   Skill("IPython", ["ipython"], ""), # interactive shell
-  Skill("JAX", [propn("JAX")], ""), # TensorFlow alternative
-  Skill("JAX", ["jax"], "", disambiguate=neighbour(2)), # /
   Skill("Jupyter", ["jupyter=lab", "jupyter-notebook(s)", "jupyter"], ""),
   Skill("Matplotlib", ["matplotlib"], ""),
   Skill("NLTK", ["nltk"], ""),
@@ -137,8 +126,7 @@ SKILLS: list[Skill] = [
   Skill("Spacy", ["spacy"], ""),
   Skill("Stan", ["stan"], "", disambiguate=contextual("R", "Python")),
   Skill("Stata", ["stata"], ""),
-  Skill("TensorFlow", ["tensorflow"], ""),
-  Skill("TensorRT", ["tensorrt"], ""),
+  Skill("TensorRT", ["tensorrt"], ""), # NVidia
 
   # GAME
   Skill("BabylonJS", ["babylon.=js"], "Game and rendering engine packed into a JavaScript framework."),
@@ -184,16 +172,15 @@ SKILLS: list[Skill] = [
   Skill("Symfony", [ver1("symfony")], ""),
   Skill("Yii", [ver1("yii")], ""),
 
-#   Key Components of J2EE:
-#
-# Java Servlets: Server-side Java programs that handle requests and responses, enabling dynamic web content generation.
-# JavaServer Pages (JSP): A technology that allows for the creation of dynamic web pages using HTML and Java code.
-# Enterprise JavaBeans (EJB): A server-side component architecture that allows for the development of scalable, transactional, and multi-user applications.
-# Java Message Service (JMS): A messaging standard that allows applications to communicate asynchronously.
-# Java Naming and Directory Interface (JNDI): An API that provides naming and directory functionality to applications, allowing them to look up resources like databases and EJBs.
-# Java Transaction API (JTA): A specification that allows for the management of transactions across multiple resources.
+# #   Key Components of J2EE:
+# #
+# # Java Servlets: Server-side Java programs that handle requests and responses, enabling dynamic web content generation.
+# # JavaServer Pages (JSP): A technology that allows for the creation of dynamic web pages using HTML and Java code.
+# # Enterprise JavaBeans (EJB): A server-side component architecture that allows for the development of scalable, transactional, and multi-user applications.
+# # Java Message Service (JMS): A messaging standard that allows applications to communicate asynchronously.
+# # Java Naming and Directory Interface (JNDI): An API that provides naming and directory functionality to applications, allowing them to look up resources like databases and EJBs.
+# # Java Transaction API (JTA): A specification that allows for the management of transactions across multiple resources.
 
-  # Skill("ActiveMQ", ["active=mq"], ""), -- Apache
   Skill("Micronaut", ["micronaut"], ""),
   Skill("RabbitMQ", ["rabbit=mq"], ""),
   Skill("Vert-X", ["vert.=x"], ""),
@@ -220,7 +207,6 @@ SKILLS: list[Skill] = [
   Skill("Tailwind-CSS", ["tailwind.=css", "tailwind"], ""),
   Skill("VueJS", ["vue.=js", ver1("vue")], ""),
   Skill("VueX", ["vuex"], "State management pattern + library for VueJS applications."),
-  # TODO edge, ambiguous
 
   # WEB FULLSTACK
   Skill("Gulp", ["gulp"], ""),
@@ -228,16 +214,16 @@ SKILLS: list[Skill] = [
   Skill("Vite", ["vite"], ""),
   Skill("Webpack", ["webpack"], ""),
 
-  Skill("MEAN-Stack", ["mean=stack", propn("mean")], "", stack=["MongoDB", "Express", "Angular", "NodeJS"]),
-  Skill("MERN-Stack", ["mern=stack", "mern"], "", stack=["MongoDB", "Express", "React", "NodeJS"]),
-  Skill("MEVN-Stack", ["mevn=stack", "mevn"], "", stack=["MongoDB", "Express", "VueJS", "NodeJS"]),
-  Skill("PERN-Stack", ["pern=stack", "pern"], "", stack=["PostgreSQL", "Express", "React", "NodeJS"]),
-  Skill("LAMP-Stack", ["lamp=stack", propn("LAMP")], "", stack=["Linux", "MySQL", "PHP"]), # Apache
+  Skill("MEAN-Stack", ["mean=stack", propn("mean")], "", resolve=lambda _: ["MongoDB", "Express", "Angular", "NodeJS"]),
+  Skill("MERN-Stack", ["mern=stack", "mern"], "", resolve=lambda _: ["MongoDB", "Express", "React", "NodeJS"]),
+  Skill("MEVN-Stack", ["mevn=stack", "mevn"], "", resolve=lambda _: ["MongoDB", "Express", "VueJS", "NodeJS"]),
+  Skill("PERN-Stack", ["pern=stack", "pern"], "", resolve=lambda _: ["PostgreSQL", "Express", "React", "NodeJS"]),
+  Skill("LAMP-Stack", ["lamp=stack", propn("LAMP")], "", resolve=lambda _: ["Linux", "MySQL", "PHP"]), # Apache
 
-  Skill("Chrome", ["chrome"], ""),
-  Skill("Firefox", ["firefox"], ""),
-  Skill("Safari", ["safari"], ""),
-  Skill("WebKit", ["webkit"], ""), # browser engine
+#   Skill("Chrome", ["chrome"], ""),
+#   Skill("Firefox", ["firefox"], ""),
+#   Skill("Safari", ["safari"], ""),
+#   Skill("WebKit", ["webkit"], ""), # browser engine
 
   Skill("Apollo", ["apollo.=js", "apollo=client", "apollo=server", "apollo"], "GraphQL-centric fullstack tools for web and mobile."),
   Skill("HTMX", ["htmx"], ""),
@@ -272,7 +258,7 @@ SKILLS: list[Skill] = [
 
   # INFRASTRUCTURE
   Skill("Celery", ["celery"], ""),
-  Skill("ELK-Stack", ["elk=stack", "elk"], "", stack=["Elasticsearch", "Logstash", "Kibana"]), # , "Beats"
+  Skill("ELK-Stack", ["elk=stack", "elk"], "", resolve=lambda _: ["Elasticsearch", "Logstash", "Kibana"]), # , "Beats"
   Skill("Infrastructure", ["infrastructure"], "Competence"),
   Skill("Ansible", ["ansible"], "Automation engine for configuration management, application deployment, and task automation."),
   # Skill("Dagger", ["dagger"], "Programmable CI/CD engine that runs pipelines in containers."),
@@ -402,7 +388,6 @@ SKILLS: list[Skill] = [
   Skill("LLVM", ["llvm"], ""),
 
   # BIGTECH
-  Skill("Apple", ["apple"], ""), # company
   Skill("AMD", ["amd", "amd=32", "amd=64"], ""), # company
   Skill("eBay", ["ebay"], ""), # company
   Skill("Facebook", ["facebook"], ""), # company TODO meta
@@ -438,24 +423,6 @@ SKILLS: list[Skill] = [
   Skill("SFTP", ["sftp"], ""),
   Skill("RTOS", ["rtos"], ""),
   Skill("GPOS", ["gpos"], ""),
-  # Skill("Network", ["network"], ""),
-  # Skill("Networking", ["networking"], ""),
-  # Skill("Embedded", ["embedded"], ""),
-  # Skill("Security", ["security", "appsec", "infosec", "cybersec"], ""),
-  # Skill("Scalability", ["scalability"], ""),
-  # Skill("Resiliency", ["resiliency"], ""),
-  # Skill("Deploy", ["deploy"], ""),
-  # Skill("Architecture", ["architecture"], ""),
-  # Skill("Integration", ["integration"], ""),
-  # Skill("Scraping", ["scraping"], ""),
-  # Skill("Mining", ["mining"], ""), # ambiguous (Data-mining vs Crypto-mining)
-  # Skill("Algorithm", ["algorithm(s)"], ""),
-  # Skill("Science", ["science"], ""),
-  # Skill("CMS", ["cms"], ""),
-  # Skill("E-Commerce", ["e=commerce"], ""),
-  # Skill("Cluster", ["cluster"], ""),
-  # Skill("Container", ["container"], ""),
-  # Skill("Orchestration", ["orchestration"], ""),
 
   # HARDWARE & EMBEDDED
   # Skill("HPC", ["hpc"], ""), # high performance computing
@@ -501,7 +468,7 @@ SKILLS: list[Skill] = [
   # DESKTOP
   Skill("ElectronJS", ["electron=js"], ""), # tons of FPs for just "electron"
 
-  # LANGUAGES
+  # MAIN LANGUAGES
   Skill("Ada", ["ada"], ""),
   Skill("Apex", ["apex"], ""),
   Skill("C", ["c-lang"], ""),
@@ -513,6 +480,7 @@ SKILLS: list[Skill] = [
   Skill("Cobol", ["cobol"], ""),
   Skill("Crystal", ["crystal-lang", "crystal"], ""),
   Skill("CSS", [ver1("css")], ""),
+  Skill("CSV", ["csv"], ""),
   Skill("D", ["d=lang"], ""),
   Skill("D", ["d"], "", disambiguate=singleletter()),
   Skill("Dart", ["dart"], ""),
@@ -524,7 +492,7 @@ SKILLS: list[Skill] = [
   Skill("F#", ["f#", "f=lang", "fsharp"], ""),
   Skill("GQL", ["gql"], ""), # TODO Cypher
   Skill("Gleam", ["gleam"], ""),
-  Skill("Go", ["golang", propn("go")], ""),
+  Skill("Go", ["golang", "gopher", propn("go")], ""),
   Skill("Groovy", ["groovy"], ""),
   Skill("Haskell", ["haskell"], ""),
   Skill("HTML", [ver1("html")], ""),
@@ -540,7 +508,6 @@ SKILLS: list[Skill] = [
   Skill("Makefile", ["makefile"], ""),
   Skill("Matlab", ["matlab"], ""),
   Skill("Mojo", ["mojo"], ""),
-  Skill("Objective-C", ["objective=c", "objective=c++", "objective=cpp"], ""),
   Skill("Ocaml", ["ocaml"], ""),
   Skill("Odin", ["odin"], ""),
   Skill("Perl", [ver1("perl")], ""),
@@ -555,7 +522,6 @@ SKILLS: list[Skill] = [
   Skill("SASS", ["sass", "scss"], ""),
   Skill("Scala", ["scala"], ""),
   Skill("Solidity", ["solidity"], ""),
-  Skill("Swift", ["swift"], ""),
   Skill("TypeScript", ["type=script", "ts"], ""),
   Skill("Shell", ["shell", "bash", "zsh"], ""),
   Skill("XML", ["xml"], ""),
@@ -610,7 +576,6 @@ SKILLS: list[Skill] = [
 #   "Robotics": {pattern: "robotics, robocon", category: "topic"},
 #   "Mathematics": {pattern: "mathematics, maths?", category: "topic"},
 #   "CI/CD": {pattern: "ci/=cd", category: "topic"},
-#   "UI/UX": {pattern: "u[ix]/=u[ix], u[ix], user=interface, human=interface", category: "topic"},
 #   "Chemistry": {pattern: "chemistry", category: "topic"},
 #   "Physics": {pattern: "physics", category: "topic"},
 #   "Photography": {pattern: "photography", category: "topic"},
@@ -625,19 +590,10 @@ SKILLS: list[Skill] = [
 #   "Headless CMS": {pattern: "headless=cms", category: "topic", role: "Engineer"},
 #   "Low-Code": {pattern: "low=code", category: "topic", role: "Engineer"},
 #
-#   "Analytics": {pattern: "analytics", category: "topic", role: "Analyst"},
-#   "Architecture": {pattern: "architecture", category: "topic", role: "Architect"},
-#   "Design": {pattern: "design", category: "topic", role: "Designer"},
-#   "Engineering": {pattern: "engineering, R&D", category: "topic", role: "Engineer"},
-#   "Development": {pattern: "Development", category: "topic", role: "Engineer"},
-#   "Management": {pattern: "management", category: "topic", role: "Manager"},
-#   "Science": {pattern: "science", category: "topic", role: "Scientist"},
-#
 #   // Role-agnostic (multi-role) topics
 #   "Manual": {pattern: "manual", category: "topic"},
 #   "R&D": {pattern: "r ?& ?d", category: "topic"},
 #   "Sales": {pattern: "sales", category: "topic"}, // another problematic word @_@
-#   "System": {pattern: "systems?", category: "topic"},
 #   "Typography": {pattern: "typography", category: "topic"},
 #   "Startup": {pattern: "startups?", category: "topic"},
 #   "Product": {pattern: "!Products?", category: "topic"},
@@ -647,7 +603,6 @@ SKILLS: list[Skill] = [
 #   "Functional Programming": {pattern: "functional-programming, fp", category: "topic"},
 #   "Crypto": {pattern: "crypto, defi, web=3", category: "topic"}, // crypto enthusiast = crypto-currencies + decentralized finance (DeFi)
 #   // Crypto vs Blockchain?!?!
-#   // Containers?
 #   // should nopCommerce -> eCommerce? But then NodeJS -> js, are there INVALID precedents like that?
 #
 #   /*
@@ -688,7 +643,6 @@ SKILLS: list[Skill] = [
 #   microservice, monolith, monorepo, Event-Driven, Vertical Slice
 #   Distributed
 #   large-scale
-#   saas, paas
 #   architectures?
 #   scalability
 #   performance

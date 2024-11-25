@@ -1,0 +1,3 @@
+CSV, JSON, XML, Computer
+^ useful for disambiguation and completeness, so they are parsed. Yet they do not add value to the
+  DB so one should consider not storing them.

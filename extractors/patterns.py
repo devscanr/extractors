@@ -18,6 +18,7 @@ def to_patterns(phrase: str) -> list[str]:
   l = len(phrase)
   first_cc = min(l, l, *[i for i in [dotequal_i, equal_i, dash_i] if i != -1])
   if first_cc == dotequal_i:
+    # TODO support also "/=" ?
     # Handling ".="s
     head, tail = phrase[0:dotequal_i], phrase[dotequal_i + 2:]
     tail_patterns = to_patterns(tail)

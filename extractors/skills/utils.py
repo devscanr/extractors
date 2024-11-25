@@ -1,4 +1,5 @@
 from dataclasses import dataclass, field
+import re
 from spacy.tokens import Span, Token
 from typing import Callable
 from ..utils import Pattern, get_cons_tokens, get_prec_tokens
@@ -6,6 +7,7 @@ from ..utils import Pattern, get_cons_tokens, get_prec_tokens
 __all__ = ["Skill", "Disambiguate", "contextual", "neighbour"]
 
 type Disambiguate = Callable[[Span], bool]
+type Resolve = Callable[[Span], list[str]]
 
 @dataclass
 class Skill:
@@ -14,13 +16,10 @@ class Skill:
     str |   # Custom pattern (exact matches)
     Pattern # Spacy pattern
   ]
-  descr: str
-  stack: list[str] = field(default_factory=lambda: [])
-  # categories: list[str] = field(default_factory=lambda: [])
+  descr: str = ""
   disambiguate: Disambiguate | None = None
-
-# @dataclass
-# class MaybeSkill(Skill):
+  resolve: Resolve | None = None
+  alias: str | None = None
 
 def contextual_or_neighbour(skills: list[str], distance: int) -> Disambiguate:
   fn1 = contextual(*skills)
@@ -47,15 +46,15 @@ def contextual(*skills: str) -> Disambiguate:
 def neighbour(distance: int) -> Disambiguate:
   # TODO next word as "Developer", "Dev", "Engineer" (maybe all DEV & STUDENT roles)
   # should also disambiguate the skill
-  def disambiguate(ent: Span) -> bool:
+  def disambiguate(ent: Span) ->bool:
     doc = ent[0].doc
     tis = [
       t.i for t in ent
-    ] # indexes of current Entity' tokens
+    ] # indexes of tokens of the given ent
     otis = [
       t.i for e in doc.ents for t in e
       if e != ent and (":maybe:" not in e.label_)
-    ] # indexes of other (non-maybe) Entity tokens
+    ] # indexes of other (non-maybe) ent tokens
     return any(
       True for ti in tis
       if any(abs(oti - ti) <= distance for oti in otis)

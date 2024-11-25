@@ -5,16 +5,16 @@ from typing import Any, Callable, cast, Sequence
 from ..patterns import to_patterns2
 from ..utils import get_nlp, hash_skillname, Pattern, uniq
 from .data import SKILLS
-from .utils import Skill
+from .utils import Disambiguate, Resolve, Skill
 
 IN, LOWER, ORTH, POS = "IN", "LOWER", "ORTH", "POS"
 
-type Disambiguate = Callable[[Span], bool]
-
 class SkillExtractor:
   def __init__(self, name: str = "en_core_web_sm") -> None:
-    self.stacks: dict[str, list[str]] = {}
+    self.descriptions: dict[str, str] = {}
     self.disambiguates: dict[str, Disambiguate] = {}
+    self.resolvers: dict[str, Resolve] = {}
+    self.aliases: dict[str, str] = {}
     self.nlp = get_nlp(name)
     self.nlp.add_pipe("index_tokens_by_sents")
     skills: list[Skill] = []
@@ -30,13 +30,18 @@ class SkillExtractor:
       "phrase_matcher_attr": "LOWER",
     }, name=name))
     for skill in skills:
-      if skill.stack:
-        assert skill.name not in self.disambiguates, f"{skill.name!r} issue: multiple `stack` rules are not supported yet"
-        self.stacks[skill.name] = skill.stack
       if skill.disambiguate:
         l = label(skill)
         assert l not in self.disambiguates, f"{skill.name!r} issue: multiple `disambiguate` rules are not supported yet"
         self.disambiguates[l] = skill.disambiguate
+      if skill.resolve:
+        assert skill.name not in self.resolvers, f"{skill.name!r} issue: duplicate `resolve`"
+        self.resolvers[skill.name] = skill.resolve
+      if skill.alias:
+        assert skill.name not in self.aliases, f"{skill.name!r} issue: duplicate `alias`"
+        self.aliases[skill.name] = skill.alias
+      if skill.name not in self.descriptions:
+        self.descriptions[skill.name] = skill.descr
       for item in skill.phrases:
         if isinstance(item, str):
           assert not re.search("[A-Z]", item), f"{item!r} contains uppercase character(s), use pattern syntax"
@@ -55,27 +60,33 @@ class SkillExtractor:
     #   print(token, token.pos_)
       # pprint(list((token, token.pos_, token.dep_) for token in doc if not token.is_punct))
     # print("ents:", list(ent.label_ for ent in doc.ents))
-    skills = [
-      skill
-      for ent in doc.ents
-      for skill in self.get_skill(ent)
-    ]
-    return uniq(skills)
 
-  def get_skill(self, ent: Span) -> list[str]:
-    if ":maybe:" in ent.label_:
-      if self.disambiguates[ent.label_](ent):
-        l = clean(ent.label_)
-        if l in self.stacks:
-          return self.stacks[l]
+    # Disambiguate entities
+    ents: list[Span] = []
+    for ent in doc.ents:
+      if ":maybe:" not in ent.label_ or self.disambiguates[ent.label_](ent):
+        ent.label_ = clean(ent.label_)
+        ents.append(ent)
+    doc.ents = ents
+
+    # Resolve entities to skills
+    skills: list[str] = []
+    for sent in doc.sents:
+      sent_skills: list[str] = []
+      for ent in sent.ents:
+        if ent.label_ in self.resolvers:
+          sent_skills += self.resolvers[ent.label_](ent)
         else:
-          return [l]
-      else:
-        return []
-    if ent.label_ in self.stacks:
-      return self.stacks[ent.label_]
-    else:
-      return [ent.label_]
+          sent_skills.append(ent.label_)
+      skills += [
+        skill for skill in sent_skills
+        if self.descriptions.get(skill, "") != "Competence" or
+           not any(s.startswith(skill + "-") for s in sent_skills)
+      ]
+    return [
+      self.aliases.get(skill, skill)
+      for skill in uniq(skills)
+    ]
 
 def from_pattern(skill: Skill, pattern: Pattern) -> Pattern:
   return [{

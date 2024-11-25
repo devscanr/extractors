@@ -1,3 +1,8 @@
+from spacy.tokens import Span, Token
+
+Span.set_extension("used", default=False)
+Token.set_extension("i", default=None)
+
 # from .category import Categorizer
 # from .phone import parse_phones
 # from .email import parse_emails

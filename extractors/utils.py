@@ -210,8 +210,6 @@ def get_nlp(name: str | Path = "en_core_web_sm") -> Language:
 @Language.factory("index_tokens_by_sents")
 def component(nlp: Language, name: str) -> Callable[[Doc], Doc]:
   del nlp, name
-  if not Token.has_extension("i"):
-    Token.set_extension("i", default=None)
   def index_tokens_by_sents(doc: Doc) -> Doc:
     for token in doc:
       token._.i = token.i - token.sent.start

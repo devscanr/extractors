@@ -9,14 +9,24 @@ ctxn = contextual_or_neighbour(["Microsoft"], 2)
 SKILLS: list[Skill] = [
   Skill("Microsoft", ["microsoft"], ""), # company (etc)
 
-  Skill("Excel", [propn("excel")], ""),
+  Skill("MS-Access", ["microsoft-access", "ms-access"], ""),
+  Skill("MS-Excel", ["microsoft-excel", "ms-excel", propn("excel")], ""),
+  Skill("MS-SQLServer", [
+    "microsoft-sql(=server)", "(ms=)sql=server", "ms=sql",
+    "(sql=server-)management-studio",
+    "(microsoft-)management-studio",
+  ], ""),
+  # TODO T-SQL
+  Skill("MS-Sharepoint", ["microsoft-sharepoint", "ms-sharepoint", "sharepoint"], ""),
+  Skill("MS-365", ["microsoft=365", "ms=365"], ""),
+  Skill("MS-365", ["365"], "", disambiguate=ctx), # /
 
-  Skill("Power-Platform", ["power=platform"], ""),
+  Skill("Power-Platform", ["power-platform"], ""),
   Skill("Power-Apps", ["power=apps"], ""),
-  Skill("Power-Automate", ["power=automate"], ""),
+  Skill("Power-Automate", ["power-automate"], ""),
   Skill("Power-BI", ["power=bi"], ""),
-  Skill("Power-Pivot", ["power=pivot"], ""),
-  Skill("Power-Query", ["power=query"], ""),
+  Skill("Power-Pivot", ["power-pivot"], ""),
+  Skill("Power-Query", ["power-query"], ""),
 
   # .NET
   Skill(".NET", [ver1(".net"), "dotnet", "dot.net"], "Cross-platform, open source dev. platform."),
@@ -41,7 +51,7 @@ SKILLS: list[Skill] = [
   Skill("Azure-DataExplorer", ["azure-data=explorer", propn("adx")], ""), # big data platform optimized for analytical queries
   Skill("Azure-CosmosDB", ["azure-cosmosdb"], ""), # noSQL + relational DB
   Skill("Azure-IoT", ["azure-iot"], ""), # IoT platform
-  Skill("Azure-Kubernetes", ["azure-kubernetes=service", "azure-ks", "aks"], ""), # ~ Amazon-EKS
+  Skill("Azure-Kubernetes", ["azure-kubernetes-service", "azure-ks", "aks"], ""), # ~ Amazon-EKS
   Skill("Azure-Relay", ["azure-relay"], ""), # enables to securely expose services that run in corporate network to the public cloud
   Skill("Azure-SQL", ["azure-sql"], ""), # Managed Cloud Database Service
   Skill("Azure-Synapse", ["azure-synapse"], ""), # service that brings together enterprise data warehousing and bigdata analytics
@@ -55,17 +65,6 @@ SKILLS: list[Skill] = [
   # Azure Kubernetes Service (AKS)
   # Azure Managed Disks (= AWS EBS)
   # Azure Pipelines
-
-  # DATABASE
-  Skill("Microsoft-SQL", [
-    "microsoft-sql(=server)", "(ms=)sql=server", "ms=sql",
-    "(sql=server=)management=studio",
-    "(microsoft=)management=studio",
-  ], ""),
-  # TODO T-SQL
-  Skill("Microsoft-Sharepoint", ["microsoft-sharepoint", "ms=sharepoint", "sharepoint"], ""),
-  Skill("Microsoft-365", ["microsoft=365"], ""),
-  Skill("Microsoft-365", ["365"], "", disambiguate=ctx), # /
 
   # HARDWARE
   Skill("ARM", [propn("arm"), noun("ARM")], ""), # CPU family
