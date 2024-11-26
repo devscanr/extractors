@@ -6,8 +6,8 @@ from .apple import SKILLS as APPLE_SKILLS
 from .google import SKILLS as GOOGLE_SKILLS
 from .microsoft import SKILLS as MICROSOFT_SKILLS
 from .yandex import SKILLS as YANDEX_SKILLS
-from .competences import SKILLS as COMPETENCE_SKILLS
-from .large import SKILLS as LARGE_SKILLS
+from .topics1 import SKILLS as TOPICS1_SKILLS
+from .topics2 import SKILLS as TOPICS2_SKILLS
 
 __all__ = ["SKILLS"]
 
@@ -18,8 +18,10 @@ SKILLS: list[Skill] = [
   *GOOGLE_SKILLS,
   *MICROSOFT_SKILLS,
   *YANDEX_SKILLS,
-  *COMPETENCE_SKILLS,
-  *LARGE_SKILLS,
+  *TOPICS1_SKILLS,
+  *TOPICS2_SKILLS,
+
+  Skill("Statistics", ["statistics"], "Competence"),
 
   # ANALYSIS
   Skill("Tableau", ["tableau"], ""),
@@ -37,11 +39,6 @@ SKILLS: list[Skill] = [
   Skill("Photoshop", ["photoshop"], ""),
   Skill("Postman", ["postman"], ""),
   Skill("Swagger", ["swagger"], ""),
-  # Hubstaff
-  # Skill("Zoom", ["zoom"], ""),
-
-  # ARCHITECTURE
-  # SOA
 
   # MOBILE & CROSS-PLATFORM
   # notification, ui, gui, interface, native, web
@@ -539,6 +536,8 @@ SKILLS: list[Skill] = [
   Skill("RxJS", ["rxjs"], ""),
   Skill("Git", ["git"], ""),
   Skill("SVN", ["svn"], ""),
+  Skill("gRPC", ["grpc"], "Skill"),
+  Skill("tRPC", ["trpc"], "Skill"),
 ]
 
 # // SECURITY TOOLS
@@ -573,7 +572,6 @@ SKILLS: list[Skill] = [
 #   "Edtech": {pattern: "edtech", category: "topic"},
 #   "E-commerce": {pattern: "e=commerce", category: "topic"},
 #   "Open Source": {pattern: "open=source, fl?oss, f?oss", category: "topic"},
-#   "Robotics": {pattern: "robotics, robocon", category: "topic"},
 #   "Mathematics": {pattern: "mathematics, maths?", category: "topic"},
 #   "CI/CD": {pattern: "ci/=cd", category: "topic"},
 #   "Chemistry": {pattern: "chemistry", category: "topic"},
@@ -584,7 +582,6 @@ SKILLS: list[Skill] = [
 #   // "Font": {pattern: "fonts?", category: "topic"}, // disambiguate?
 #   "Animation": {pattern: "animation, motion", category: "topic"},
 #   "Graphic": {pattern: "graphics?", category: "topic", role: "Designer"},
-#   "Level": {pattern: "level", category: "topic"},
 #   "Enterprise": {pattern: "enterprise", category: "topic"},
 #   "CMS": {pattern: "cms", category: "topic", role: "Engineer"},
 #   "Headless CMS": {pattern: "headless=cms", category: "topic", role: "Engineer"},
@@ -596,9 +593,6 @@ SKILLS: list[Skill] = [
 #   "Sales": {pattern: "sales", category: "topic"}, // another problematic word @_@
 #   "Typography": {pattern: "typography", category: "topic"},
 #   "Startup": {pattern: "startups?", category: "topic"},
-#   "Product": {pattern: "!Products?", category: "topic"},
-#   "Project": {pattern: "!Projects?", category: "topic"},
-#   "Solution": {pattern: "!Solutions?", category: "topic"},
 #   "Team": {pattern: "!Teams?", category: "topic"},
 #   "Functional Programming": {pattern: "functional-programming, fp", category: "topic"},
 #   "Crypto": {pattern: "crypto, defi, web=3", category: "topic"}, // crypto enthusiast = crypto-currencies + decentralized finance (DeFi)

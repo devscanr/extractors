@@ -1,7 +1,7 @@
 import re
 from spacy.pipeline import EntityRuler
 from spacy.tokens import Doc, Span
-from typing import Any, Callable, cast, Sequence
+from typing import Any, cast, Sequence
 from ..patterns import to_patterns2
 from ..utils import get_nlp, hash_skillname, Pattern, uniq
 from .data import SKILLS
@@ -29,15 +29,17 @@ class SkillExtractor:
     ruler: EntityRuler = cast(Any, self.nlp.add_pipe("entity_ruler", config={
       "phrase_matcher_attr": "LOWER",
     }, name=name))
+    def create_resolve(ss: list[str]) -> Resolve:
+      return lambda _: ss
     for skill in skills:
-      if skill.disambiguate:
+      if skill.disambiguate is not None:
         l = label(skill)
         assert l not in self.disambiguates, f"{skill.name!r} issue: multiple `disambiguate` rules are not supported yet"
         self.disambiguates[l] = skill.disambiguate
-      if skill.resolve:
+      if skill.resolve is not None:
         assert skill.name not in self.resolvers, f"{skill.name!r} issue: duplicate `resolve`"
-        self.resolvers[skill.name] = skill.resolve
-      if skill.alias:
+        self.resolvers[skill.name] = create_resolve(skill.resolve) if isinstance(skill.resolve, list) else skill.resolve
+      if skill.alias is not None:
         assert skill.name not in self.aliases, f"{skill.name!r} issue: duplicate `alias`"
         self.aliases[skill.name] = skill.alias
       if skill.name not in self.descriptions:
@@ -80,8 +82,8 @@ class SkillExtractor:
           sent_skills.append(ent.label_)
       skills += [
         skill for skill in sent_skills
-        if self.descriptions.get(skill, "") != "Competence" or
-           not any(s.startswith(skill + "-") for s in sent_skills)
+        # if self.descriptions.get(skill, "") != "Competence" or
+        #    not any(s.startswith(skill + "-") for s in sent_skills)
       ]
     return [
       self.aliases.get(skill, skill)

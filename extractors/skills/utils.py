@@ -1,5 +1,4 @@
-from dataclasses import dataclass, field
-import re
+from dataclasses import dataclass
 from spacy.tokens import Span, Token
 from typing import Callable
 from ..utils import Pattern, get_cons_tokens, get_prec_tokens
@@ -18,7 +17,7 @@ class Skill:
   ]
   descr: str = ""
   disambiguate: Disambiguate | None = None
-  resolve: Resolve | None = None
+  resolve: Resolve | list[str] | None = None
   alias: str | None = None
 
 def contextual_or_neighbour(skills: list[str], distance: int) -> Disambiguate:
