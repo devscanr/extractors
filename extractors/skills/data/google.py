@@ -7,7 +7,7 @@ ctx = contextual("Google")
 ctxn = contextual_or_neighbour(["Google"], 2)
 
 SKILLS: list[Skill] = [
-  Skill("Google", ["google"], ""), # company (etc)
+  Skill("Google", ["google"], "Company"),
 
   Skill("Flax", ["flax"], "NN for Jax"),
   Skill("JAX", [propn("JAX")], "TensorFlow alternative"),

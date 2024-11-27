@@ -4,7 +4,7 @@ from ..utils import Skill #, contextual, contextual_or_neighbour, neighbour
 __all__ = ["SKILLS"]
 
 SKILLS: list[Skill] = [
-  Skill("Apple", ["apple"], ""), # company (etc)
+  Skill("Apple", ["apple"], "Company"),
 
   # MOBILE
   Skill("Objective-C", ["objective=c", "objective=c++", "objective=cpp"], ""),

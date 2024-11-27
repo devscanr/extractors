@@ -7,7 +7,7 @@ ctx = contextual("Microsoft")
 ctxn = contextual_or_neighbour(["Microsoft"], 2)
 
 SKILLS: list[Skill] = [
-  Skill("Microsoft", ["microsoft"], ""), # company (etc)
+  Skill("Microsoft", ["microsoft"], "Company"),
 
   Skill("MS-Access", ["microsoft-access", "ms-access"], ""),
   Skill("MS-Excel", ["microsoft-excel", "ms-excel", propn("excel")], ""),

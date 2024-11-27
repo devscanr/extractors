@@ -118,7 +118,7 @@ def describe_SkillExtractor() -> None:
       assert extract("senior dba") == ["Database", "Administration"]
 
     def it_handles_adhoc_set14() -> None:
-      assert extract("automated test") == ["Automation"]
+      assert extract("automated test") == ["Automation", "Testing"]
       assert extract("automated testing") == ["Automation", "Testing"]
       assert extract("automated qa") == ["Automation", "QA"]
       assert extract("test automation") == ["Automation"]
@@ -127,6 +127,11 @@ def describe_SkillExtractor() -> None:
       assert extract("qa & automation testing") == ["QA", "Automation", "Testing"]
       assert extract("tester and qa") == ["Testing", "QA"]
       assert extract("automated tester and qa") == ["Automation", "Testing", "QA"]
+
+    def it_handles_adhoc_set15() -> None:
+      assert extract("be lit") == []
+      assert extract("#lit") == ["Lit"]
+      assert extract("using Lit for fun and profit") == ["Lit"]
 
     def it_handles_natural_set1() -> None:
       assert extract("Self-employed web engineer. #Rust #Wasm #Go #TypeScript #React #REST") == [

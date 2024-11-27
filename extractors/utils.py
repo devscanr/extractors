@@ -77,7 +77,7 @@ jj = {TAG: "JJ", POS: "ADJ"}
 def add_dev_exceptions(nlp: Language) -> None:
   # Covers most common cases (ideally, we should retrain the model)
   ruler = cast(Any, nlp.get_pipe("attribute_ruler"))
-  problematic = ["Go", "Next", "Node", "REST"]
+  problematic = ["Go", "Lit", "Next", "Node", "REST"]
   # "foo Go. bar Next"
   ruler.add([
     [{ORTH: orth, IS_SENT_START: False}]

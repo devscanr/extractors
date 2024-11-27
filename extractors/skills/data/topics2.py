@@ -36,6 +36,7 @@ SKILLS: list[Skill] = [
   Skill("HTTPS", ["https"], "Topic"),
   Skill("WebGL", ["webgl"], "Topic"),
   Skill("WebSocket", ["websocket", "ws"], "Topic"),
+  Skill("Web-Components", ["web=component(s)"], "Topic"),
 
   Skill("dApps", ["decentralized-application(s)", "dapp(s)"], "Topic"),
   Skill("DeFi", ["decentralized-finance", "de=fi"], "Topic"),
@@ -49,15 +50,13 @@ SKILLS: list[Skill] = [
   Skill("PaaS", ["paas"], "Topic"),
   Skill("SaaS", ["saas"], "Topic"),
 
-  # PL/QL UMBRELLAS
-  Skill("Assembly", ["assembly"], "Topic"),
-  Skill("GraphQL", ["graphql"], "Topic"),
-  Skill("SQL", ["sql"], "Topic"),
-  Skill("NoSQL", ["nosql"], "Topic"),
+  # OPERATIONS
+  Skill("Gitops", ["gitops"], "Topic"),
+  Skill("Monorepo", ["monorepo(s)", "monorepository", "monorepositories"], "Topic"),
 
   # SECURITY
-  Skill("Malware", ["malware"], "Topic"),
 
+  # ...
   Skill("Large-Language-Models", ["large-language-model(s)", "llm"], "Topic"),
   Skill("Multimodal-Large-Language-Models", ["multimodal-large-language-model(s)", "mllm"], "Topic"),
   # Motion-Prediction
@@ -70,18 +69,14 @@ SKILLS: list[Skill] = [
   # Skill("Advertisement", ["advertising", "advertisement"], "Topic"),
   # Academy (doc, post-doc, etc)
   # Skill("Ecology", ["ecology", "ecologist"], "Topic"),
-  # Skill("Education", ["edtech", "educator", "dean", "prof(essor)", "teacher"], "Topic"), # how to differentiate from "(my) Education:"
   # Skill("Energy", ["energy"], "Topic"), # FPs
   # Environment, Environmental
-  # Skill("Finance", ["finance", "fintech", "financial"], "Topic"),
   # Skill("Graphic", ["graphic", "graphical"], "Topic"),
   # Skill("Health", ["health(care)"], "Topic"),
   # Skill("Psychology", ["psychology"], "Topic"),
-  # Skill("Marketing", ["marketing"], "Topic"),
   # Skill("Medicine", ["medicine", "medical"], "Topic"),
   # Skill("Music", ["music(al)", "musician"], "Topic"),
   # Skill("Sport", ["sport", "basketball"], "Topic"),
-  # Skill("Startup", ["startup"], "Topic"),
   # Travel
 
   # SCIENCES

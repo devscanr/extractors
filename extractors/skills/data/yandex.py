@@ -6,7 +6,7 @@ ctx = contextual("Apache")
 ctxn = contextual_or_neighbour(["Apache"], 2)
 
 SKILLS: list[Skill] = [
-  Skill("Yandex", ["yandex"], ""), # company (etc)
+  Skill("Yandex", ["yandex"], "Company"),
 
   Skill("ClickHouse", ["clickhouse"], ""),
 

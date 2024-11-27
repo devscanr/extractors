@@ -6,7 +6,7 @@ ctx = contextual("Apache")
 ctxn = contextual_or_neighbour(["Apache"], 2)
 
 SKILLS: list[Skill] = [
-  Skill("Apache", ["apache"], ""), # company (etc)
+  Skill("Apache", ["apache"], "Company"),
 
   Skill("Apache-Maven", ["apache-maven", "maven"], ""),
 

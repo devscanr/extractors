@@ -6,10 +6,10 @@ ctx = contextual("Amazon")
 ctxn = contextual_or_neighbour(["Amazon"], 2)
 
 SKILLS: list[Skill] = [
-  Skill("Amazon", ["amazon"], ""), # company (etc)
+  Skill("Amazon", ["amazon"], "Company"),
 
   # AWS
-  Skill("Amazon-WebServices", ["amazon-web=services", "aws"], ""),
+  Skill("Amazon-WebServices", ["amazon-web=services", "aws"], "AWS"),
   Skill("Amazon-Athena", ["aws=athena"], "Analytics, ML + SQL over S3"),
   Skill("Amazon-Athena", ["athena"], disambiguate=ctx),
   Skill("Amazon-Aurora", ["aws=aurora"], "Managed DB"),

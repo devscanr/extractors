@@ -189,6 +189,7 @@ SKILLS: list[Skill] = [
   Skill("EmberJS", ["ember.=js", "ember"], ""),
   Skill("Figma", ["figma"], ""),
   Skill("jQuery", ["jquery"], ""),
+  Skill("Lit", [propn("lit")], ""),
   Skill("Material-UI", ["material=ui", "mui", propn("material")], ""),
   Skill("Materialize", ["materialize"], ""),
   Skill("NgRx", ["ngrx"], "Reactive state management for Angular apps inspired by Redux"),
@@ -197,7 +198,7 @@ SKILLS: list[Skill] = [
   Skill("Redux", ["redux.=js", "redux"], ""),
   Skill("Remix", ["remix.=js", "remix"], ""),
   Skill("RiotJS", ["riot.=js"], ""),
-  Skill("SolidJS", ["solid.=js", propn("solid")], ""),
+  Skill("SolidJS", ["solid.=js", literal("Solid")], ""),
   Skill("Svelte", ["svelte.=js", "svelte"], ""),
   Skill("Tailwind-CSS", ["tailwind.=css", "tailwind"], ""),
   Skill("VueJS", ["vue.=js", ver1("vue")], ""),
@@ -209,11 +210,11 @@ SKILLS: list[Skill] = [
   Skill("Vite", ["vite"], ""),
   Skill("Webpack", ["webpack"], ""),
 
-  Skill("MEAN-Stack", ["mean=stack", propn("mean")], "", resolve=lambda _: ["MongoDB", "Express", "Angular", "NodeJS"]),
-  Skill("MERN-Stack", ["mern=stack", "mern"], "", resolve=lambda _: ["MongoDB", "Express", "React", "NodeJS"]),
-  Skill("MEVN-Stack", ["mevn=stack", "mevn"], "", resolve=lambda _: ["MongoDB", "Express", "VueJS", "NodeJS"]),
-  Skill("PERN-Stack", ["pern=stack", "pern"], "", resolve=lambda _: ["PostgreSQL", "Express", "React", "NodeJS"]),
-  Skill("LAMP-Stack", ["lamp=stack", propn("LAMP")], "", resolve=lambda _: ["Linux", "MySQL", "PHP"]), # Apache
+  Skill("MEAN-Stack", ["mean=stack", propn("mean")], resolve=["MongoDB", "Express", "Angular", "NodeJS"]),
+  Skill("MERN-Stack", ["mern=stack", "mern"], resolve=["MongoDB", "Express", "React", "NodeJS"]),
+  Skill("MEVN-Stack", ["mevn=stack", "mevn"], resolve=["MongoDB", "Express", "VueJS", "NodeJS"]),
+  Skill("PERN-Stack", ["pern=stack", "pern"], resolve=["PostgreSQL", "Express", "React", "NodeJS"]),
+  Skill("LAMP-Stack", ["lamp=stack", propn("LAMP")], resolve=["Linux", "MySQL", "PHP"]), # Apache
 
 #   Skill("Chrome", ["chrome"], ""),
 #   Skill("Firefox", ["firefox"], ""),
@@ -252,7 +253,7 @@ SKILLS: list[Skill] = [
 
   # INFRASTRUCTURE
   Skill("Celery", ["celery"], ""),
-  Skill("ELK-Stack", ["elk=stack", "elk"], "", resolve=lambda _: ["Elasticsearch", "Logstash", "Kibana"]), # , "Beats"
+  Skill("ELK-Stack", ["elk=stack", "elk"], resolve=["Elasticsearch", "Logstash", "Kibana"]), # , "Beats"
   Skill("Ansible", ["ansible"], "Automation engine for configuration management, application deployment, and task automation"),
   # Skill("Dagger", ["dagger"], "Programmable CI/CD engine that runs pipelines in containers"),
   Skill("CircleCI", ["circleci"], ""),
@@ -526,6 +527,12 @@ SKILLS: list[Skill] = [
   Skill("WebAssembly", ["wasm", "web=assembly"], ""),
   Skill("Zig", ["zig"], ""),
 
+  # LANGUAGE UMBRELLAS
+  Skill("Assembly", ["assembly"], "PL category"),
+  Skill("GraphQL", ["graphql", "graphiql"], "QL"),
+  Skill("SQL", ["sql"], "QL/DB category"),
+  Skill("NoSQL", ["nosql"], "DB category"),
+
   # UNSORTED
   Skill("Blender", ["blender"], ""),
   Skill("CompTIA-A+", ["comptia a+"], ""), # certificate for tech. support and IT ops
@@ -685,3 +692,4 @@ SKILLS: list[Skill] = [
 #
 # // http://localhost:3000/platform/search/adw0rd
 # // Why this profile has experienceYears: undefined?
+# Experience with OP Stack and Arbitrum works is preferred
