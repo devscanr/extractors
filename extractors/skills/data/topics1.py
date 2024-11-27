@@ -33,7 +33,9 @@ SKILLS: list[Skill] = [
   Skill("CI/CD", ["continuous=integration", "continuous=delivery", "ci/cd", "ci"], "Competence"),
 
   Skill("Computer", ["computer", "computing"], "Topic"),
-  Skill("Computer-Science", ["computerscience", "computerscientist", "comp=sci", literal("CS")], "Topic", resolve=["Computer", "Science"]),
+  Skill("Computer-Science", [
+    "computerscience", "computerscientist", "comp=sci", literal("CS")
+  ], "Topic", resolve=["Computer", "Science"]),
   Skill("Computer-Vision", ["computer=vision"], "Topic"),
 
   Skill("Cloud", ["cloud"], "Topic"),
@@ -249,7 +251,7 @@ SKILLS: list[Skill] = [
   Skill("-Testing", ["battle-tested", "tested to"], "Topic", resolve=[]),
 
   Skill("UI/UX", ["ui=ux", "ui/ux", "uix", "ui", "ux", "user=interface", "human=interface", "user=experience"], "Topic"),
-  Skill("UI-Design", ["uidesign", "uidesigner"], "Topic", resolve=["UI", "Design"]),
+  Skill("UI-Design", ["uidesign", "uidesigner"], "Topic", resolve=["UI/UX", "Design"]),
 
   Skill("Unit-Testing", ["unit=testing", "unit=test(s)"], "Topic"),
 

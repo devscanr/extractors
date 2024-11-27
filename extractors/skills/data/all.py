@@ -351,7 +351,7 @@ SKILLS: list[Skill] = [
   Skill("SSCP", ["sscp"], ""), # certificate
 
   # ROBOTICS
-  Skill("ABB", ["abb"], ""),           # robot brand
+  # Skill("ABB", ["abb"], ""),           # robot brand
   Skill("Fanuc", ["fanuc"], ""),       # robot brand
   Skill("iCub", ["icub"], ""),         # robot brand
   Skill("HyQ", ["hyq"], ""),           # robot brand
