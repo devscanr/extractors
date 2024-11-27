@@ -12,5 +12,5 @@ SKILLS: list[Skill] = [
 
   # CLOUD
   # Skill("?", ["yt"], ""), # many FPs
-  Skill("YDB", ["ydb"], "Distributed SQL Database that combines high availability and scalability with strong consistency and ACID transactions."), # https://ydb.tech/
+  Skill("YDB", ["ydb"], "Distributed SQL database with high availability, scalability, and strong consistency"), # https://ydb.tech/
 ]

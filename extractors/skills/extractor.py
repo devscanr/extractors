@@ -9,12 +9,15 @@ from .utils import Disambiguate, Resolve, Skill
 
 IN, LOWER, ORTH, POS = "IN", "LOWER", "ORTH", "POS"
 
+def create_resolve(ss: list[str]) -> Resolve:
+  return lambda _: ss
+
 class SkillExtractor:
   def __init__(self, name: str = "en_core_web_sm") -> None:
-    self.descriptions: dict[str, str] = {}
+    self.descrs: dict[str, str] = {}
     self.disambiguates: dict[str, Disambiguate] = {}
     self.resolvers: dict[str, Resolve] = {}
-    self.aliases: dict[str, str] = {}
+    # self.aliases: dict[str, str] = {}
     self.nlp = get_nlp(name)
     self.nlp.add_pipe("index_tokens_by_sents")
     skills: list[Skill] = []
@@ -29,21 +32,26 @@ class SkillExtractor:
     ruler: EntityRuler = cast(Any, self.nlp.add_pipe("entity_ruler", config={
       "phrase_matcher_attr": "LOWER",
     }, name=name))
-    def create_resolve(ss: list[str]) -> Resolve:
-      return lambda _: ss
     for skill in skills:
+      # Update self.descrs:
+      if skill.descr is not None:
+        if skill.name in self.descrs:
+          print(skill.name, skill.phrases, repr(skill.descr))
+        assert skill.name not in self.descrs, f"duplicate `descr` at {skill.name!r}"
+        self.descrs[skill.name] = skill.descr
+      # Update self.disambiguates:
       if skill.disambiguate is not None:
         l = label(skill)
-        assert l not in self.disambiguates, f"{skill.name!r} issue: multiple `disambiguate` rules are not supported yet"
+        assert l not in self.disambiguates, f"duplicate `disambiguate` at {skill.name!r}"
         self.disambiguates[l] = skill.disambiguate
+      # Update self.resolvers:
       if skill.resolve is not None:
-        assert skill.name not in self.resolvers, f"{skill.name!r} issue: duplicate `resolve`"
+        assert skill.name not in self.resolvers, f"duplicate `resolve` at {skill.name!r}"
         self.resolvers[skill.name] = create_resolve(skill.resolve) if isinstance(skill.resolve, list) else skill.resolve
-      if skill.alias is not None:
-        assert skill.name not in self.aliases, f"{skill.name!r} issue: duplicate `alias`"
-        self.aliases[skill.name] = skill.alias
-      if skill.name not in self.descriptions:
-        self.descriptions[skill.name] = skill.descr
+      # if skill.alias is not None:
+      #   assert skill.name not in self.aliases, f"{skill.name!r}: duplicate `alias`"
+      #   self.aliases[skill.name] = skill.alias
+      # Update rulers with patterns:
       for item in skill.phrases:
         if isinstance(item, str):
           assert not re.search("[A-Z]", item), f"{item!r} contains uppercase character(s), use pattern syntax"
@@ -82,11 +90,11 @@ class SkillExtractor:
           sent_skills.append(ent.label_)
       skills += [
         skill for skill in sent_skills
-        # if self.descriptions.get(skill, "") != "Competence" or
+        # if self.descrs.get(skill, "") != "Competence" or
         #    not any(s.startswith(skill + "-") for s in sent_skills)
       ]
     return [
-      self.aliases.get(skill, skill)
+      skill # self.aliases.get(skill, skill)
       for skill in uniq(skills)
     ]
 

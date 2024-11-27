@@ -14,8 +14,6 @@ SKILLS: list[Skill] = [
 
   Skill("Analysis", ["analysis", "analytics", "analyst"], "Topic"),
 
-  Skill("Analysis", ["analysis", "analytics", "analyst"], "Topic"),
-
   Skill("Animation", ["animation", "animated", "animating", "animator"], "Topic"),
 
   Skill("Architecture", ["architecture", "architect"], "Topic"),
@@ -83,8 +81,6 @@ SKILLS: list[Skill] = [
     "motiondesign", "motiondesigner",
     "visualdesign", "visualdesigner"
   ], "Topic"),
-
-  Skill("Software-Design", ["softwaredesign", "softwaredesigner"], "Topic", resolve=["Software", "Design"]),
 
   Skill("E2E-Testing", ["end=to=end=testing", "e2e=testing", "e2e=test(s)"], "Topic"), # TODO capture split words
 
@@ -220,12 +216,13 @@ SKILLS: list[Skill] = [
   Skill("Scraping", ["scraping", "webscraping"], "Topic"),
 
   Skill("Security", ["security", "secure" ], "Topic"),
-  Skill("Security", ["sec"], "Topic", disambiguate=neighbour(2)),
+  Skill("Security", ["sec"], disambiguate=neighbour(2)),
   Skill("Security-Operations", ["securityoperations", "secoperations", "secops"], "Topic", resolve=["Security", "Operations"]),
   Skill("Security-Cyber", ["cyber=security", "cyber=sec", "cyber=defence"], "Topic", resolve=["Security"]),
   Skill("Security-Information", ["information=security", "info=security", "info=sec"], "Topic", resolve=["Security"]),
 
   Skill("Software", ["software"], "Topic"),
+  Skill("Software-Design", ["softwaredesign", "softwaredesigner"], "Topic", resolve=["Software", "Design"]),
   Skill("Software-Engineering", [
     "softwareengineering", "softwareengineer",
     "softwareprogramming", "softwareprogrammer",
@@ -237,8 +234,6 @@ SKILLS: list[Skill] = [
   Skill("Solution-Architecture", ["solutionarchitecture", "solutionarchitect"], "Topic", resolve=["Solution", "Architecture"]),
 
   Skill("SDLC", ["sdlc"], "Topic", resolve=["Software", "Engineering"]),
-
-  Skill("Software", ["software"], "Topic"),
 
   Skill("SRE", [literal("SRE")], "Topic", resolve=["Reliability", "Engineering"]),
 

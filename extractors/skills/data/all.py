@@ -21,8 +21,6 @@ SKILLS: list[Skill] = [
   *TOPICS1_SKILLS,
   *TOPICS2_SKILLS,
 
-  Skill("Statistics", ["statistics"], "Competence"),
-
   # ANALYSIS
   Skill("Tableau", ["tableau"], ""),
 
@@ -126,7 +124,7 @@ SKILLS: list[Skill] = [
   Skill("TensorRT", ["tensorrt"], ""), # NVidia
 
   # GAME
-  Skill("BabylonJS", ["babylon.=js"], "Game and rendering engine packed into a JavaScript framework."),
+  Skill("BabylonJS", ["babylon.=js"], "Game and rendering engine packed into a JavaScript framework"),
   Skill("CUDA", ["cuda"], ""), # also ROBOTICS, EMBEDDED (GPU computing, NVIDIA)
   Skill("Godot", ["godot=engine", "godot", "gd=script"], ""),
   Skill("Phaser", ["phaser.=js", "phaser"], ""),
@@ -152,7 +150,7 @@ SKILLS: list[Skill] = [
   Skill("Fastify", ["fastify"], ""),
   Skill("Flask", ["flask"], ""),
   Skill("Jakarta-EE", ["jakarta(=ee)", "java-ee", "j2ee", "java-platform"], ""),
-  Skill("JVM", ["jvm"], "Java Virtual Machine enables a computer to run Java (Kotlin, etc.) programs."),
+  Skill("JVM", ["jvm"], "Java Virtual Machine enables a computer to run Java (Kotlin, etc.) programs"),
   Skill("Hasura", ["hasura"], ""),
   Skill("Koa", ["koa"], ""),
   Skill("Laravel", ["laravel"], ""),
@@ -183,8 +181,8 @@ SKILLS: list[Skill] = [
   Skill("Vert-X", ["vert.=x"], ""),
 
   # WEB FRONTEND
-  Skill("Angular", ["angular.=js", "angular"], "Web framework for SPA, mobile, PWA development with focus on modularity."),
-  Skill("Astro", ["astro.=js", "astro"], "Web framework for content-driven websites. Server-first."),
+  Skill("Angular", ["angular.=js", "angular"], "Web framework for SPA, mobile, PWA development with focus on modularity"),
+  Skill("Astro", ["astro.=js", "astro"], "Web framework for content-driven websites, server-first"),
   Skill("Bootstrap", ["bootstrap"], ""),
   Skill("Chakra-UI", ["chakra=ui", "chakra"], ""),
   Skill("D3JS", ["d3.=js", "d3"], ""),
@@ -193,7 +191,7 @@ SKILLS: list[Skill] = [
   Skill("jQuery", ["jquery"], ""),
   Skill("Material-UI", ["material=ui", "mui", propn("material")], ""),
   Skill("Materialize", ["materialize"], ""),
-  Skill("NgRx", ["ngrx"], "Reactive state management for Angular apps inspired by Redux."),
+  Skill("NgRx", ["ngrx"], "Reactive state management for Angular apps inspired by Redux"),
   Skill("Pinia", ["pinia"], ""),
   Skill("React", ["react.=js", "react"], ""),
   Skill("Redux", ["redux.=js", "redux"], ""),
@@ -203,7 +201,7 @@ SKILLS: list[Skill] = [
   Skill("Svelte", ["svelte.=js", "svelte"], ""),
   Skill("Tailwind-CSS", ["tailwind.=css", "tailwind"], ""),
   Skill("VueJS", ["vue.=js", ver1("vue")], ""),
-  Skill("VueX", ["vuex"], "State management pattern + library for VueJS applications."),
+  Skill("VueX", ["vuex"], "State management pattern + library for VueJS applications"),
 
   # WEB FULLSTACK
   Skill("Gulp", ["gulp"], ""),
@@ -222,12 +220,12 @@ SKILLS: list[Skill] = [
 #   Skill("Safari", ["safari"], ""),
 #   Skill("WebKit", ["webkit"], ""), # browser engine
 
-  Skill("Apollo", ["apollo.=js", "apollo=client", "apollo=server", "apollo"], "GraphQL-centric fullstack tools for web and mobile."),
+  Skill("Apollo", ["apollo.=js", "apollo=client", "apollo=server", "apollo"], "GraphQL-centric fullstack tools for web and mobile"),
   Skill("HTMX", ["htmx"], ""),
   Skill("Meteor", ["meteor", "meteor.=js"], ""),
   Skill("Ktor", ["ktor"], ""), # fullstack framework in Kotlin
   Skill("NextJS", ["next.=js", propn("next")], ""),
-  Skill("NextJS", ["next"], "", disambiguate=neighbour(1)), # /
+  Skill("NextJS", ["next"], disambiguate=neighbour(1)), # /
   Skill("NuxtJS", ["nuxt.=js", propn("nuxt")], ""),
   Skill("NodeJS", ["node.=js", propn("node")], ""),
   Skill("SvelteKit", ["svelte=kit"], ""),
@@ -240,7 +238,6 @@ SKILLS: list[Skill] = [
     "bitrix=24", "битрикс=24",
   ], ""), # so rare it makes sense to merge them...
   Skill("Airtable", ["airtable"], ""),
-  Skill("Bitrix", ["bitrix", "bitrix24"], ""),
   Skill("Drupal", ["drupal"], ""),
   Skill("Gatsby", ["gatsby"], ""),
   Skill("Hygraph", ["hygraph", "graph=cms"], ""),
@@ -256,9 +253,8 @@ SKILLS: list[Skill] = [
   # INFRASTRUCTURE
   Skill("Celery", ["celery"], ""),
   Skill("ELK-Stack", ["elk=stack", "elk"], "", resolve=lambda _: ["Elasticsearch", "Logstash", "Kibana"]), # , "Beats"
-  Skill("Infrastructure", ["infrastructure"], "Competence"),
-  Skill("Ansible", ["ansible"], "Automation engine for configuration management, application deployment, and task automation."),
-  # Skill("Dagger", ["dagger"], "Programmable CI/CD engine that runs pipelines in containers."),
+  Skill("Ansible", ["ansible"], "Automation engine for configuration management, application deployment, and task automation"),
+  # Skill("Dagger", ["dagger"], "Programmable CI/CD engine that runs pipelines in containers"),
   Skill("CircleCI", ["circleci"], ""),
   Skill("CKA", ["cka"], ""), # certificate
   Skill("CKAD", ["ckad"], ""), # certificate
@@ -271,12 +267,12 @@ SKILLS: list[Skill] = [
   Skill("GitHub-Actions", ["github=actions"], ""),
   Skill("GitLab-CI", ["gitlab=ci"], ""),
   Skill("Grafana", ["grafana"], ""),
-  Skill("Jaeger", ["jaeger"], "Distributed tracing platform. CNCF."),
+  Skill("Jaeger", ["jaeger"], "Distributed tracing platform, CNCF"),
   Skill("Jenkins", ["jenkins"], ""),
   Skill("Kibana", ["kibana"], ""),
   Skill("Kubernetes", ["kubernetes", "k8s", "k3s"], ""),
   Skill("Logstash", ["logstash"], ""),
-  Skill("OpenShift", ["openshift"], "Hybrid cloud application platform: a comprehensive set of tools and services to streamline the application lifecycle."),
+  Skill("OpenShift", ["openshift"], "Cloud platform, a set of tools and services for application lifecycle"),
   Skill("Prometheus", ["prometheus"], ""),
   Skill("Pulumi", ["pulumi"], ""),
   Skill("Puppet", ["puppet"], ""),
@@ -308,7 +304,7 @@ SKILLS: list[Skill] = [
   Skill("WebdriverIO", ["webdriverio"], ""),
 
   # BLOCKCHAIN
-  Skill("Arweave", ["arweave"], "A permanent and decentralized web inside an open ledger."),
+  Skill("Arweave", ["arweave"], "A permanent and decentralized web inside an open ledger"),
   Skill("Bitcoin", ["bitcoin"], ""),
   Skill("Ethereum", ["ethereum"], ""),
   Skill("EVM", ["evm"], ""),
@@ -318,7 +314,7 @@ SKILLS: list[Skill] = [
   # Skill("Web3", ["web3"], ""), topic/concept, not a skill
 
   # MEDIA
-  Skill("FFmpeg", ["ffmpeg"], "Cross-platform solution to record, convert and stream audio and video."),
+  Skill("FFmpeg", ["ffmpeg"], "Cross-platform solution to record, convert and stream audio and video"),
 
   # NETWORKING
   Skill("CompTIA-Network+", ["network+", "comptia n(etwork)+"], ""), # certificate
@@ -334,7 +330,7 @@ SKILLS: list[Skill] = [
   Skill("Zigbee", ["zigbee"], ""), # protocol spec. also EMBEDDED
 
   # SECURITY
-  Skill("Burp-Suite", ["burp=suite"], "Proprietary vulnerability scanning, penetration testing, and webapp security platform."),
+  Skill("Burp-Suite", ["burp=suite"], "Proprietary vulnerability scanning, penetration testing, and webapp security platform"),
   Skill("CEH", ["ceh"], ""),     # certificate
   Skill("CISA", ["cisa"], ""),   # certificate
   Skill("CISM", ["cism"], ""),   # certificate
@@ -422,14 +418,14 @@ SKILLS: list[Skill] = [
   Skill("GPOS", ["gpos"], ""),
 
   # HARDWARE & EMBEDDED
-  # Skill("HPC", ["hpc"], ""), # high performance computing
-  Skill("Arduino", ["arduino"], ""), # controller brand
+  # Skill("HPC", ["hpc"], "High performance computing"),
+  Skill("Arduino", ["arduino"], "Controller brand"),
   Skill("ASIC", ["asic"], ""), # ASICs are custom-designed circuits for specific applications, offering high performance and efficiency
-  Skill("ARC", [propn("ARC")], ""), # CPU family
-  Skill("ARC", ["arc"], "", disambiguate=neighbour(2)), # /
+  Skill("ARC", [propn("ARC")], "CPU family"),
+  Skill("ARC", ["arc"], disambiguate=neighbour(2)),
   Skill("AutoCAD", ["autocad"], ""),
-  Skill("AVR", ["avr"], ""), # controller family
-  Skill("Elbrus-2000", ["elbrus=2000", "e2k"], ""), # CPU
+  Skill("AVR", ["avr"], "Controller family"),
+  Skill("Elbrus-2000", ["elbrus=2000", "e2k"], "CPU"),
   Skill("Embox", ["embox"], ""), # Embox is a configurable RTOS designed for resource constrained and embedded systems
   Skill("ESP32", ["esp=32"], ""), # controller family
   Skill("ESP8266", ["esp=8266"], ""), # controller family
@@ -446,21 +442,21 @@ SKILLS: list[Skill] = [
   Skill("SPARC", ["sparc"], ""), # platform
   Skill("Altium-Designer", ["altium=designer"], ""), # tool
   Skill("Altium-365", ["altium=365"], ""), # tool
-  Skill("Autodesk", ["autodesk"], ""), # company
+  Skill("Autodesk", ["autodesk"], "Company"),
   Skill("Autodesk-Fusion", ["autodesk-fusion", "fusion=360"], ""), # tool
   Skill("Autodesk-Eagle", ["autodesk-eagle"], ""), # tool
-  Skill("Autodesk-Eagle", ["eagle"], "", disambiguate=contextual("Autodesk", "AutoCAD")), # /
-  Skill("Touchdesigner", ["touchdesigner"], ""), # visual development platform
-  Skill("Solidworks", ["solidworks-pcb", "solidworks"], ""), # CB design tool
+  Skill("Autodesk-Eagle", ["eagle"], disambiguate=contextual("Autodesk", "AutoCAD")), # /
+  Skill("Touchdesigner", ["touchdesigner"], "Visual development platform"), #
+  Skill("Solidworks", ["solidworks-pcb", "solidworks"], "CB design tool"),
   Skill("STM32", ["stm=32"], ""), # platform
-  Skill("Verilog", ["verilog", "sysverilog", "systemverilog"], ""), # PL
-  Skill("VHDL", ["vhdl"], ""), # PL
-  Skill("VLIW", ["vliw"], ""), # CPU architecture
-  Skill("x32", ["x32"], ""), # CPU architecture umbrella
-  Skill("x64", ["x64"], ""), # CPU architecture umbrella
-  Skill("x86", ["x86", "x86-32", "x86-64", "i286", "i386"], ""), # CPU architecture
+  Skill("Verilog", ["verilog", "sysverilog", "systemverilog"], "Specialized PL"),
+  Skill("VHDL", ["vhdl"], "Specialized PL"),
+  Skill("VLIW", ["vliw"], "CPU architecture"),
+  Skill("x32", ["x32"], "CPU architecture"),
+  Skill("x64", ["x64"], "CPU architecture"),
+  Skill("x86", ["x86", "x86-32", "x86-64", "i286", "i386"], "Intel CPU architecture"),
   Skill("Yosys", ["yosys"], ""), # https://github.com/YosysHQ/yosys
-  Skill("Z80", ["z=80"], ""), # CPU brand
+  Skill("Z80", ["z=80"], "CPU brand"),
 
   # DESKTOP
   Skill("ElectronJS", ["electron=js"], ""), # tons of FPs for just "electron"
@@ -469,7 +465,7 @@ SKILLS: list[Skill] = [
   Skill("Ada", ["ada"], ""),
   Skill("Apex", ["apex"], ""),
   Skill("C", ["c-lang"], ""),
-  Skill("C", ["c"], "", disambiguate=singleletter()),
+  Skill("C", ["c"], disambiguate=singleletter()),
   Skill("C++", ["c++", "cpp", "c=plus=plus"], ""),
   Skill("C#", ["c#", "csharp"], ""),
   Skill("Clojure", ["clojure", "clojurian"], ""),
@@ -479,7 +475,7 @@ SKILLS: list[Skill] = [
   Skill("CSS", [ver1("css")], ""),
   Skill("CSV", ["csv"], ""),
   Skill("D", ["d=lang"], ""),
-  Skill("D", ["d"], "", disambiguate=singleletter()),
+  Skill("D", ["d"], disambiguate=singleletter()),
   Skill("Dart", ["dart"], ""),
   Skill("Delphi", ["delphi"], ""),
   Skill("Elixir", ["elixir"], ""),
@@ -512,8 +508,8 @@ SKILLS: list[Skill] = [
   Skill("PowerShell", ["power=shell"], ""),
   Skill("Prolog", ["prolog"], ""),
   Skill("Python", [ver1("python"), "pythonist(a)"], ""),
-  Skill("R", ["r=lang"], ""),
-  Skill("R", ["r"], "", disambiguate=singleletter()),
+  Skill("R", ["r=lang"], "Programming language for statistical computing and data visualization"),
+  Skill("R", ["r"], disambiguate=singleletter()),
   Skill("Ruby", ["ruby=lang", "ruby", "rubyist", "rubist"], ""),
   Skill("Rust", ["rust", "rustacean"], ""),
   Skill("SASS", ["sass", "scss"], ""),
@@ -523,7 +519,7 @@ SKILLS: list[Skill] = [
   Skill("Shell", ["shell", "bash", "zsh"], ""),
   Skill("XML", ["xml"], ""),
   Skill("V", ["vlang"], ""),
-  Skill("V", ["v"], "", disambiguate=singleletter()),
+  Skill("V", ["v"], disambiguate=singleletter()),
   Skill("Vala", ["vala"], ""),
   Skill("Vyper", ["vyper"], ""),
   Skill("Visual-Basic", ["visual=basic", "vb(a)", "vb.net"], ""),

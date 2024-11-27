@@ -16,7 +16,7 @@ SKILLS: list[Skill] = [
   Skill("API", ["api"], "Topic"),
   Skill("ORM", ["orm"], "Topic"),
   Skill("REST", ["rest=api", propn("rest"), noun("REST")], "Topic"),
-  Skill("REST", ["rest"], "Topic", disambiguate=neighbour(2)),
+  Skill("REST", ["rest"], disambiguate=neighbour(2)),
   Skill("RPC", ["rpc=api", "rpc"], "Topic"),
   Skill("SOAP", ["soap"], "Topic"),
   Skill("SSG", ["ssg"], "Topic"),
@@ -58,7 +58,6 @@ SKILLS: list[Skill] = [
   # SECURITY
   Skill("Malware", ["malware"], "Topic"),
 
-  Skill("Large-Language-Models", ["large-language-model(s)", "llm"], "Topic"),
   Skill("Large-Language-Models", ["large-language-model(s)", "llm"], "Topic"),
   Skill("Multimodal-Large-Language-Models", ["multimodal-large-language-model(s)", "mllm"], "Topic"),
   # Motion-Prediction

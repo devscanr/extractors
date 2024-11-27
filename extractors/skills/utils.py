@@ -15,7 +15,7 @@ class Skill:
     str |   # Custom pattern (exact matches)
     Pattern # Spacy pattern
   ]
-  descr: str = ""
+  descr: str | None = None
   disambiguate: Disambiguate | None = None
   resolve: Resolve | list[str] | None = None
   alias: str | None = None
