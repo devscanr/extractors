@@ -4,10 +4,10 @@ from .extractor import SkillExtractor
 extractor = SkillExtractor()
 
 def extract_many(texts: list[str]) -> list[list[str]]:
-  return extractor.extract_many([normalize(text) for text in texts])
+  return extractor.extract_many([normalize(text, pipechar=",") for text in texts])
 
 def extract(text: str) -> list[str]:
-  return extractor.extract(normalize(text))
+  return extractor.extract(normalize(text, pipechar=","))
 
 def describe_SkillExtractor() -> None:
   def describe_extract_many() -> None:
@@ -109,7 +109,7 @@ def describe_SkillExtractor() -> None:
       assert extract("Ph.D. candidate, interested in software security") == ["Software", "Security"]
 
     def it_handles_adhoc_set12() -> None:
-      assert extract("Graphic Designer") == ["Design"]
+      assert extract("Graphic Designer") == ["Graphic", "Design"]
       assert extract("visual design") == ["Design"]
 
     def it_handles_adhoc_set13() -> None:
@@ -121,7 +121,7 @@ def describe_SkillExtractor() -> None:
       assert extract("automated test") == ["Automation", "Testing"]
       assert extract("automated testing") == ["Automation", "Testing"]
       assert extract("automated qa") == ["Automation", "QA"]
-      assert extract("test automation") == ["Automation"]
+      assert extract("test automation") == ["Testing", "Automation"]
       assert extract("qa & automation") == ["QA", "Automation"]
       assert extract("qa & testing") == ["QA", "Testing"]
       assert extract("qa & automation testing") == ["QA", "Automation", "Testing"]
@@ -256,15 +256,15 @@ def describe_SkillExtractor() -> None:
       assert extract("Power BI, my-sql-manager, Dotnet, Django/Python") == [
         "Power-BI", "MySQL", ".NET", "Django", "Python"
       ]
-      assert extract("The java.lang.Math") == [] # "Mathematics"
+      assert extract("The java.lang.Math") == ["Mathematics"]
       assert extract("hey are a bi person, my@sql") == []
       assert extract("PHP phper, Python pythonista") == ["PHP", "Python"]
       assert extract("Where old projects go to live out the rest of their days") == []
 
     def it_handles_natural_set10() -> None:
-      assert extract("I'm Julia, a marketing manager") == ["Julia", "Management"] # known FP , "Marketing", "Management"
+      assert extract("I'm Julia, a marketing manager") == ["Marketing", "Management"]
       assert extract("I learn Julia language") == ["Julia"]
-      assert extract("developer:iOS,Robot,Fintech") == ["Engineering", "iOS"] # , "iOS", "Finance"
+      assert extract("developer:iOS,Robot,Fintech") == ["Engineering", "iOS", "Finance"]
       assert extract("C Plus Plus programmar from India") == ["C++"]
       assert extract("hey are a bi person, my@sql") == []
       assert extract("PHP phper, Python pythonista") == ["PHP", "Python"]
@@ -280,8 +280,8 @@ def describe_SkillExtractor() -> None:
       assert extract("To be or not to BE") == [] # no FP!
 
     def it_handles_natural_set12() -> None:
-      assert extract("ARM processors") == ["ARM"]
-      assert extract("Hi, my name is Arm") == ["ARM"] # FP
+      assert extract("ARM processors") == ["ARM", "CPU"]
+      assert extract("Hi, my name is Arm") == []
       assert extract("My left arm is stronger than my right arm") == []
       assert extract("I’m doing high-performance computing work on CPU, including x86, arm.") == [
         "Performance", "Computer", "CPU", "x86", "ARM"
@@ -367,7 +367,7 @@ def describe_SkillExtractor() -> None:
 
     def it_handles_natural_set19() -> None:
       assert extract("I love to research malware, viruses, and other types of malicious files.") == [
-        "Research", "Malware"
+        "Research", "Security-Concepts"
       ]
       assert extract("CS PhD student at Stony Brook University, new to Distributed System.") == [
         "Computer", "Science", "Distributed", "System"
@@ -390,7 +390,7 @@ def describe_SkillExtractor() -> None:
       ]
       assert extract("looking to help clients use their data to the fullest.") == []
 
-    def it_handles_set20() -> None:
+    def it_handles_natural_set20() -> None:
       assert extract("data-backed decision making: statistical analysis, Computational Fluid Dynamics") == [
         "Data", "Statistics", "Analysis"
       ]
@@ -405,6 +405,14 @@ def describe_SkillExtractor() -> None:
       ]
       assert extract("SQL Server/Cloud DBA") == [
         "MS-SQLServer", "Cloud", "Database", "Administration"
+      ]
+
+    def it_handles_natural_set21() -> None:
+      assert extract("""
+        Experience with infrastructure as code (IaC) tools like Terraform, Ansible, 
+        or Azure Resource Manager (ARM) templates.
+      """) == [
+        "Infrastructure", "Engineering", "Terraform", "Ansible", "Microsoft-Azure"
       ]
 
 # interested in data science, neuroscience, and machine learning

@@ -1,10 +1,21 @@
-from ...utils import ver1, propn, noun
-from ..utils import Skill, contextual, neighbour, contextual_or_neighbour
+from spacy.tokens import Span
+from ...utils import ver1, propn
+from ..utils import Disambiguate, Skill, clean, contextual, contextual_or_neighbour
 
 __all__ = ["SKILLS"]
 
 ctx = contextual("Microsoft")
 ctxn = contextual_or_neighbour(["Microsoft"], 2)
+
+def dis_arm() -> Disambiguate:
+  def disambiguate(ent: Span) -> bool:
+    for e in ent.sent.ents:
+      if e == ent: continue
+      label = clean(e.label_)
+      if label in {"CPU", "x86", "x32", "x64", "RISC", "ARC"}:
+        return True
+    return False
+  return disambiguate
 
 SKILLS: list[Skill] = [
   Skill("Microsoft", ["microsoft"], "Company"),
@@ -46,7 +57,10 @@ SKILLS: list[Skill] = [
   # Entity Framework -- ORM for .NET
 
   # AZURE
-  Skill("Microsoft-Azure", ["microsoft-azure", "azure"], ""),
+  Skill("Microsoft-Azure", [
+    "microsoft-azure", "azure",
+    "log-analytics", "application-insights",
+  ], ""),
   Skill("Azure-Databricks", ["azure-databricks"], ""), # uses Apache-Spark | unified, open analytics platform for building, deploying, sharing, and maintaining EE data
   Skill("Azure-DataExplorer", ["azure-data=explorer", propn("adx")], ""), # big data platform optimized for analytical queries
   Skill("Azure-CosmosDB", ["azure-cosmosdb"], ""), # noSQL + relational DB
@@ -67,8 +81,9 @@ SKILLS: list[Skill] = [
   # Azure Pipelines
 
   # HARDWARE
-  Skill("ARM", [propn("arm"), noun("ARM")], "CPU family"),
-  Skill("ARM", ["arm"], disambiguate=neighbour(2)),
-  Skill("ARM32", ["aarch32", "arm32"], "CPU"),
-  Skill("ARM64", ["aarch64", "arm64"], "CPU"),
+  Skill("ARM", [
+    "aarch32", "arm32",
+    "aarch64", "arm64",
+  ], "CPU family"),
+  Skill("ARM", ["arm"], disambiguate=dis_arm()),
 ]

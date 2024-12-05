@@ -1,5 +1,6 @@
+from spacy.tokens import Span
 from ...utils import IN, LOWER, OP, literal, propn, ver1
-from ..utils import Skill, contextual, contextual_or_neighbour, neighbour, singleletter
+from ..utils import Disambiguate, Skill, contextual, contextual_or_neighbour, neighbour, singleletter
 from .amazon import SKILLS as AMAZON_SKILLS
 from .apache import SKILLS as APACHE_SKILLS
 from .apple import SKILLS as APPLE_SKILLS
@@ -10,6 +11,14 @@ from .topics1 import SKILLS as TOPICS1_SKILLS
 from .topics2 import SKILLS as TOPICS2_SKILLS
 
 __all__ = ["SKILLS"]
+
+def dis_julia() -> Disambiguate:
+  def disambiguate(ent: Span) -> bool:
+    for token in ent.sent:
+      if token.lower_ in {"'m", "am", "name"}:
+        return False
+    return True
+  return disambiguate
 
 SKILLS: list[Skill] = [
   *AMAZON_SKILLS,
@@ -45,11 +54,11 @@ SKILLS: list[Skill] = [
   Skill("CMake", ["cmake"], ""),
   Skill("Cocoa", ["cocoa"], ""),
   Skill("Cordova", ["cordova", "phonegap"], ""),
-  Skill("Dagger2", ["dagger2"], ""),
+  Skill("Dagger2", ["dagger=2"], "Programmable CI/CD engine that runs pipelines in containers"),
   Skill("GTK", ["gtk", "gtk+"], ""),
   Skill("Ionic", ["ionic"], ""),
   Skill("Capacitor", ["capacitor"], ""),
-  Skill("Jetpack-Compose", ["jetpack=compose", "android=compose"], ""), # just Jetpack is ambiguous
+  Skill("Jetpack-Compose", ["jetpack=compose", "jetpack=navigation", "android=compose"], ""), # just Jetpack is ambiguous
 
   Skill("Lottie", ["lottie"], ""),
   Skill("Onsen UI", ["onsen", "onsen=ui"], ""),
@@ -78,6 +87,7 @@ SKILLS: list[Skill] = [
   Skill("MongoDB", ["mongo=db", ver1("mongo")], ""),
   Skill("MySQL", ["my-sql", "my sql", ver1("mysql"), "(my=)sql=manager"], ""),
   Skill("Neo4j", ["neo4j", "neo4j=db"], ""),
+  Skill("Opensearch", ["opensearch"], "Community-driven Elasticsearch fork"),
   Skill("Oracle", ["oracle=db", "oracle", "pl(/)sql"], ""), # Oracle Database or Oracle RDBMS TODO split DB and COMPANY
   Skill("PouchDB", ["pouch=db"], ""),
   Skill("Presto", ["presto"], ""),
@@ -198,7 +208,7 @@ SKILLS: list[Skill] = [
   Skill("Redux", ["redux.=js", "redux"], ""),
   Skill("Remix", ["remix.=js", "remix"], ""),
   Skill("RiotJS", ["riot.=js"], ""),
-  Skill("SolidJS", ["solid.=js", literal("Solid")], ""),
+  Skill("SolidJS", ["solid.=js", propn("solid")], ""),
   Skill("Svelte", ["svelte.=js", "svelte"], ""),
   Skill("Tailwind-CSS", ["tailwind.=css", "tailwind"], ""),
   Skill("VueJS", ["vue.=js", ver1("vue")], ""),
@@ -251,7 +261,7 @@ SKILLS: list[Skill] = [
   Skill("WooCommerce", ["woo=commerce"], ""),
   Skill("WordPress", ["wordpress"], ""),
 
-  # INFRASTRUCTURE
+  # OPERATIONS
   Skill("Celery", ["celery"], ""),
   Skill("ELK-Stack", ["elk=stack", "elk"], resolve=["Elasticsearch", "Logstash", "Kibana"]), # , "Beats"
   Skill("Ansible", ["ansible"], "Automation engine for configuration management, application deployment, and task automation"),
@@ -268,6 +278,7 @@ SKILLS: list[Skill] = [
   Skill("GitHub-Actions", ["github=actions"], ""),
   Skill("GitLab-CI", ["gitlab=ci"], ""),
   Skill("Grafana", ["grafana"], ""),
+  Skill("Helm", ["helm"], ""),
   Skill("Jaeger", ["jaeger"], "Distributed tracing platform, CNCF"),
   Skill("Jenkins", ["jenkins"], ""),
   Skill("Kibana", ["kibana"], ""),
@@ -278,6 +289,7 @@ SKILLS: list[Skill] = [
   Skill("Pulumi", ["pulumi"], ""),
   Skill("Puppet", ["puppet"], ""),
   Skill("Quarkus", ["quarkus"], ""),
+  Skill("Spinnaker", ["spinnaker"], ""),
   Skill("Splunk", ["splunk"], ""), # also SECURITY
   Skill("RHCE", ["rhce"], ""),   # certificate
   Skill("RHCSA", ["rhcsa"], ""), # certificate
@@ -393,31 +405,6 @@ SKILLS: list[Skill] = [
   Skill("SalesForce", ["salesforce"], ""),
   Skill("Vercel", ["vercel"], ""),
 
-  # MIXED TOPICS
-  Skill("CPU", ["cpu"], ""),
-  Skill("GPU", ["gpu"], ""),
-  Skill("CLI", ["cli"], ""),
-  Skill("GUI", ["gui"], ""),
-
-  Skill("Voxel", ["voxel"], ""),
-  Skill("Pixel", ["pixel"], ""),
-  Skill("Sprite", ["sprite"], ""),
-  Skill("Texture", ["texture"], ""),
-  # Skill("2D", ["2d"], ""), -- too widespread
-  # Skill("3D", ["3d"], ""), -- too widespread
-  # Skill("Ray-Tracing", ["ray=tracing"], ""),
-  # Skill("Compiler", ["compiler"], ""),
-  # Skill("Singleplayer", ["single=player"], ""),
-  # Skill("Multiplayer", ["multi=player"], ""),
-  # Skill("Entity-Component-System", ["entity-component-system", "ecs"], ""), -- conflicts with AWS-ECS
-  Skill("Cron", ["cron", "crond", "cronjob"], ""),
-  Skill("SSL", ["ssl"], ""),
-  Skill("SSH", ["ssh"], ""),
-  Skill("FTP", ["ftp"], ""),
-  Skill("SFTP", ["sftp"], ""),
-  Skill("RTOS", ["rtos"], ""),
-  Skill("GPOS", ["gpos"], ""),
-
   # HARDWARE & EMBEDDED
   # Skill("HPC", ["hpc"], "High performance computing"),
   Skill("Arduino", ["arduino"], "Controller brand"),
@@ -493,7 +480,7 @@ SKILLS: list[Skill] = [
   Skill("Java", [ver1("java"), "java-se"], ""),
   Skill("JavaScript", ["java=script", "js"], ""),
   Skill("JSON", ["json", "json5"], ""),
-  Skill("Julia", ["julia"], ""),
+  Skill("Julia", ["julia"], "", disambiguate=dis_julia()),
   Skill("Kotlin", ["kotlin"], ""),
   Skill("LESS", [literal("LESS")], ""),
   Skill("Lisp", ["lisp"], ""),
@@ -693,3 +680,14 @@ SKILLS: list[Skill] = [
 # // http://localhost:3000/platform/search/adw0rd
 # // Why this profile has experienceYears: undefined?
 # Experience with OP Stack and Arbitrum works is preferred
+# Experience with service mesh technologies like Istio or Linkerd.
+# + Room (persistence in SQLite library)
+# + SAP MM, SAP PM, and SAP EWM
+# Kubeflow, Vertex AI Pipelines, TFX
+# Kubeflow, Step Functions, MLflow, TFX
+# such as Scikit-learn, XGBoost, MXNet, TensorFlow or PyTorch
+# exposition to GenAI and solid understanding of multimodal AI via HuggingFace, Llama, VertexAI, AWS Bedrock or GPT
+# + Dask
+# • Strong proficiency with CI/CD pipelines and distributed computing frameworks like Ray or Dask.
+# • Familiarity with model monitoring, logging, and versioning tools (e.g., MLflow, Weights & Biases).
+# • Proficient in designing and deploying agentic systems with modern model serving frameworks (e.g., LangChain, vLLM, FastAPI, or KServe).

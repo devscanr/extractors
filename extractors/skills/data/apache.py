@@ -26,7 +26,7 @@ SKILLS: list[Skill] = [
   Skill("Apache-Pig", ["apache-pig"], "Used to analyze Hadoop data (higher-level MapReduce)"),
   Skill("Apache-Pig", ["pig"], disambiguate=ctx),
   Skill("Apache-Sqoop", ["apache-sqoop", "sqoop"], "Hadoop data ingestion from relational databases to HDFS"),
-  Skill("Apache-Spark", ["apache-spark", "spark"], "Distributed data processing engine, a MapReduce replacement"),
+  Skill("Apache-Spark", ["apache-spark", "spark", "pyspark", "sparksql"], "Distributed data processing engine, a MapReduce replacement"),
   Skill("Apache-Storm", ["apache-storm"], "Like Kafka but for real-time streaming"),
   Skill("Apache-Storm", ["storm"], disambiguate=ctx),
   Skill("Apache-ZooKeeper", ["apache-zookeper"], "Centralized service for process configuration and distributed synchronization"),

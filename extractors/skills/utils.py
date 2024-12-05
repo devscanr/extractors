@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+import re
 from spacy.tokens import Span, Token
 from typing import Callable
 from ..utils import Pattern, get_cons_tokens, get_prec_tokens
@@ -75,3 +76,6 @@ def singleletter() -> Disambiguate:
 
 def gets(tokens: list[Token], index: int) -> str:
   return tokens[index].lower_ if -len(tokens) <= index < len(tokens) else ""
+
+def clean(label: str) -> str:
+  return re.sub(r":maybe:.+$", "", label)

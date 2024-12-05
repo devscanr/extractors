@@ -5,7 +5,7 @@ from typing import Any, cast, Sequence
 from ..patterns import to_patterns2
 from ..utils import get_nlp, hash_skillname, Pattern, uniq
 from .data import SKILLS
-from .utils import Disambiguate, Resolve, Skill
+from .utils import Disambiguate, Resolve, Skill, clean
 
 IN, LOWER, ORTH, POS = "IN", "LOWER", "ORTH", "POS"
 
@@ -115,6 +115,3 @@ def label(skill: Skill) -> str:
     return skill.name + ":maybe:" + hash_skillname(skill.name)
   else:
     return skill.name
-
-def clean(label: str) -> str:
-  return re.sub(r":maybe:.+$", "", label)

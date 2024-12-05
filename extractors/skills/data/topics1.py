@@ -54,8 +54,10 @@ def dis_management() -> Disambiguate:
 
 def dis_test() -> Disambiguate:
   whitelist = {
-    "acceptance", "automated", "case", "cases", "execute",
-    "e2e", "functional", "integration", "load", "manual",
+    "acceptance", "automated", "automation", "case", "cases",
+    "documentation", "execution", "execute",
+    "e2e", "functional", "integration", "load",
+    "management", "manual",
     "suite", "suites", "unit", "write", "writing"
   }
   def disambiguate(ent: Span) -> bool:
@@ -77,6 +79,8 @@ SKILLS: list[Skill] = [
   Skill("Algorithm", ["algorithm(s)", "algorithmic"], "Topic"),
 
   Skill("Analysis", ["analysis", "analytics", "analyst"], "Topic"),
+  # TODO: -"issue analysis"
+  # analyses (plural, appears in vacancies)
 
   Skill("Animation", ["animation", "animated", "animating", "animator"], "Topic"),
 
@@ -93,8 +97,6 @@ SKILLS: list[Skill] = [
   Skill("Business", ["business", "entrepreneur", "entrepreneurship", "business-development"], "Topic"),
   Skill("Business-Analysis", ["businessanalysis", "businessanalytics", "businessanalyst"], resolve=["Business", "Analysis"]),
   # TODO business intelligence, BI
-
-  Skill("CI/CD", ["continuous=integration", "continuous=delivery", "ci/cd", "ci"], "Topic"),
 
   Skill("Computer", ["computer", "computing"], "Topic"),
   Skill("Computer-Science", [
@@ -113,7 +115,7 @@ SKILLS: list[Skill] = [
 
   Skill("CRM", ["crm", "customer=relationship=management"], "Topic"),
 
-  Skill("Data", ["data"], "Topic"),
+  Skill("Data", ["data"], "Topic"), # maybe a whitelist will work better here
   Skill("-Data", [
     "personal=data", "user=data",
     "my=data", "your=data", "our=data", "their=data",
@@ -147,13 +149,14 @@ SKILLS: list[Skill] = [
   Skill("Distributed", ["distributed"], "Topic"),
 
   Skill("Design", [
-    noun("design"), "designer",
+    noun("design"), # too many FPs, need to narrow somehow. A frequent verb.
+    "designer",
     "graphicdesign", "graphicdesigner",
     "motiondesign", "motiondesigner",
     "visualdesign", "visualdesigner"
   ], "Topic"),
 
-  Skill("E2E-Testing", ["end=to=end=testing", "e2e=testing", "e2e=test(s)"], "Topic"), # TODO capture split words
+  Skill("Economics", ["economics", "economist"], "Topic"),
 
   Skill("Education", ["edtech", "educator", "dean", "prof(essor)", "teacher"], "Topic"), # how to differentiate from "(my) Education:"
   Skill("-Education", ["my-education"], resolve=[]),
@@ -185,17 +188,18 @@ SKILLS: list[Skill] = [
     "devsecops", "secdevops",
   ], resolve=["Engineering", "Security", "Operations"]),
 
-  Skill("ETL", ["etl", "elt"], "Topic"),
+  Skill("ETL", ["etl(s)", "elt"], "Topic"),
 
-  Skill("Finance", ["finance", "fintech", "financial"], "Topic"),
+  Skill("Finance", [
+    "banking", "bankless",
+    "finance", "fintech", "financial",
+  ], "Topic"),
 
   Skill("Firmware", ["firmware"], "Topic"),
 
   Skill("Frontend", ["front=end", "frontender", noun("FE")], "Topic"), # not detected as PROPN, needs to be retrained
 
   Skill("Fullstack", ["full=stack(er)"], resolve=["Backend", "Frontend"]),
-
-  Skill("Functional-Testing", ["functional=testing", "functional=test(s)"], "Topic"),
 
   Skill("Game", ["game"], "Topic"),
   Skill("-Game", ["game=theory"], resolve=[]), # oversimplified, will update later
@@ -205,6 +209,8 @@ SKILLS: list[Skill] = [
     "gameprogramming", "gameprogrammer"
     "gamedeveloper", "gamedev"
   ], resolve=["Game", "Engineering"]),
+
+  Skill("Graphic", ["graphic(s)"], "Topic"),
 
   Skill("Hardware", ["hardware"], "Topic"),
   Skill("Hardware-Design", ["hardwaredesign", "hardwaredesigner"], resolve=["Hardware", "Design"]),
@@ -216,19 +222,18 @@ SKILLS: list[Skill] = [
   Skill("HighLoad", ["high=load"], "Topic"),
 
   Skill("Infrastructure", ["infrastructure"], "Topic"),
+  Skill("Infrastructure-As-Code", ["iac"], "Topic", resolve=["Infrastructure", "Engineering"]),
 
-  Skill("Integration", ["integration"], "Topic"),
-  Skill("Integration-Testing", ["integration=testing", "integration=test(s)"], "Topic"),
+
 
   Skill("IoT", ["iot", "internet-of-things"], "Topic"),
 
-  Skill("Leadership", ["leadership", "leader", "lead"], "Topic"),
-
-  Skill("Load-Testing", ["load=testing", "load=test(s)"], "Topic"),
+  Skill("Leadership", ["leadership", "leader", "lead", "leading role"], "Topic"),
 
   Skill("Low-Code", ["low=code", "no=code"], "Topic"),
 
   Skill("Machine-Learning", ["machine-learning", "ml"], "Topic"),
+  # ^ loses "ML" in "Machine and Deep Learning"
   Skill("ML-Engineering", [
     "mobileengineering", "mobileengineer",
     "mobileprogramming", "mobileprogrammer",
@@ -257,18 +262,13 @@ SKILLS: list[Skill] = [
 
   Skill("Neural-Networks", ["(deep=)neural-networks", "nn", "dnn"], "Topic"), # not sure about FPs
 
-  Skill("Operations", ["operations", "ops"], "Topic"),
+  Skill("Operations", [
+    "operations", "ops",
+  ], "Topic"),
 
   Skill("Orchestration", ["orchestration"], "Topic"),
 
-  Skill("VA/PT", [
-    "penetration=testing", "penetration=test(s)", "penetration=tester",
-    "pen=testing", "pen=test", "pen=tester",
-    "vapt",
-    "vulnerability=assessment",
-    "vulnerability=scanning", "vulnerability=scan(ner)",
-    "vulnerability=testing", "vulnerability=test(s)", "vulnerability=tester",
-  ], "Topic"),
+  Skill("Politics", ["politics", "political"], "Topic"),
 
   Skill("Performance", ["performance", "performant"], "Topic"),
 
@@ -295,7 +295,8 @@ SKILLS: list[Skill] = [
 
   Skill("SDLC", ["sdlc"], resolve=["Software", "Engineering"]),
 
-  Skill("Security", ["security", "secure", "exploit", "malware"], "Topic"),
+  Skill("Security", ["security", "secure"], "Topic"),
+  Skill("Security-Concepts", ["exploit", "malware"], "Topic"),
   Skill("Security", ["sec"], disambiguate=neighbour(2)),
   Skill("Security-Operations", ["securityoperations", "secoperations", "secops"], resolve=["Security", "Operations"]),
   Skill("Security-Cyber", ["cyber=security", "cyber=sec", "cyber=defence"], resolve=["Security"]),
@@ -318,7 +319,15 @@ SKILLS: list[Skill] = [
 
   Skill("Startup", ["startup(s)"], "Topic"),
 
-  Skill("Statistics", ["statistic(s)", "statistician", "statistical"], "Topic"),
+  Skill("Statistics", [
+    "statistic(s)", "statistician", "statistical",
+  ], "Topic"),
+  Skill("Statistical-Concepts", [
+    "correlation", "confidence interval(s)",
+    "probability", "regression",
+    # classification, clustering -- more ML concepts
+    # ensemble learning
+  ], "Topic"),
 
   Skill("System", ["system(s)"], "Topic"), # TODO fix FPs
   Skill("System-Administration", [
@@ -340,7 +349,7 @@ SKILLS: list[Skill] = [
   Skill("UI/UX", ["ui=ux", "ui/ux", "uix", "ui", "ux", "user=interface", "human=interface", "user=experience"], "Topic"),
   Skill("UI-Design", ["uidesign", "uidesigner"], resolve=["UI/UX", "Design"]),
 
-  Skill("Unit-Testing", ["unit=testing", "unit=test(s)"], "Topic"),
+  Skill("Usability", ["usability", "usable"], "Topic"),
 
   Skill("Visualization", ["visualization", "visualizer"], "Topic"),
 
@@ -380,7 +389,6 @@ SKILLS: list[Skill] = [
 
 # Skill("Resilience", ["resilience", "resilient"], "Topic"),
 # Skill("Observability", ["observability", "observable"], "Topic"),
-# Skill("Usability", ["usability", "usable"], "Topic"),
 # Highly Available, High Availability, high performance, high traffic,
 # Clustering, Sharding, load balancing
 # Replication, Partitioning | Enterprise, large-scale
@@ -391,3 +399,4 @@ SKILLS: list[Skill] = [
 # Skill("E-Commerce", ["e=commerce"], "Topic"),
 # Skill("Cluster", ["cluster"], "Topic"),
 # Skill("Container", ["container"], "Topic"),
+# + Logistics
