@@ -4,8 +4,9 @@ from extractors.utils import normalize
 # + 2 DevOps
 # + 3 Mobile
 # + 1 (Product) Analyst
-# + 2 QA
+# + 3 QA
 # + 4 ML
+# + 4 Security
 
 texts: list[str] = [
   """

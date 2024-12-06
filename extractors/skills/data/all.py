@@ -187,7 +187,7 @@ SKILLS: list[Skill] = [
 # # Java Transaction API (JTA): A specification that allows for the management of transactions across multiple resources.
 
   Skill("Micronaut", ["micronaut"], ""),
-  Skill("RabbitMQ", ["rabbit=mq"], ""),
+  Skill("RabbitMQ", ["rabbit=mq", "rmq"], ""),
   Skill("Vert-X", ["vert.=x"], ""),
 
   # WEB FRONTEND
@@ -277,7 +277,7 @@ SKILLS: list[Skill] = [
   Skill("Dokku", ["dokku"], ""), # also Cloud
   Skill("GitHub-Actions", ["github=actions"], ""),
   Skill("GitLab-CI", ["gitlab=ci"], ""),
-  Skill("Grafana", ["grafana"], ""),
+  Skill("Grafana", ["grafana"], "Monitoring"),
   Skill("Helm", ["helm"], ""),
   Skill("Jaeger", ["jaeger"], "Distributed tracing platform, CNCF"),
   Skill("Jenkins", ["jenkins"], ""),
@@ -296,6 +296,8 @@ SKILLS: list[Skill] = [
   Skill("TeamCity", ["teamcity"], ""),
   Skill("Terraform", ["terraform"], ""),
   Skill("Vagrant", ["vagrant"], ""),
+  # Good to have Knowledge of modern monitoring solutions (e.g. Nagios, Zabbix, Prometheus, Splunk).
+  # Familiarity with monitoring tools such as SolarWinds, Nagios, or similar.
 
   # QA-n-AUTOMATION (tech & platforms)
   Skill("Appium", ["appium"], ""),
@@ -311,7 +313,7 @@ SKILLS: list[Skill] = [
   Skill("Protractor", ["protractor"], ""),
   Skill("PyTest", ["pytest"], ""),
   Skill("Selenium", ["selenium"], ""),
-  Skill("Sentry", ["sentry"], ""),
+  Skill("Sentry", ["sentry"], "Monitoring"),
   Skill("TestCafe", ["testcafe"], ""),
   Skill("TestNg", ["testng"], ""),
   Skill("WebdriverIO", ["webdriverio"], ""),
@@ -332,7 +334,7 @@ SKILLS: list[Skill] = [
   # NETWORKING
   Skill("CompTIA-Network+", ["network+", "comptia n(etwork)+"], ""), # certificate
   Skill("Cisco-CNA", ["ccna"], ""), # certificate
-  Skill("Cisco-CNP", ["ccnp"], ""), # certificate
+  Skill("Cisco-CNP", ["ccnp"], ""), # certificate -- TODO "CCNP or equivalent required; CCIE or other advanced certs are preferred."
   Skill("LoRa", [propn("LoRa")], ""), # transmission tech
   Skill("MTCNA", ["mtcna"], ""),    # certificate
   Skill("MQTT", ["mqtt"], ""),      # IoT messaging standard, also CLOUD
@@ -347,13 +349,17 @@ SKILLS: list[Skill] = [
   Skill("CEH", ["ceh"], ""),     # certificate
   Skill("CISA", ["cisa"], ""),   # certificate
   Skill("CISM", ["cism"], ""),   # certificate
-  Skill("CISSP", ["ciss", "cissp"], ""), # certificate
+  Skill("CISSP", ["ciss", "cissp"], "Certified Information Systems Security Professional"), # certificate
+  Skill("CSSLP", ["csslp"], "Certified Secure Software Lifecycle Professional"), # certificate
+  Skill("CASE", [literal("CASE")], "Certified Application Security Engineer"), # certificate
   Skill("CompTIA-PenTest+", ["pentest+", "comptia-p(entest)+"], ""), # certificate
   Skill("CompTIA-Security+", ["security+", "comptia-s(ecurity)+"], ""), # certificate
-  Skill("GIAC-CIH", ["gcih"], ""),   # certificate
-  Skill("GIAC-SEC", ["gsec"], ""),   # certificate
-  Skill("GIAC-REM", ["grem"], ""),   # certificate
-  Skill("GIAC-WAPT", ["gwapt"], ""), # certificate
+  Skill("GIAC-CIH", ["gcih"], ""),     # certificate
+  Skill("GIAC-SEC", ["gsec"], ""),     # certificate
+  Skill("GIAC-REM", ["grem"], ""),     # certificate
+  Skill("GIAC-WAPT", ["gwapt"], ""),   # certificate
+  Skill("OSCP/OSCE", ["oscp", "osce"], ""), # certificate
+  Skill("Cobalt-Strike", ["cobalt=strike"], ""),
   Skill("JWT", ["jwt"], ""),
   Skill("Metasploit", ["metasploit"], ""),
   Skill("Nessus", ["nessus"], ""),
@@ -362,6 +368,10 @@ SKILLS: list[Skill] = [
   Skill("SAML", ["saml"], ""),
   Skill("Snort", [propn("snort")], ""),
   Skill("SSCP", ["sscp"], ""), # certificate
+  # CANVAS, Empire, Core Impact -- attack frameworks
+  # Relevant certifications (kept only new: CISSP-ISSAP, CCSP, SC-100, CRTSA, GDSA, TOGAF) are highly desirable.
+
+  # SANS (GPEN, GXPN, GWAPT) -- wtf: SANS vs GIAC
 
   # ROBOTICS
   # Skill("ABB", ["abb"], ""),           # robot brand
@@ -616,8 +626,6 @@ SKILLS: list[Skill] = [
 #   ddos, session
 #
 #   DEVOPS specific words
-#   cluster, container(?)
-#   serverless, monitoring, logging
 #   development, production, staging
 #
 #   DEVOPS terms

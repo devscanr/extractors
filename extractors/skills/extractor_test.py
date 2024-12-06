@@ -367,7 +367,7 @@ def describe_SkillExtractor() -> None:
 
     def it_handles_natural_set19() -> None:
       assert extract("I love to research malware, viruses, and other types of malicious files.") == [
-        "Research", "Security-Concepts"
+        "Research", "Security"
       ]
       assert extract("CS PhD student at Stony Brook University, new to Distributed System.") == [
         "Computer", "Science", "Distributed", "System"

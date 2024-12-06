@@ -185,7 +185,7 @@ SKILLS: list[Skill] = [
   Skill("Engineering-Security-Operations", [
     "dev/sec-ops", "sec/dev-ops",
     "dev-sec-ops", "sec-dev-ops",
-    "devsecops", "secdevops",
+    "devsecops", "secdevops", "devopssec",
   ], resolve=["Engineering", "Security", "Operations"]),
 
   Skill("ETL", ["etl(s)", "elt"], "Topic"),
@@ -201,7 +201,9 @@ SKILLS: list[Skill] = [
 
   Skill("Fullstack", ["full=stack(er)"], resolve=["Backend", "Frontend"]),
 
-  Skill("Game", ["game"], "Topic"),
+  Skill("Game", [
+    "game", "gameplay",
+  ], "Topic"),
   Skill("-Game", ["game=theory"], resolve=[]), # oversimplified, will update later
   Skill("Game-Design", ["gamedesign", "gamedesigner"], resolve=["Game", "Design"]),
   Skill("Game-Engineering", [
@@ -222,9 +224,7 @@ SKILLS: list[Skill] = [
   Skill("HighLoad", ["high=load"], "Topic"),
 
   Skill("Infrastructure", ["infrastructure"], "Topic"),
-  Skill("Infrastructure-As-Code", ["iac"], "Topic", resolve=["Infrastructure", "Engineering"]),
-
-
+  Skill("IAC", ["iac", "infrastructure=as=code"], resolve=["Infrastructure", "Engineering"]),
 
   Skill("IoT", ["iot", "internet-of-things"], "Topic"),
 
@@ -255,7 +255,10 @@ SKILLS: list[Skill] = [
 
   Skill("Modeling", ["datamodeling"], "Topic"),
 
-  Skill("Network", ["networking", "network"], "Topic"),
+  Skill("Network", ["networking", "network(s)"], "Topic"),
+  Skill("Network-Operations", [
+    "networkoperations", "networkops", "netops",
+  ], resolve=["Network", "Operations"]),
   Skill("Network-Security", ["networksecurity", "netsecurity", "net=sec"], resolve=["Network", "Security"]),
 
   Skill("Natural-Language-Processing", ["natural=language=processing", "nlp"], "Topic"),
@@ -266,11 +269,12 @@ SKILLS: list[Skill] = [
     "operations", "ops",
   ], "Topic"),
 
-  Skill("Orchestration", ["orchestration"], "Topic"),
-
   Skill("Politics", ["politics", "political"], "Topic"),
 
-  Skill("Performance", ["performance", "performant"], "Topic"),
+  Skill("Performance", [
+    "performance", "performant",
+    # "bandwidth", -- also specific to Networking...
+  ], "Topic"),
 
   Skill("Product", ["product"], "Topic"),
 
@@ -295,12 +299,17 @@ SKILLS: list[Skill] = [
 
   Skill("SDLC", ["sdlc"], resolve=["Software", "Engineering"]),
 
-  Skill("Security", ["security", "secure"], "Topic"),
-  Skill("Security-Concepts", ["exploit", "malware"], "Topic"),
+  Skill("Security", [
+    "security", "secure",
+    "defensive", "offensive", "threat", # _ tools, _ techniques, etc.
+    "exploit(s)", "malware", "malicious",
+    "vulnerability", "vulnerabilities",
+  ], "Topic"),
   Skill("Security", ["sec"], disambiguate=neighbour(2)),
   Skill("Security-Operations", ["securityoperations", "secoperations", "secops"], resolve=["Security", "Operations"]),
   Skill("Security-Cyber", ["cyber=security", "cyber=sec", "cyber=defence"], resolve=["Security"]),
   Skill("Security-Information", ["information=security", "info=security", "info=sec"], resolve=["Security"]),
+  # offensive security, audit
 
   Skill("Software", ["software"], "Topic"),
   Skill("Software-Design", ["softwaredesign", "softwaredesigner"], resolve=["Software", "Design"]),
@@ -321,12 +330,8 @@ SKILLS: list[Skill] = [
 
   Skill("Statistics", [
     "statistic(s)", "statistician", "statistical",
-  ], "Topic"),
-  Skill("Statistical-Concepts", [
     "correlation", "confidence interval(s)",
-    "probability", "regression",
-    # classification, clustering -- more ML concepts
-    # ensemble learning
+    "probability", "regression", "classification", "clustering",
   ], "Topic"),
 
   Skill("System", ["system(s)"], "Topic"), # TODO fix FPs
@@ -341,13 +346,16 @@ SKILLS: list[Skill] = [
     "systemprogramming", "systemprogrammer",
     "systemdeveloper", "systemdev",
   ], resolve=["System", "Engineering"]),
+  Skill("System-Operations", [
+    "systemoperations", "systemops", "sysops",
+  ], resolve=["System", "Operations"]),
 
   Skill("Testing", ["testing", "tested", "tester"], "Topic"),
   Skill("Testing", ["test(s)"], disambiguate=dis_test()),
   Skill("-Testing", ["battle-tested", "tested to"], resolve=[]),
 
   Skill("UI/UX", ["ui=ux", "ui/ux", "uix", "ui", "ux", "user=interface", "human=interface", "user=experience"], "Topic"),
-  Skill("UI-Design", ["uidesign", "uidesigner"], resolve=["UI/UX", "Design"]),
+  Skill("UI-Design", ["uidesign", "uidesigner", "uxdesign", "uxdesigner"], resolve=["UI/UX", "Design"]),
 
   Skill("Usability", ["usability", "usable"], "Topic"),
 
@@ -393,10 +401,7 @@ SKILLS: list[Skill] = [
 # Clustering, Sharding, load balancing
 # Replication, Partitioning | Enterprise, large-scale
 # Skill("Resiliency", ["resiliency", "resilient"], "Topic"),
-# Skill("Deploy", ["deploy"], "Topic"),
-# Skill("Integration", ["integration"], "Topic"),
 #
 # Skill("E-Commerce", ["e=commerce"], "Topic"),
 # Skill("Cluster", ["cluster"], "Topic"),
-# Skill("Container", ["container"], "Topic"),
 # + Logistics

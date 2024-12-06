@@ -31,7 +31,7 @@ SKILLS: list[Skill] = [
 
   Skill("API", ["api"], "Topic"),
   Skill("ORM", ["orm"], "Topic"),
-  Skill("REST", ["rest=api", propn("rest"), noun("REST")], "Topic"),
+  Skill("REST", ["rest=api", "restful", propn("rest"), noun("REST")], "Topic"),
   Skill("REST", ["rest"], disambiguate=neighbour(2)),
   Skill("RPC", ["rpc=api", "rpc"], "Topic"),
   Skill("SOAP", ["soap"], "Topic"),
@@ -71,18 +71,27 @@ SKILLS: list[Skill] = [
   Skill("PCB", ["pcb"], "Topic"),
 
   # OPERATIONS
-  Skill("CI/CD", ["continuous=integration", "continuous=delivery", "continuous=deployment", "ci/cd", "ci"], "Topic"),
+  Skill("CI/CD", [
+    "continuous=integration", "continuous=delivery", "continuous=deployment",
+    "ci/cd", "ci",
+  ], "Topic"),
+  Skill("Deployment", ["deployment", "deploy"], "Topic"),
   Skill("Gitops", ["gitops"], "Topic"),
   Skill("Monorepo", ["monorepo(s)", "monorepository", "monorepositories"], "Topic"),
-  Skill("Containerization", ["containerization", "containerized"], "Topic"),
-  Skill("Virtual-Machine", ["virtual=machine(s)", "vm(s)"], "Topic"),
-
-  # ???
+  Skill("Containerization", ["containerization", "containerized"], "Topic"), # TODO container with disambig.
+  Skill("Orchestration", ["orchestration"], "Topic"),
+  Skill("Provisioning", ["provisioning"], "Topic"),
+  Skill("Virtualization", ["virtualization", "virtual=machine(s)", "vm(s)"], "Topic"),
+  # certificates: AWS Certified Solutions Architect Professional, AWS Certified DevOps Engineer Professional
   Skill("Integration", ["integration"], "Topic"),
-  Skill("Integration-Testing", ["integration=testing", "integration=test(s)"], "Topic"),
+
+  # NETWORKING
+  Skill("Firewall", ["firewall"], "Topic"), # also SECURITY
+  Skill("VPN", ["vpn(s)"], "Topic"),        # also SECURITY
 
   # SECURITY
   Skill("Access-Control", ["rbac", "abac", "acl"], "Topic"),
+  # Identity and Access management
   Skill("VA/PT", [
     "penetration=testing", "penetration=test(s)", "penetration=tester",
     "pen=testing", "pen=test", "pen=tester",
@@ -91,6 +100,11 @@ SKILLS: list[Skill] = [
     "vulnerability=scanning", "vulnerability=scan(ner)",
     "vulnerability=testing", "vulnerability=test(s)", "vulnerability=tester",
   ], "Topic"),
+  # Familiarity with industry standards like MITRE ATT&CK and D3FEND,
+  # the NIST Cybersecurity Framework, STIX/TAXII, and OpenIOC
+  Skill("ISO-27001", ["iso-27001"], "Security Compliance"),
+  Skill("GDPR", ["gdpr"], "Security Compliance"),
+  Skill("NIST", ["nist"], "Security Compliance"),
 
   # QA
   Skill("E2E-Testing", ["end=to=end=testing", "e2e=testing", "e2e=test(s)"], "Topic"), # TODO capture split words
@@ -124,7 +138,7 @@ SKILLS: list[Skill] = [
   # Travel
 
   # ANALYSIS
-  Skill("AB-Testing", ["a/b test(ing)"], "Topic"),
+  Skill("AB-Testing", ["a/b-test(s)", "a/b-testing", "ab-test(s)", "ab-testing"], "Topic"),
   Skill("Hypothesis", ["hypothesis", "hypotheses"], "Topic"),
 
   # SCIENCES
@@ -142,6 +156,12 @@ SKILLS: list[Skill] = [
   Skill("GPU", ["gpu"], ""),
   Skill("CLI", ["cli"], ""),
   Skill("GUI", ["gui"], ""),
+
+  # VCS
+  Skill("VCS", ["branching", "versioning", "version control", "vcs"], ""),
+
+  # ??
+  # blue green deployments
 
   Skill("Voxel", ["voxel"], ""),
   Skill("Pixel", ["pixel"], ""),
