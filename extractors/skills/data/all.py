@@ -43,7 +43,6 @@ SKILLS: list[Skill] = [
   Skill("GitHub", ["github"], ""),
   Skill("GitLab", ["gitlab"], ""),
   Skill("Jira", ["jira"], ""),
-  Skill("Photoshop", ["photoshop"], ""),
   Skill("Postman", ["postman"], ""),
   Skill("Swagger", ["swagger"], ""),
 
@@ -198,6 +197,7 @@ SKILLS: list[Skill] = [
   Skill("D3JS", ["d3.=js", "d3"], ""),
   Skill("EmberJS", ["ember.=js", "ember"], ""),
   Skill("Figma", ["figma"], ""),
+  Skill("Framer", ["framer"], ""),
   Skill("jQuery", ["jquery"], ""),
   Skill("Lit", [propn("lit")], ""),
   Skill("Material-UI", ["material=ui", "mui", propn("material")], ""),
@@ -254,10 +254,11 @@ SKILLS: list[Skill] = [
   Skill("Hygraph", ["hygraph", "graph=cms"], ""),
   Skill("Jekyll", ["jekyll"], ""),
   Skill("Joomla", ["joomla"], ""),
-  Skill("Magento", ["magento"], ""),
   Skill("MODx", ["modx"], ""),
   Skill("Shopify", ["shopify"], ""),
   Skill("Strapi", ["strapi"], ""),
+  Skill("WebFlow", ["webflow"], ""),
+  Skill("Wix", ["wix"], ""),
   Skill("WooCommerce", ["woo=commerce"], ""),
   Skill("WordPress", ["wordpress"], ""),
 
@@ -322,26 +323,27 @@ SKILLS: list[Skill] = [
   Skill("Arweave", ["arweave"], "A permanent and decentralized web inside an open ledger"),
   Skill("Bitcoin", ["bitcoin"], ""),
   Skill("Ethereum", ["ethereum"], ""),
-  Skill("EVM", ["evm"], ""),
+  Skill("EthersJS", ["eithers.=js"], ""),
+  Skill("EVM", ["evm"], "Ethereum Virtual Machine"),
   Skill("Solana", ["solana"], ""),
-  Skill("Web3js", ["web3.=js"], ""),
+  Skill("Web3JS", ["web3.=js"], ""),
   # Skill("SVM", ["svm"], ""), TODO disambiguate Support-Vector-Machine vs Solana-Virtual-Machine
-  # Skill("Web3", ["web3"], ""), topic/concept, not a skill
 
   # MEDIA
   Skill("FFmpeg", ["ffmpeg"], "Cross-platform solution to record, convert and stream audio and video"),
 
-  # NETWORKING
+  # NETWORKS
   Skill("CompTIA-Network+", ["network+", "comptia n(etwork)+"], ""), # certificate
-  Skill("Cisco-CNA", ["ccna"], ""), # certificate
-  Skill("Cisco-CNP", ["ccnp"], ""), # certificate -- TODO "CCNP or equivalent required; CCIE or other advanced certs are preferred."
+  Skill("F5-Networks", ["f5-networks", "f5"], ""), # Company
   Skill("LoRa", [propn("LoRa")], ""), # transmission tech
   Skill("MTCNA", ["mtcna"], ""),    # certificate
   Skill("MQTT", ["mqtt"], ""),      # IoT messaging standard, also CLOUD
+  Skill("Netconf", ["netconf"], "Protocol"),
   Skill("Nmap", ["nmap"], ""),             # also SECURITY
   Skill("Netcat", ["netcat", "ncat"], ""), # also SECURITY
   Skill("Proxyman", ["proxyman"], ""),   # also SECURITY
   Skill("Wireshark", ["wireshark"], ""),   # also SECURITY
+  Skill("YANG", [literal("YANG")], "Data modeling language"),
   Skill("Zigbee", ["zigbee"], ""), # protocol spec. also EMBEDDED
 
   # SECURITY
@@ -466,6 +468,7 @@ SKILLS: list[Skill] = [
   Skill("C", ["c"], disambiguate=singleletter()),
   Skill("C++", ["c++", "cpp", "c=plus=plus"], ""),
   Skill("C#", ["c#", "csharp"], ""),
+  Skill("Cairo", ["cairo"], ""),
   Skill("Clojure", ["clojure", "clojurian"], ""),
   Skill("ClojureScript", ["clojure=script"], ""),
   Skill("Cobol", ["cobol"], ""),
@@ -516,6 +519,7 @@ SKILLS: list[Skill] = [
   Skill("TypeScript", ["type=script", "ts"], ""),
   Skill("Shell", ["shell", "bash", "zsh"], ""),
   Skill("XML", ["xml"], ""),
+  Skill("YAML", ["yaml"], ""),
   Skill("V", ["vlang"], ""),
   Skill("V", ["v"], disambiguate=singleletter()),
   Skill("Vala", ["vala"], ""),
@@ -628,9 +632,6 @@ SKILLS: list[Skill] = [
 #   DEVOPS specific words
 #   development, production, staging
 #
-#   DEVOPS terms
-#   Nomad, Vault, Consul
-#
 #   ARCHITECT specific words
 #   microservice, monolith, monorepo, Event-Driven, Vertical Slice
 #   Distributed
@@ -699,3 +700,6 @@ SKILLS: list[Skill] = [
 # • Strong proficiency with CI/CD pipelines and distributed computing frameworks like Ray or Dask.
 # • Familiarity with model monitoring, logging, and versioning tools (e.g., MLflow, Weights & Biases).
 # • Proficient in designing and deploying agentic systems with modern model serving frameworks (e.g., LangChain, vLLM, FastAPI, or KServe).
+# Facebook Instant Games SDK
+# hypervisor, hyper-v, vmware (also a company)
+# ITIL Service Operation frameworks.

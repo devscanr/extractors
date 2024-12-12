@@ -6,6 +6,9 @@ __all__ = ["SKILLS"]
 SKILLS: list[Skill] = [
   Skill("Apple", ["apple"], "Company"),
 
+  # DESIGN
+  # Skill("Sketch", ["sketch"], ""), many FPs, need to disambig.
+
   # MOBILE
   Skill("Objective-C", ["objective=c", "objective=c++", "objective=cpp"], ""),
   Skill("Swift", ["swift"], ""),

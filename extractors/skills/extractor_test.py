@@ -44,7 +44,7 @@ def describe_SkillExtractor() -> None:
       assert extract("software and hardware engineering") == ["Software", "Hardware", "Engineering"]
       assert extract("engineer of software") == ["Engineering", "Software"]
       assert extract("mobile engineer") == ["Mobile", "Engineering"]
-      assert extract("game engineering") == ["Game", "Engineering"]
+      assert extract("game engineering") == ["Games", "Engineering"]
 
     def it_handles_adhoc_set4() -> None:
       assert extract("fullstack qa") == ["Backend", "Frontend", "QA"]
@@ -63,7 +63,7 @@ def describe_SkillExtractor() -> None:
     def it_handles_adhoc_set6() -> None:
       assert extract("Mobile design and engineering") == ["Mobile", "Design", "Engineering"]
       assert extract("Web engineering & design") == ["Web", "Engineering", "Design"]
-      assert extract("Game design/dev") == ["Game", "Design", "Engineering"]
+      assert extract("Game design/dev") == ["Games", "Design", "Engineering"]
 
     def it_handles_adhoc_set7() -> None:
       assert extract("analysis + analytics") == ["Analysis"]
@@ -85,7 +85,7 @@ def describe_SkillExtractor() -> None:
       assert extract("Websec") == ["Web", "Security"]
       assert extract("Websecurity") == ["Web", "Security"]
       assert extract("Web security") == ["Web", "Security"]
-      assert extract("Web & Network security") == ["Web", "Network", "Security"]
+      assert extract("Web & Network security") == ["Web", "Networks", "Security"]
 
     def it_handles_adhoc_set10() -> None:
       assert extract("Kafka and Pig all the way") == ["Apache-Kafka", "Apache-Pig"]
@@ -109,13 +109,13 @@ def describe_SkillExtractor() -> None:
       assert extract("Ph.D. candidate, interested in software security") == ["Software", "Security"]
 
     def it_handles_adhoc_set12() -> None:
-      assert extract("Graphic Designer") == ["Graphic", "Design"]
+      assert extract("Graphic Designer") == ["Graphics", "Design"]
       assert extract("visual design") == ["Design"]
 
     def it_handles_adhoc_set13() -> None:
       assert extract("system administration") == ["System", "Administration"]
-      assert extract("database administration") == ["Database", "Administration"]
-      assert extract("senior dba") == ["Database", "Administration"]
+      assert extract("database administration") == ["Databases", "Administration"]
+      assert extract("senior dba") == ["Databases", "Administration"]
 
     def it_handles_adhoc_set14() -> None:
       assert extract("automated test") == ["Automation", "Testing"]
@@ -180,7 +180,7 @@ def describe_SkillExtractor() -> None:
         "NumPy", "SciPy", "Numba", "Anaconda"
       ]
       assert extract("✐Python ✎Jupyter Notebook, Flutter 🎈Smart Contract(Solidity)=") == [
-        "Python", "Jupyter", "Flutter", "Solidity"
+        "Python", "Jupyter", "Flutter", "Smart-Contracts", "Solidity"
       ]
       assert extract("Debugger debugger at WebStorm JetBrains MSE student at ITMO University") == []
 
@@ -332,38 +332,38 @@ def describe_SkillExtractor() -> None:
       """) == ["Web", "Engineering", "CMS", "WordPress"]
 
     def it_handles_natural_set16() -> None:
-      assert extract("NVIDIA Technologies for game and application developers") == ["NVidia", "Game"]
+      assert extract("NVIDIA Technologies for game and application developers") == ["NVidia", "Games"]
       assert extract("Open source continuous integration for games") == ["Open-Source", "CI/CD"]
-      assert extract("Game developer.") == ["Game", "Engineering"]
-      assert extract("Game Server Programmer :)") == ["Game", "Engineering"]
+      assert extract("Game developer.") == ["Games", "Engineering"]
+      assert extract("Game Server Programmer :)") == ["Games", "Engineering"]
       assert extract("I'm a JS / TS specialist focused on web and game development.") == [
-        "JavaScript", "TypeScript", "Web", "Game", "Engineering"
+        "JavaScript", "TypeScript", "Web", "Games", "Engineering"
       ]
-      assert extract("Game-related tidbits + bytes found on GitHub") == ["Game", "GitHub"]
-      assert extract("Working on a Game Engine") == ["Game"]
-      assert extract("Game Security & Realtime Rendering") == ["Game", "Security"]
-      assert extract("game of game") == ["Game"]
-      assert extract("Like world and game") == ["Game"]
+      assert extract("Game-related tidbits + bytes found on GitHub") == ["Games", "GitHub"]
+      assert extract("Working on a Game Engine") == ["Games"]
+      assert extract("Game Security & Realtime Rendering") == ["Games", "Security"]
+      assert extract("game of game") == ["Games"]
+      assert extract("Like world and game") == ["Games"]
       assert extract("Father, hacker, blogger, gamer, & nerd. Bounty Hunter") == [] # "Hacking"
 
     def it_handles_natural_set17() -> None:
-      assert extract("3D game engine development amateur") == ["Game", "Engineering"]
-      assert extract("Deep Learning Student | Game Dev") == ["Deep-Learning", "Game", "Engineering"]
-      assert extract("Game Hacking") == ["Game"] # , "Hacking"
-      assert extract("ex-game developer") == ["Game", "Engineering"]
-      assert extract("Like world and game") == ["Game"]
-      assert extract("Gaming the game is Gabe's game.") == ["Game"]
+      assert extract("3D game engine development amateur") == ["Games", "Engineering"]
+      assert extract("Deep Learning Student | Game Dev") == ["Deep-Learning", "Games", "Engineering"]
+      assert extract("Game Hacking") == ["Games"] # , "Hacking"
+      assert extract("ex-game developer") == ["Games", "Engineering"]
+      assert extract("Like world and game") == ["Games"]
+      assert extract("Gaming the game is Gabe's game.") == ["Games"]
       assert extract("Computational Game Theory Research") == ["Research"]
 
     def it_handles_natural_set18() -> None:
-      assert extract("CS-sophomore | Game-dev (Unity & C#)") == ["Computer", "Science", "Game", "Engineering", "Unity", "C#"]
-      assert extract("Game assets, software and games") == ["Game", "Software"]
-      assert extract("JavaScript, the BEST game") == ["JavaScript", "Game"]
+      assert extract("CS-sophomore | Game-dev (Unity & C#)") == ["Computer", "Science", "Games", "Engineering", "Unity", "C#"]
+      assert extract("Game assets, software and games") == ["Games", "Software"]
+      assert extract("JavaScript, the BEST game") == ["JavaScript", "Games"]
       assert extract("I'm a Professional C++ Game and Software Developer from New York.") == [
-        "C++", "Game", "Software", "Engineering"
+        "C++", "Games", "Software", "Engineering"
       ]
-      assert extract("Gamedev and shite") == ["Game", "Engineering"]
-      assert extract("The Game") == ["Game"]
+      assert extract("Gamedev and shite") == ["Games", "Engineering"]
+      assert extract("The Game") == ["Games"]
 
     def it_handles_natural_set19() -> None:
       assert extract("I love to research malware, viruses, and other types of malicious files.") == [
@@ -373,7 +373,7 @@ def describe_SkillExtractor() -> None:
         "Computer", "Science", "Distributed", "System"
       ]
       assert extract("Building Distributed SQL Database") == [
-        "Distributed", "SQL", "Database"
+        "Distributed", "SQL", "Databases"
       ]
       assert extract("Computer science student with an interest in data science.") == [
         "Computer", "Science", "Data"
@@ -404,7 +404,7 @@ def describe_SkillExtractor() -> None:
         "Microsoft", "Data", "AI"
       ]
       assert extract("SQL Server/Cloud DBA") == [
-        "MS-SQLServer", "Cloud", "Database", "Administration"
+        "MS-SQLServer", "Cloud", "Databases", "Administration"
       ]
 
     def it_handles_natural_set21() -> None:

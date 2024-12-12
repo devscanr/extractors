@@ -8,6 +8,8 @@ ctxn = contextual_or_neighbour(["Amazon"], 2)
 SKILLS: list[Skill] = [
   Skill("Amazon", ["amazon"], "Company"),
 
+  Skill("AWS-CDK", ["aws=cdk", "cdk"], "Framework for defining and provisioning cloud IAC"),
+
   # AWS
   Skill("Amazon-WebServices", ["amazon-web=services", "aws"], "AWS"),
   Skill("Amazon-Athena", ["aws=athena"], "Analytics, ML + SQL over S3"),

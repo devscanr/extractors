@@ -84,6 +84,11 @@ SKILLS: list[Skill] = [
 
   Skill("Animation", ["animation", "animated", "animating", "animator"], "Topic"),
 
+  Skill("AR/VR", [
+    "augmented=reality", "mixed=reality", "virtual=reality",
+    "vr/ar", "vr/mr", "ar/vr", "mr/vr", "vr",
+  ], "Topic"),
+
   Skill("Architecture", ["architecture", "architect"], "Topic"),
 
   Skill("Automation", ["automation", "automated", "automatic", "automating"], "Topic"),
@@ -92,9 +97,15 @@ SKILLS: list[Skill] = [
 
   Skill("BigData", ["big=data"], "Topic"),
 
-  Skill("Blockchain", ["blockchain"], "Topic"),
+  Skill("Blockchain", [
+    "blockchain",
+    "on-chain", "off-chain",
+  ], "Topic"),
 
-  Skill("Business", ["business", "entrepreneur", "entrepreneurship", "business-development"], "Topic"),
+  Skill("Business", [
+    "business", "entrepreneur", "entrepreneurship", "business-development",
+    "b2b", "b2c", "b2b2c",
+  ], "Topic"),
   Skill("Business-Analysis", ["businessanalysis", "businessanalytics", "businessanalyst"], resolve=["Business", "Analysis"]),
   # TODO business intelligence, BI
 
@@ -125,14 +136,14 @@ SKILLS: list[Skill] = [
   Skill("Data-Mining", ["data=mining", "data=extraction"], "Topic"),
   Skill("Data-Operations", ["dataoperations", "dataops"], resolve=["Data", "Operations"]),
 
-  Skill("Database", ["database(s)"], "Topic"),
+  Skill("Databases", ["database(s)"], "Topic"),
   Skill("Database-Administration", [
     "databaseadministration", "databaseadministrator", "dba"
-  ], resolve=["Database", "Administration"]),
+  ], resolve=["Databases", "Administration"]),
   Skill("Database-Design", [
     "databasedesign", "databasedesigner", "dbdesign", "dbdesigner",
     "databasemodeling", "dbmodeling",
-  ], resolve=["Database", "Modeling"]), #
+  ], resolve=["Databases", "Modeling"]), #
 
   Skill("Datalake", ["data=lake(s)"], "Topic"),
   Skill("Data-Engineering", [
@@ -151,7 +162,6 @@ SKILLS: list[Skill] = [
   Skill("Design", [
     noun("design"), # too many FPs, need to narrow somehow. A frequent verb.
     "designer",
-    "graphicdesign", "graphicdesigner",
     "motiondesign", "motiondesigner",
     "visualdesign", "visualdesigner"
   ], "Topic"),
@@ -193,6 +203,7 @@ SKILLS: list[Skill] = [
   Skill("Finance", [
     "banking", "bankless",
     "finance", "fintech", "financial",
+    "payment(s)",
   ], "Topic"),
 
   Skill("Firmware", ["firmware"], "Topic"),
@@ -201,18 +212,22 @@ SKILLS: list[Skill] = [
 
   Skill("Fullstack", ["full=stack(er)"], resolve=["Backend", "Frontend"]),
 
-  Skill("Game", [
+  Skill("Games", [
     "game", "gameplay",
   ], "Topic"),
-  Skill("-Game", ["game=theory"], resolve=[]), # oversimplified, will update later
-  Skill("Game-Design", ["gamedesign", "gamedesigner"], resolve=["Game", "Design"]),
+  Skill("-Games", ["game=theory"], resolve=[]), # oversimplified, will update later
+  Skill("Game-Design", ["gamedesign", "gamedesigner"], resolve=["Games", "Design"]),
   Skill("Game-Engineering", [
     "gameengineering", "gameengineer",
     "gameprogramming", "gameprogrammer"
     "gamedeveloper", "gamedev"
-  ], resolve=["Game", "Engineering"]),
+  ], resolve=["Games", "Engineering"]),
+  Skill("Game-Testing", [
+    "playtest(s)",
+  ], resolve=["Games", "Testing"]),
 
-  Skill("Graphic", ["graphic(s)"], "Topic"),
+  Skill("Graphics", ["graphic(s)"], "Topic"),
+  Skill("Graphics-Design", ["graphic(s)design", "graphic(s)designer"], resolve=["Graphics", "Design"]),
 
   Skill("Hardware", ["hardware"], "Topic"),
   Skill("Hardware-Design", ["hardwaredesign", "hardwaredesigner"], resolve=["Hardware", "Design"]),
@@ -255,11 +270,11 @@ SKILLS: list[Skill] = [
 
   Skill("Modeling", ["datamodeling"], "Topic"),
 
-  Skill("Network", ["networking", "network(s)"], "Topic"),
+  Skill("Networks", ["networking", "network(s)"], "Topic"),
   Skill("Network-Operations", [
     "networkoperations", "networkops", "netops",
-  ], resolve=["Network", "Operations"]),
-  Skill("Network-Security", ["networksecurity", "netsecurity", "net=sec"], resolve=["Network", "Security"]),
+  ], resolve=["Networks", "Operations"]),
+  Skill("Network-Security", ["networksecurity", "netsecurity", "net=sec"], resolve=["Networks", "Security"]),
 
   Skill("Natural-Language-Processing", ["natural=language=processing", "nlp"], "Topic"),
 
@@ -273,7 +288,7 @@ SKILLS: list[Skill] = [
 
   Skill("Performance", [
     "performance", "performant",
-    # "bandwidth", -- also specific to Networking...
+    # "bandwidth", -- also specific to NETWORKS
   ], "Topic"),
 
   Skill("Product", ["product"], "Topic"),
@@ -330,7 +345,7 @@ SKILLS: list[Skill] = [
 
   Skill("Statistics", [
     "statistic(s)", "statistician", "statistical",
-    "correlation", "confidence interval(s)",
+    "correlation", "confidence interval(s)", "hypothesis",
     "probability", "regression", "classification", "clustering",
   ], "Topic"),
 
@@ -349,6 +364,8 @@ SKILLS: list[Skill] = [
   Skill("System-Operations", [
     "systemoperations", "systemops", "sysops",
   ], resolve=["System", "Operations"]),
+
+  Skill("Telecom", ["telecom", "telecommunication(s)"], "Topic"),
 
   Skill("Testing", ["testing", "tested", "tester"], "Topic"),
   Skill("Testing", ["test(s)"], disambiguate=dis_test()),

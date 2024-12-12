@@ -26,7 +26,10 @@ SKILLS: list[Skill] = [
   Skill("OOP", [
     "object=oriented( programming)", "oop", literal("SOLID"), literal("S.O.L.I.D"), "ооп"
   ], "Topic"),
-  # YAGNI, DRY, KISS, MVC
+  Skill("MVC", [
+    "mvc", "model-view-controller",
+  ], "Topic"),
+  # YAGNI, DRY, KISS
   # (software) design patterns
 
   Skill("API", ["api"], "Topic"),
@@ -60,6 +63,7 @@ SKILLS: list[Skill] = [
   Skill("DeFi", ["decentralized-finance", "de=fi"], "Topic"),
   Skill("Crypto", ["crypto"], "Topic"),
   Skill("P2P", ["peer=2=peer", "peer=to=peer", "p2p"], "Topic"),
+  Skill("Smart-Contracts", ["smart=contract(s)"], "Topic"),
 
   # LOW-CODE
   Skill("IaaS", ["iaas"], "Topic"),
@@ -85,9 +89,11 @@ SKILLS: list[Skill] = [
   # certificates: AWS Certified Solutions Architect Professional, AWS Certified DevOps Engineer Professional
   Skill("Integration", ["integration"], "Topic"),
 
-  # NETWORKING
-  Skill("Firewall", ["firewall"], "Topic"), # also SECURITY
-  Skill("VPN", ["vpn(s)"], "Topic"),        # also SECURITY
+  # NETWORKS
+  Skill("Firewall", ["firewall(s)"], "Topic"), # also SECURITY
+  Skill("VLAN", ["vlan"], "Virtual LAN: a way to logically separate a group of computers into a network"),
+  Skill("VPN", ["vpn(s)"], "Topic"), # also SECURITY
+  Skill("Wireless", ["wireless"], "Topic"),
 
   # SECURITY
   Skill("Access-Control", ["rbac", "abac", "acl"], "Topic"),
@@ -105,6 +111,14 @@ SKILLS: list[Skill] = [
   Skill("ISO-27001", ["iso-27001"], "Security Compliance"),
   Skill("GDPR", ["gdpr"], "Security Compliance"),
   Skill("NIST", ["nist"], "Security Compliance"),
+
+  # GAMES
+  Skill("Pixel", ["pixel(s)"], ""),
+  # Polygon -- disambig.
+  Skill("Shaders", ["shader(s)"], ""),
+  Skill("Sprite", ["sprite(s)"], ""),
+  Skill("Texture", ["texture(s)"], ""),
+  Skill("Voxel", ["voxel(s)"], ""),
 
   # QA
   Skill("E2E-Testing", ["end=to=end=testing", "e2e=testing", "e2e=test(s)"], "Topic"), # TODO capture split words
@@ -163,10 +177,7 @@ SKILLS: list[Skill] = [
   # ??
   # blue green deployments
 
-  Skill("Voxel", ["voxel"], ""),
-  Skill("Pixel", ["pixel"], ""),
-  Skill("Sprite", ["sprite"], ""),
-  Skill("Texture", ["texture"], ""),
+
   # Skill("2D", ["2d"], ""), -- too widespread
   # Skill("3D", ["3d"], ""), -- too widespread
   # Skill("Ray-Tracing", ["ray=tracing"], ""),
@@ -220,3 +231,27 @@ SKILLS: list[Skill] = [
 # Monitoring
 # OCR models
 # Familiarity with ConvNeXt and similar models
+# • Extensive hands-on experience with BGP, OSPF, and EIGRP routing protocols in large-scale, enterprise environments.
+# • In-depth knowledge of Layer 2 and Layer 3 network technologies, including VLANs, spanning-tree, and routing.
+# • Proven expertise in SD-WAN architecture and deployment.
+# • Proficiency with networking products and solutions from Cisco, Meraki, Fortinet, Palo Alto, and other leading vendors.
+# • In-depth knowledge of VoIP protocols (e.g., SIP, RTP, H.323) and their application in diverse environments.
+# • Strong experience in unified communications platforms (e.g., Cisco, Avaya, Asterisk, Microsoft Teams).
+# • Advanced understanding of VoIP hardware and software, including PBX systems, softphones, and gateways.
+# ISTQB Performance testing experience
+# • Knowledge of DoD STIGs, STIG vulnerabilities, and remediation strategies
+
+# LATEST ADDON:
+# + 3 DevOps
+# + 4 Mobile
+# + 1 (Product) Analyst
+# + 4 QA
+# + 6 ML
+# + 5 Security
+# + 1 Low-Code
+# + 3 Blockchain & Web3
+# + 3 Games
+# + 3 Networks
+# + 1 Frontend
+# + 1 Backend
+# + 1 Fullstack
