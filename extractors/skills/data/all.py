@@ -1,14 +1,18 @@
 from spacy.tokens import Span
 from ...utils import IN, LOWER, OP, literal, propn, ver1
 from ..utils import Disambiguate, Skill, contextual, contextual_or_neighbour, neighbour, singleletter
+from .adobe import SKILLS as ADOBE_SKILLS
 from .amazon import SKILLS as AMAZON_SKILLS
 from .apache import SKILLS as APACHE_SKILLS
 from .apple import SKILLS as APPLE_SKILLS
+from .cisco import SKILLS as CISCO_SKILLS
+from .companies import SKILLS as COMPANIES_SKILLS
 from .google import SKILLS as GOOGLE_SKILLS
+from .hashicorp import SKILLS as HASHICORP_SKILLS
 from .microsoft import SKILLS as MICROSOFT_SKILLS
-from .yandex import SKILLS as YANDEX_SKILLS
 from .topics1 import SKILLS as TOPICS1_SKILLS
 from .topics2 import SKILLS as TOPICS2_SKILLS
+from .yandex import SKILLS as YANDEX_SKILLS
 
 __all__ = ["SKILLS"]
 
@@ -21,10 +25,14 @@ def dis_julia() -> Disambiguate:
   return disambiguate
 
 SKILLS: list[Skill] = [
+  *ADOBE_SKILLS,
   *AMAZON_SKILLS,
   *APACHE_SKILLS,
   *APPLE_SKILLS,
+  *CISCO_SKILLS,
+  *COMPANIES_SKILLS,
   *GOOGLE_SKILLS,
+  *HASHICORP_SKILLS,
   *MICROSOFT_SKILLS,
   *YANDEX_SKILLS,
   *TOPICS1_SKILLS,
@@ -220,6 +228,7 @@ SKILLS: list[Skill] = [
   Skill("Vite", ["vite"], ""),
   Skill("Webpack", ["webpack"], ""),
 
+  Skill("JAM-Stack", ["jam=stack"], resolve=["JavaScript", "API", "Markup"]),
   Skill("MEAN-Stack", ["mean=stack", propn("mean")], resolve=["MongoDB", "Express", "Angular", "NodeJS"]),
   Skill("MERN-Stack", ["mern=stack", "mern"], resolve=["MongoDB", "Express", "React", "NodeJS"]),
   Skill("MEVN-Stack", ["mevn=stack", "mevn"], resolve=["MongoDB", "Express", "VueJS", "NodeJS"]),
@@ -295,7 +304,6 @@ SKILLS: list[Skill] = [
   Skill("RHCE", ["rhce"], ""),   # certificate
   Skill("RHCSA", ["rhcsa"], ""), # certificate
   Skill("TeamCity", ["teamcity"], ""),
-  Skill("Terraform", ["terraform"], ""),
   Skill("Vagrant", ["vagrant"], ""),
   # Good to have Knowledge of modern monitoring solutions (e.g. Nagios, Zabbix, Prometheus, Splunk).
   # Familiarity with monitoring tools such as SolarWinds, Nagios, or similar.
@@ -391,11 +399,11 @@ SKILLS: list[Skill] = [
   Skill("Simulink", ["simulink"], ""), # some lang.
 
   # SYSTEM
-  Skill("Debian", ["debian"], ""),
   Skill("FreeBSD", ["freebsd"], ""), # also CROSS-PLATFORM
-  Skill("Linux", ["linux"], ""), # also CROSS-PLATFORM
+  Skill("Linux", [
+    "linux", "debian", "ubuntu",
+  ], ""), # also CROSS-PLATFORM
   Skill("MacOS", ["macos", "osx"], ""), # also CROSS-PLATFORM
-  Skill("Ubuntu", ["ubuntu"], ""),
   Skill("Unix", ["unix", "*nix"], ""),   # also CROSS-PLATFORM
   Skill("Windows", ["windows", "win32", "win64"], ""), # also CROSS-PLATFORM
 
@@ -404,18 +412,6 @@ SKILLS: list[Skill] = [
   Skill("GCC", ["gcc"], ""), # compiler
   Skill("Kernel", ["kernel"], ""),
   Skill("LLVM", ["llvm"], ""),
-
-  # BIGTECH
-  Skill("AMD", ["amd", "amd=32", "amd=64"], ""), # company
-  Skill("eBay", ["ebay"], ""), # company
-  Skill("Facebook", ["facebook"], ""), # company TODO meta
-  Skill("Intel", ["intel"], ""), # company
-  Skill("Kaggle", ["kaggle"], ""), # company
-  Skill("Mozilla", ["mozilla"], ""), # company
-  Skill("Netflix", ["netflix"], ""), # company
-  Skill("NVidia", ["nvidia"], ""), # company
-  Skill("SalesForce", ["salesforce"], ""),
-  Skill("Vercel", ["vercel"], ""),
 
   # HARDWARE & EMBEDDED
   # Skill("HPC", ["hpc"], "High performance computing"),
@@ -437,12 +433,11 @@ SKILLS: list[Skill] = [
   Skill("MIPS", ["mips"], ""), # CPU architecture
   Skill("MSP430", ["msp=430"], ""), # controller family
   Skill("PowerPC", ["powerpc"], ""), # CPU architecture
-  Skill("Raspberry-Pi", ["raspberry", "rasp=pi", "raspberry=pi(s)"], ""), # platform
+  Skill("Raspberry-Pi", ["raspberry", "rasp=pi", "raspberry=pi(s)", "rpi"], ""), # platform
   Skill("RISC", ["risc", "risc-v"], ""), # CPU architecture
   Skill("SPARC", ["sparc"], ""), # platform
   Skill("Altium-Designer", ["altium=designer"], ""), # tool
   Skill("Altium-365", ["altium=365"], ""), # tool
-  Skill("Autodesk", ["autodesk"], "Company"),
   Skill("Autodesk-Fusion", ["autodesk-fusion", "fusion=360"], ""), # tool
   Skill("Autodesk-Eagle", ["autodesk-eagle"], ""), # tool
   Skill("Autodesk-Eagle", ["eagle"], disambiguate=contextual("Autodesk", "AutoCAD")), # /
@@ -500,15 +495,17 @@ SKILLS: list[Skill] = [
   Skill("Lua", ["lua"], ""),
   Skill("Nim", ["nim"], ""),
   Skill("Makefile", ["makefile"], ""),
+  Skill("Markdown", ["markdown", "md"], ""),
   Skill("Matlab", ["matlab"], ""),
   Skill("Mojo", ["mojo"], ""),
   Skill("Ocaml", ["ocaml"], ""),
   Skill("Odin", ["odin"], ""),
+  Skill("-Odin", ["odin-project"], resolve=[]),
   Skill("Perl", [ver1("perl")], ""),
   Skill("PHP", [ver1("php"), "phper"], ""),
   Skill("PowerShell", ["power=shell"], ""),
   Skill("Prolog", ["prolog"], ""),
-  Skill("Python", [ver1("python"), "pythonist(a)"], ""),
+  Skill("Python", [ver1("python"), "py", "pythonist(a)"], ""),
   Skill("R", ["r=lang"], "Programming language for statistical computing and data visualization"),
   Skill("R", ["r"], disambiguate=singleletter()),
   Skill("Ruby", ["ruby=lang", "ruby", "rubyist", "rubist"], ""),
@@ -578,7 +575,7 @@ SKILLS: list[Skill] = [
 #   "Open Source": {pattern: "open=source, fl?oss, f?oss", category: "topic"},
 #   "Mathematics": {pattern: "mathematics, maths?", category: "topic"},
 #   "CI/CD": {pattern: "ci/=cd", category: "topic"},
-#   "Chemistry": {pattern: "chemistry", category: "topic"},
+#   "Chemistry": {pattern: "chemistry", category: "topic"}, "chemist"
 #   "Physics": {pattern: "physics", category: "topic"},
 #   "Photography": {pattern: "photography", category: "topic"},
 #   "2D": {pattern: "2d", category: "topic"},
@@ -587,9 +584,6 @@ SKILLS: list[Skill] = [
 #   "Animation": {pattern: "animation, motion", category: "topic"},
 #   "Graphic": {pattern: "graphics?", category: "topic", role: "Designer"},
 #   "Enterprise": {pattern: "enterprise", category: "topic"},
-#   "CMS": {pattern: "cms", category: "topic", role: "Engineer"},
-#   "Headless CMS": {pattern: "headless=cms", category: "topic", role: "Engineer"},
-#   "Low-Code": {pattern: "low=code", category: "topic", role: "Engineer"},
 #
 #   // Role-agnostic (multi-role) topics
 #   "Manual": {pattern: "manual", category: "topic"},

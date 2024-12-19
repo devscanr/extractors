@@ -20,16 +20,36 @@ __all__ = [
 ]
 
 def normalize(text: str, pipechar: str = ".") -> str:
+  # Correct separators for grammar
   text = text.replace("：", ": ")
   text = re.sub(r"\s+[•|]+\s+", f" {pipechar} ", text)
   text = re.sub(r"\s+/{2,}\s+", " . ", text)
+  # Phone indicators
   text = re.sub(r"(📞|☎️|📱|☎)\s*:?\s*", "Phone: ", text, flags=re.UNICODE)
-  text = replace_emoji(text, "!")       # drop emojis
-  text = re.sub(r":[-\w]+:", "!", text) # drop sudo-emojis like ":snowflake:" which might overlap with skills
+  # Drop "etc" in Japanese – e.g handle "Salesforceなど"
+  text = text.replace("など", "")
+   # Drop emojis
+  text = replace_emoji(text, "!")
+  # Drop sudo-emojis like ":snowflake:" which might overlap with skills
+  text = re.sub(r":[-\w]+:", "!", text)
+  # Workaround FPs for URLs – cases like "next.js/nuxt"
+  text = re.sub(r"(\.js)/(?=\w)", r"\1 / ", text, flags=re.IGNORECASE)
+  # Workarounds for C# and C++ joined with separators
+  text = re.sub(r"(?<!\w)(c(?:\+\+|#))([,/])(?=\w)", sep_splitter, text, flags=re.IGNORECASE)
+  # Strip the whitespace
   text = text.strip()
+  # Add the trailing dot
   text = re.sub(r"(?<=\w)$", " .", text)
+  # Collapse whitespace
   text = re.sub(r"\s+", " ", text)
   return text
+
+def sep_splitter(match: re.Match[str]) -> str:
+  word, sep = match.group(1), match.group(2)
+  return (
+    word + f"{sep} " if sep in {","} else
+    word + f" {sep} "
+  )
 
 def uniq[T](arr: list[T] | Generator[str, Any, Any]) -> list[T]:
   """
@@ -77,7 +97,7 @@ jj = {TAG: "JJ", POS: "ADJ"}
 def add_dev_exceptions(nlp: Language) -> None:
   # Covers most common cases (ideally, we should retrain the model)
   ruler = cast(Any, nlp.get_pipe("attribute_ruler"))
-  problematic = ["Go", "Lit", "Next", "Node", "REST"]
+  problematic = ["Go", "Lit", "Next", "Node", "React", "REST"]
   # "foo Go. bar Next"
   ruler.add([
     [{ORTH: orth, IS_SENT_START: False}]
@@ -153,42 +173,38 @@ def get_nlp(name: str | Path = "en_core_web_sm") -> Language:
   # ^ can't add here as we sometimes merge ENT tokens
 
   prefixes = list(nlp.Defaults.prefixes or [])
-  prefixes.extend(["-", "="])
+  prefixes.append(r"[-=/(](?=[a-zA-Z(])")
   prefix_regex = spacy.util.compile_prefix_regex(prefixes)
   nlp.tokenizer.prefix_search = prefix_regex.search # type: ignore
 
   suffixes = list(nlp.Defaults.suffixes or [])
-  suffixes.extend(["-", "=", "[.]"])
+  suffixes.append(r"(?<=[a-zA-Z)])[-=/.)]")
+  suffixes = [
+    # Slice "#" when "#" if not preceded by r"[cC]" (except when it's like r"\w[cC]")
+    suffix if suffix != "#" else r"(?<!\W[cC])#"
+    # Note: r"^[cC]#" cases are covered separately, by token_match
+    for suffix in suffixes
+  ]
   suffix_regex = spacy.util.compile_suffix_regex(suffixes)
   nlp.tokenizer.suffix_search = suffix_regex.search # type: ignore
 
-  infixes = list(nlp.Defaults.infixes or [])
-  infixes.append(r"[,()\[\]]")
-  # infixes.append(r"(?<=[0-9a-zA-Z_()\[\]])[()\[\]](?=[0-9a-zA-Z_()\[\]])")
-  # infixes.append(r"(?<=[#+0-9a-zA-Z_])[,](?=[#0-9+a-zA-Z_])")
-  infixes.append(r"(?<=[a-zA-Z])[+](?=[a-zA-Z])")
-  infix_finditer = spacy.util.compile_infix_regex(infixes)
-  nlp.tokenizer.infix_finditer = infix_finditer.finditer # type: ignore
-
-  # rules_ = {}
-  # for orth, exc in nlp.tokenizer.rules.items():
-  #   if orth in {"c.", "r."}:
-  #     continue
-  #   rules_[orth] = exc
-  # nlp.tokenizer.rules = rules_
-
-  # Tokenizer exceptions
+  # Tokenizer exceptions (sometimes are applied after prefix/suffix, sometimes before – wtf)
   def token_match(token: str) -> bool | None:
-    KNOWN_PREFIXES = ("@",)
-    KNOWN_SUFFIXES = (".js", ".py")
     lower = token.lower()
-    if lower in {"c#", "ex.", "ph.d"} or lower.startswith(KNOWN_PREFIXES) or lower.endswith(KNOWN_SUFFIXES):
+    if lower in {"c+", "c++", "c#", ".net", "ex.", "ph.d"}:
+      return True
+    # For cases like "@foo-bar" to keep it together
+    if lower.startswith(("@",)):
+      return True
+    if lower.endswith((".js", ".py", ".net")) and (lower.count(".") == 1) and ("/" not in lower):
       return True
     return False
   nlp.tokenizer.token_match = token_match # type: ignore
 
-  nlp.tokenizer.add_special_case("ex.", [{ORTH: "ex."}]) # type: ignore
-  # nlp.tokenizer.add_special_case("node.js", [{ORTH: "ex."}])
+  infixes = list(nlp.Defaults.infixes or [])
+  infixes.append(r"(?<=[a-zA-Z)])[&+()](?=[a-zA-Z(])") # /
+  infix_finditer = spacy.util.compile_infix_regex(infixes)
+  nlp.tokenizer.infix_finditer = infix_finditer.finditer # type: ignore
 
   # Make the following PROPER NOUNs
   add_dev_exceptions(nlp)

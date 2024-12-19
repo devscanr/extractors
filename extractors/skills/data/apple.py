@@ -4,7 +4,7 @@ from ..utils import Skill #, contextual, contextual_or_neighbour, neighbour
 __all__ = ["SKILLS"]
 
 SKILLS: list[Skill] = [
-  Skill("Apple", ["apple"], "Company"),
+  Skill("Apple", ["(@)apple"], "Company"),
 
   # DESIGN
   # Skill("Sketch", ["sketch"], ""), many FPs, need to disambig.

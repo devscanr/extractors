@@ -4,7 +4,7 @@ from ..utils import Skill
 __all__ = ["SKILLS"]
 
 SKILLS: list[Skill] = [
-  Skill("Adobe", ["adobe"], "Company"),
+  Skill("Adobe", ["(@)adobe"], "Company"),
 
   # Low-Code
   Skill("Adobe-Commerce", ["adobe=commerce", "magento-enterprise", ver1("magento")], ""),

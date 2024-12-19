@@ -7,7 +7,7 @@ ctx = contextual("Google")
 ctxn = contextual_or_neighbour(["Google"], 2)
 
 SKILLS: list[Skill] = [
-  Skill("Google", ["google"], "Company"),
+  Skill("Google", ["(@)google"], "Company"),
 
   Skill("Flax", ["flax"], "NN for Jax"),
   Skill("JAX", [propn("JAX")], "TensorFlow alternative"),
@@ -22,6 +22,7 @@ SKILLS: list[Skill] = [
   Skill("Google-Cloud", ["gc"], disambiguate=contextual("AWS", "Azure")),
   Skill("Google-Firebase", ["google=firebase", "firebase"], ""),
   Skill("Google-CloudStorage", ["google-cloud=storage", "gcs"], ""),
+  Skill("Google-Pub/Sub", ["google-pub/sub"], ""),
   Skill("Google-Sheets", ["google=sheets"], ""),
   Skill("Google-BigTable", ["google-bigtable"], ""), # fast flexible noSQL
   Skill("Google-Kubernetes", ["google-kubernetes-engine", "google=ke", "google=ks", "gke", "gks"], ""), # ~ Amazon-EKS

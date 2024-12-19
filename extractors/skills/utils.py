@@ -19,7 +19,6 @@ class Skill:
   descr: str | None = None
   disambiguate: Disambiguate | None = None
   resolve: Resolve | list[str] | None = None
-  alias: str | None = None
 
 def contextual_or_neighbour(skills: list[str], distance: int) -> Disambiguate:
   fn1 = contextual(*skills)

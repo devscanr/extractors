@@ -3,7 +3,7 @@ from ..utils import Skill
 __all__ = ["SKILLS"]
 
 SKILLS: list[Skill] = [
-  Skill("Cisco", ["cisco"], "Company"),
+  Skill("Cisco", ["(@)cisco", "cysco=systems"], "Company"),
 
   # NETWORKS
   Skill("Cisco-ACI", ["cisco=aci"], "Software-defined networking (SDN) solution for data centers"),

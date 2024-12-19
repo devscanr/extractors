@@ -234,7 +234,7 @@ def describe_SkillExtractor() -> None:
         "Azure-Kubernetes", "Amazon-EKS", "Google-Kubernetes"
       ]
       assert extract("Terraform, Golang, Ansible, HashiCorp Vault") == [
-        "Terraform", "Go", "Ansible"
+        "Terraform", "Go", "Ansible", "HashiCorp", "Vault"
       ]
       assert extract("Angular || React (NextJs) || Svelte kit || Node || Nest || PHP5 || Couch CMS") == [
         "Angular", "React", "NextJS", "SvelteKit", "NodeJS", "NestJS", "PHP", "CMS"
@@ -294,7 +294,7 @@ def describe_SkillExtractor() -> None:
        assert extract("My name is Jax") == []
        assert extract("Hi, I'm Jax, an avid computer sorcerer") == ["Computer"]
        assert extract("CUDA C++ , Pytorch RT, JAX(JIT,Haiku enjoyer, FLAX Flexer)") == ["CUDA", "C++", "PyTorch", "JAX", "Flax"]
-       assert extract("JAX @NVIDIA") == ["JAX"]
+       assert extract("JAX @NVIDIA") == ["JAX", "NVidia"]
        assert extract("Scientist @ JAX") == ["Science", "JAX"]
        assert extract("I like learning | JAX | Google Brain") == ["JAX", "Google"]
        assert extract("Software Engineer at Google DeepMind working on JAX/Flax") == [
@@ -312,7 +312,7 @@ def describe_SkillExtractor() -> None:
         "ClickHouse", "Linux", "Perl", "Python", "C++", "Apache-Kafka"
       ]
       assert extract("Software Eng @ClickHouse") == ["Software", "Engineering"]
-      assert extract("Love making games") == [] # for now
+      assert extract("Love making games") == ["Games"]
       # I'm a 21 year old embedded systems electronics engineer.
       assert extract("""
         Mostly interested in robotics, low-level coding and homebrew.
@@ -333,7 +333,7 @@ def describe_SkillExtractor() -> None:
 
     def it_handles_natural_set16() -> None:
       assert extract("NVIDIA Technologies for game and application developers") == ["NVidia", "Games"]
-      assert extract("Open source continuous integration for games") == ["Open-Source", "CI/CD"]
+      assert extract("Open source continuous integration for games") == ["Open-Source", "CI/CD", "Games"]
       assert extract("Game developer.") == ["Games", "Engineering"]
       assert extract("Game Server Programmer :)") == ["Games", "Engineering"]
       assert extract("I'm a JS / TS specialist focused on web and game development.") == [
@@ -344,7 +344,7 @@ def describe_SkillExtractor() -> None:
       assert extract("Game Security & Realtime Rendering") == ["Games", "Security"]
       assert extract("game of game") == ["Games"]
       assert extract("Like world and game") == ["Games"]
-      assert extract("Father, hacker, blogger, gamer, & nerd. Bounty Hunter") == [] # "Hacking"
+      assert extract("Father, hacker, blogger, gamer, & nerd. Bounty Hunter") == ["Games"] # "Hacking"
 
     def it_handles_natural_set17() -> None:
       assert extract("3D game engine development amateur") == ["Games", "Engineering"]
@@ -398,7 +398,7 @@ def describe_SkillExtractor() -> None:
         "Leadership", "Data", "Science", "Statistics"
       ]
       assert extract("Website Developer and Software Developer with a Bachelor of Science in Informatics.") == [
-        "Web", "Engineering", "Software", "Science", # "Informatics"
+        "Web", "Engineering", "Software", "Science", "Informatics"
       ]
       assert extract("a Microsoft Technical Trainer specializing in Data & AI") == [
         "Microsoft", "Data", "AI"
@@ -413,6 +413,19 @@ def describe_SkillExtractor() -> None:
         or Azure Resource Manager (ARM) templates.
       """) == [
         "Infrastructure", "Engineering", "Terraform", "Ansible", "Microsoft-Azure"
+      ]
+      assert extract("""
+        Developing software 50 years from Business&Scientific (Fortran IV, COBOL),
+        to desktop (PowerBuilder, Visual Basic), Web Cloud, to Mixed Reality (Unity/C#)
+      """) == [
+        "Software", "Business", "Science", "Fortran", "Cobol",
+        "Desktop", "Visual-Basic", "Web", "Cloud", "AR/VR", "Unity", "C#"
+      ]
+      assert extract("""
+        React.js/Next.js/Vue.js/Nuxt.js/Nest.js/Express.js/flutter/react-native
+      """) == [
+        "React", "NextJS", "VueJS", "NuxtJS", "NestJS",
+        "Express", "Flutter", "React-Native"
       ]
 
 # interested in data science, neuroscience, and machine learning

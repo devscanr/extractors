@@ -26,7 +26,7 @@ class CategoryExtractor:
     ruler: EntityRuler = cast(Any, self.nlp.add_pipe("entity_ruler", config={
       "phrase_matcher_attr": "LOWER",
     }, name="entity_ruler"))
-    self.nlp.add_pipe("merge_entities")
+    self.nlp.add_pipe("merge_entities") # TODO so why I continue to work like ENT tokens are not merged?! @_@
     self.nlp.add_pipe("index_tokens_by_sents")
     for label, phrases in LABELED_PHRASES.items():
       for item in phrases:

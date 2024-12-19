@@ -3,7 +3,7 @@ from ..utils import Skill
 __all__ = ["SKILLS"]
 
 SKILLS: list[Skill] = [
-  Skill("HashiCorp", ["hashicorp"], "Company"),
+  Skill("HashiCorp", ["(@)hashicorp"], "Company"),
 
   # OPS
   Skill("Consul", ["consul"], "Service-based networking"),

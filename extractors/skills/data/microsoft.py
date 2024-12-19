@@ -18,7 +18,7 @@ def dis_arm() -> Disambiguate:
   return disambiguate
 
 SKILLS: list[Skill] = [
-  Skill("Microsoft", ["microsoft"], "Company"),
+  Skill("Microsoft", ["(@)microsoft"], "Company"),
 
   Skill("MS-Access", ["microsoft-access", "ms-access"], ""),
   Skill("MS-Excel", ["microsoft-excel", "ms-excel", propn("excel")], ""),
@@ -42,14 +42,14 @@ SKILLS: list[Skill] = [
   # .NET
   Skill(".NET", [ver1(".net"), "dotnet", "dot.net"], "Cross-platform, open source dev. platform"),
 
-  Skill("ASP.NET", ["asp.net", "asp"], ".NET-based web framework that allows to build dynamic sites, applications and services"),
+  Skill("ASP.NET", ["asp.net", "asp"], ".NET-based web framework that allows to build dynamic sites, apps and services"),
   Skill("ML.NET", ["ml.net"], "ML framework for .NET"),
   Skill(".NET MAUI", [".net maui", "maui"], "Multi-platform app UI, evolution of Xamarin.Forms"),
   Skill("Blazor", ["blazor"], ".NET-based framework to create fullstack apps"),
   Skill("Unity", ["unity-engine", "unity-platform", "unity=3d", propn("unity")], "Gamedev engine"),
   Skill("Unity", ["unity"], disambiguate=ctxn),
-  Skill("WCF", ["wcf"], ""),
-  Skill("WPF", ["wpf"], ""),
+  Skill("WCF", ["wcf"], "Windows Communication Foundation: framework for service-oriented apps"),
+  Skill("WPF", ["wpf"], "Windows Presentation Foundation: UI framework for desktop apps"),
   Skill("Xamarin", ["xamarin"], "Cross-platform and mobile app development"),
 
   # SUSPENDED

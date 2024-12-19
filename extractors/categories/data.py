@@ -45,6 +45,7 @@ LABELED_PHRASES: LabeledPhrases = {
   "FREELANCER": [
     "free=lance(r)",
     "free=lancing",
+    "consultancy",
     "consultant",
     "consulting",
   ],
@@ -69,6 +70,7 @@ LABELED_PHRASES: LabeledPhrases = {
   ],
   "NONDEV": [
     "academic",
+    "auditor",
     "ceo",
     "coach",
     "cofounder",
@@ -99,7 +101,7 @@ LABELED_PHRASES: LabeledPhrases = {
     ("managing", "VERB"),
     "mentor",
     ("mentoring", "VERB"),
-    "recruiter",
+    "recruiter", # recruiters?
     ("recruiting", "VERB"),
     "svp",
     "teacher",
@@ -130,6 +132,7 @@ LABELED_PHRASES: LabeledPhrases = {
     "student",
     ("study", "VERB"),
     ("studying", "VERB"),
+    "teenage",
     "teenager",
     "undergrad(uate)",
   ],
@@ -143,3 +146,5 @@ LABELED_PHRASES: LabeledPhrases = {
 # to cancel "Student" role. Not applied yet, not sure...
 # ("artist", "mechanic", "musician", "physicist") were previously used
 # to cancel "Dev" role. Not applied yet, not sure...
+
+# TODO "Currently pursuing Masters of Information Technology and Analytics at Rutgers University"

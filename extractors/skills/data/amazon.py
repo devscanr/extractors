@@ -6,7 +6,7 @@ ctx = contextual("Amazon")
 ctxn = contextual_or_neighbour(["Amazon"], 2)
 
 SKILLS: list[Skill] = [
-  Skill("Amazon", ["amazon"], "Company"),
+  Skill("Amazon", ["(@)amazon"], "Company"),
 
   Skill("AWS-CDK", ["aws=cdk", "cdk"], "Framework for defining and provisioning cloud IAC"),
 
@@ -17,6 +17,7 @@ SKILLS: list[Skill] = [
   Skill("Amazon-Aurora", ["aws=aurora"], "Managed DB"),
   Skill("Amazon-Aurora", ["aurora"], disambiguate=ctx),
   Skill("Amazon-Beanstalk", ["aws=beanstalk", "beanstalk"], "Webapp deployment"),
+  Skill("Amazon-CloudFormation", ["aws=cloudformation", "cloudformation"], "IAC provisioning"),
   Skill("Amazon-CloudFront", ["aws=cloudfront", "cloudfront"], "CDN"),
   Skill("Amazon-CloudWatch", ["aws=cloudwatch", "cloudwatch"], "Monitoring umbrella"),
   Skill("Amazon-DynamoDB", ["aws=dynamo=db", "dynamo=db"], "Distributed NoSQL DB"),

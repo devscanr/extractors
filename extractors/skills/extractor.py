@@ -17,7 +17,6 @@ class SkillExtractor:
     self.descrs: dict[str, str] = {}
     self.disambiguates: dict[str, Disambiguate] = {}
     self.resolvers: dict[str, Resolve] = {}
-    # self.aliases: dict[str, str] = {}
     self.nlp = get_nlp(name)
     self.nlp.add_pipe("index_tokens_by_sents")
     skills: list[Skill] = []
@@ -48,9 +47,6 @@ class SkillExtractor:
       if skill.resolve is not None:
         assert skill.name not in self.resolvers, f"duplicate `resolve` at {skill.name!r}"
         self.resolvers[skill.name] = create_resolve(skill.resolve) if isinstance(skill.resolve, list) else skill.resolve
-      # if skill.alias is not None:
-      #   assert skill.name not in self.aliases, f"{skill.name!r}: duplicate `alias`"
-      #   self.aliases[skill.name] = skill.alias
       # Update rulers with patterns:
       for item in skill.phrases:
         if isinstance(item, str):
@@ -65,11 +61,10 @@ class SkillExtractor:
 
   def extract(self, text_or_doc: str | Doc) -> list[str]:
     doc = self.nlp(text_or_doc) if isinstance(text_or_doc, str) else text_or_doc
-    # print(">>>", self.nlp.tokenizer.explain(text_or_doc))
-    # for token in doc:
-    #   print(token, token.pos_)
-      # pprint(list((token, token.pos_, token.dep_) for token in doc if not token.is_punct))
-    # print("ents:", list(ent.label_ for ent in doc.ents))
+    # print("Debug tokens:", list(self.nlp.tokenizer.explain(text_or_doc)))
+    # print("Debug poss:", list((token, token.pos_) for token in doc if not token.is_punct))
+    # print("Debug deps:", list((token, token.pos_, token.dep_) for token in doc if not token.is_punct))
+    # print("Debug ents:", list(ent.label_ for ent in doc.ents))
 
     # Disambiguate entities
     ents: list[Span] = []
@@ -90,12 +85,9 @@ class SkillExtractor:
           sent_skills.append(ent.label_)
       skills += [
         skill for skill in sent_skills
-        # if self.descrs.get(skill, "") != "Competence" or
-        #    not any(s.startswith(skill + "-") for s in sent_skills)
       ]
     return [
-      skill # self.aliases.get(skill, skill)
-      for skill in uniq(skills)
+      skill for skill in uniq(skills)
     ]
 
 def from_pattern(skill: Skill, pattern: Pattern) -> Pattern:

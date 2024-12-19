@@ -32,6 +32,11 @@ SKILLS: list[Skill] = [
   # YAGNI, DRY, KISS
   # (software) design patterns
 
+  Skill("Algorithms", ["algorithm(s)"], "Topic"),
+  Skill("Data-Structures", ["data=structure(s)", "data=type(s)", "data=class(es)"], "Topic"),
+  Skill("Devices", ["device(s)"], "Topic"),
+  Skill("Markup", ["markup"], "Topic"),
+
   Skill("API", ["api"], "Topic"),
   Skill("ORM", ["orm"], "Topic"),
   Skill("REST", ["rest=api", "restful", propn("rest"), noun("REST")], "Topic"),
@@ -71,8 +76,23 @@ SKILLS: list[Skill] = [
   Skill("PaaS", ["paas"], "Topic"),
   Skill("SaaS", ["saas"], "Topic"),
 
+  Skill("CMS", ["cms", "content=management=system"], "Topic"),
+  Skill("CRM", ["crm", "customer=relationship=management"], "Topic"),
+
+  # ?
+  # Skill("ERP", ["erp"], "Topic"),
+
   # EMBEDDED
   Skill("PCB", ["pcb"], "Topic"),
+
+  # DATA
+  Skill("Data-Mining", ["data=mining", "data=extraction"], "Topic", resolve=["Data", "Mining"]),
+  Skill("Data-Warehouse", ["data=warehouse", "dwh"], "Topic", resolve=["Data", "Warehouse"]),
+  Skill("ETL", ["etl(s)", "elt"], "Topic"),
+  Skill("Warehouse", ["warehouse"], "Topic"),
+
+  # DATABASES
+  Skill("Datalake", ["data=lake(s)"], "Topic"),
 
   # OPERATIONS
   Skill("CI/CD", [
@@ -114,6 +134,7 @@ SKILLS: list[Skill] = [
 
   # GAMES
   Skill("Pixel", ["pixel(s)"], ""),
+  Skill("-Pixel", ["google=pixel"]),
   # Polygon -- disambig.
   Skill("Shaders", ["shader(s)"], ""),
   Skill("Sprite", ["sprite(s)"], ""),
@@ -146,9 +167,6 @@ SKILLS: list[Skill] = [
   # Environment, Environmental
   # Skill("Health", ["health(care)"], "Topic"),
   # Skill("Psychology", ["psychology"], "Topic"),
-  # Skill("Medicine", ["medicine", "medical"], "Topic"),
-  # Skill("Music", ["music(al)", "musician"], "Topic"),
-  # Skill("Sport", ["sport", "basketball"], "Topic"),
   # Travel
 
   # ANALYSIS
@@ -170,6 +188,9 @@ SKILLS: list[Skill] = [
   Skill("GPU", ["gpu"], ""),
   Skill("CLI", ["cli"], ""),
   Skill("GUI", ["gui"], ""),
+
+  Skill("HighLoad", ["high=load"], "Topic"),
+  Skill("IAC", ["iac", "infrastructure=as=code"], resolve=["Infrastructure", "Engineering"]),
 
   # VCS
   Skill("VCS", ["branching", "versioning", "version control", "vcs"], ""),
@@ -240,6 +261,25 @@ SKILLS: list[Skill] = [
 # • Advanced understanding of VoIP hardware and software, including PBX systems, softphones, and gateways.
 # ISTQB Performance testing experience
 # • Knowledge of DoD STIGs, STIG vulnerabilities, and remediation strategies
+# President at Intellect Neurosciences, Inc. | Business Officer and Co-Founder at Various Life Science Companies | Former Chief Executive Officer at Immune Pharma
+# Data Scientist actively looking for a position within the pharma/healthcare industry.
+# I am currently a Ph.D. candidate in a Geosciences program, seismology in particular.
+# I have a mixed background in Biology and Computer Science. I also work in an animal hospital and love being around my dogs and cats.
+# I am a newbie Data Analyst who likes to explore data concerning cognitive neuroscience, psychology, gaming, anime and book publishing.
+# News, publishing, and media industry experience.
+# I am an oceanographer and climate scientist who investigates the interactions between the ocean, the atmosphere, and the rest of the Earth System.
+# Astronomy PhD student and data scientist.
+# Ph.D. Candidate in Systems Engineering with focus in Optimization of Distributed Spacecraft Missions.
+# Electrical Engineer interested in the intersection of software and hardware to build better healthcare technologies including diagnostics, robotics, and devices
+# Sensor Fusion and Navigation Engineer at Kearfott, previous experiences at @American-Robotics, @fdcl-gwu
+# Design verification engineer working with ORAN/LTE/5g radio hardware
+# HPC (high performance computing)
+# Electrician by trade, Electrical & Computer Engineering Student, Programmer, Maker, Photographer by Hobby.
+# Seasoned IT Storage Architect specializing in SAN and NAS infrastructure design , migration and deployment strategies
+# Pro tinkerer- Odroid, Pi, Pine- ARM Boards. Virtualization, LXC
+# I'm an ASU graduate with a degree in Graphic Information Technology.
+# WordPress, PHP, Stellar Lumens, XDC, XRPL, Python and Solidity. Rodi Software.
+# Software Developer, I like to use GNU Emacs and NixOS.
 
 # LATEST ADDON:
 # + 3 DevOps
@@ -255,3 +295,6 @@ SKILLS: list[Skill] = [
 # + 1 Frontend
 # + 1 Backend
 # + 1 Fullstack
+
+# HIREABLE
+# "#OpenToWork"
