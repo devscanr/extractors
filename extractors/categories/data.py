@@ -62,14 +62,15 @@ LABELED_PHRASES: LabeledPhrases = {
     "agency",
     "company",
     "community",
+    "firm",
     "organization",
     "platform",
     "professional network",
     "social network",
-    "firm",
   ],
   "NONDEV": [
     "academic",
+    "artist",
     "auditor",
     "ceo",
     "coach",
@@ -101,6 +102,7 @@ LABELED_PHRASES: LabeledPhrases = {
     ("managing", "VERB"),
     "mentor",
     ("mentoring", "VERB"),
+    "musician",
     "recruiter", # recruiters?
     ("recruiting", "VERB"),
     "svp",
@@ -140,11 +142,28 @@ LABELED_PHRASES: LabeledPhrases = {
     "remote",
     "remotely",
   ],
+  "HIREABLE": [
+    "for=hire",
+    "hire=able",
+    "hirable",
+    "hire=me",
+    "hiring=me",
+    "job=seeker",
+    "job=seeking",
+    "open=to=work",
+    "open=for=work",
+  ],
+  "OPEN-TO": [
+    "consider(ing)",
+    "look(ing) for",
+    "open(ed) for",
+    "open(ed) to",
+    "ready for",
+    "ready to",
+    "search(ing)",
+    "seeking",
+  ],
 }
 
 # ("specialist", "generalist", "guru", "expert", "ninja", "magician", "professional", "wizard") were previously used
 # to cancel "Student" role. Not applied yet, not sure...
-# ("artist", "mechanic", "musician", "physicist") were previously used
-# to cancel "Dev" role. Not applied yet, not sure...
-
-# TODO "Currently pursuing Masters of Information Technology and Analytics at Rutgers University"

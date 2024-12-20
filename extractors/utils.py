@@ -170,7 +170,7 @@ def add_jj_exceptions2(nlp: Language, items: list[str]) -> None:
 def get_nlp(name: str | Path = "en_core_web_sm") -> Language:
   nlp = spacy.load(name, exclude=["lemmatizer", "ner"])
   # nlp.add_pipe("index_tokens_by_sents", after="parser")
-  # ^ can't add here as we sometimes merge ENT tokens
+  # ^ can't add here as we sometimes merge ENT tokens -- UPDATE: not anymore, merging is problematic
 
   prefixes = list(nlp.Defaults.prefixes or [])
   prefixes.append(r"[-=/(](?=[a-zA-Z(])")
@@ -284,14 +284,20 @@ def verb(word: str) -> Pattern:
 def get_prec_tokens(token: Token) -> list[Token]:
   return list(token.doc[token.sent.start : token.i])
 
-def get_prec_words(token: Token) -> list[Token]:
-  return [token for token in token.doc[token.sent.start : token.i] if is_word(token)]
-
 def get_cons_tokens(token: Token) -> list[Token]:
   return list(token.doc[token.i+1 : token.sent.end])
 
-def get_cons_words(token: Token) -> list[Token]:
-  return [token for token in token.doc[token.i+1 : token.sent.end] if is_word(token)]
+def get_prec_words(token: Token) -> list[str]:
+  return [
+    token.lower_ for token in get_prec_tokens(token)
+    if is_word(token)
+  ]
+
+def get_cons_words(token: Token) -> list[str]:
+  return [
+    token.lower_ for token in get_cons_tokens(token)
+    if is_word(token)
+  ]
 
 def get_heads(_token: Token) -> list[Token]:
   token = _token
@@ -308,6 +314,8 @@ def get_cons_heads(_token: Token) -> list[Token]:
     token = token.head
     if token.i > _token.i:
       tokens.append(token)
+    else:
+      break
   return tokens
 
 def is_word(token: Token) -> bool:
@@ -318,3 +326,5 @@ def get_root(sent: Span) -> Token | None:
     if token.dep_ == "ROOT":
       return token
   return None
+
+# TODO remove `_.used` extension if it's no longer necessary :)

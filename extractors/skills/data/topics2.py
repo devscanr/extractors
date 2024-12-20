@@ -298,3 +298,7 @@ SKILLS: list[Skill] = [
 
 # HIREABLE
 # "#OpenToWork"
+
+# Counter-cases for "Architecture"
+# licensed architect, architectural designer and web developer/programmer
+# UI Architect

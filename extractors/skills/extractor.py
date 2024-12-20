@@ -63,7 +63,8 @@ class SkillExtractor:
     doc = self.nlp(text_or_doc) if isinstance(text_or_doc, str) else text_or_doc
     # print("Debug tokens:", list(self.nlp.tokenizer.explain(text_or_doc)))
     # print("Debug poss:", list((token, token.pos_) for token in doc if not token.is_punct))
-    # print("Debug deps:", list((token, token.pos_, token.dep_) for token in doc if not token.is_punct))
+    # print("Debug deps:")
+    # pprint(list({"token": token, "pos": token.pos_, "dep": token.dep_, "head": token.head} for token in doc if not token.is_punct))
     # print("Debug ents:", list(ent.label_ for ent in doc.ents))
 
     # Disambiguate entities
