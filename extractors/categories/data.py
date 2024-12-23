@@ -1,46 +1,89 @@
+from extractors.utils import Pattern, verb
+
 __all__ = ["LABELED_PHRASES"]
 
-type LabeledPhrases = dict[
-  str,
-  list[str | tuple[str, str]]
-]
+type LabeledPhrases = dict[str, list[str | Pattern]]
 
 LABELED_PHRASES: LabeledPhrases = {
   "DEV": [
-    "admin",
+    verb("coding"),
+    verb("developing"),
+    verb("programming"),
+    verb("engineering"),
+
+    # ADMINISTRATORS
+    "administrator", "admin",
+    "dbadmin", "dba",
+    "systemadministrator", "sysadmin",
+
+    # ANALYSTS
     "analyst",
+    "businessanalyst",
+    "dataanalyst",
+
+    # ARCHITECTS
     "architect",
-    "coder",
-    ("coding", "VERB"),
-    ("developing", "VERB"),
-    ("programming", "VERB"),
-    "dba", # DB admin
-    "dev",
-    "dev=op(s)",
-    "developer",
-    "development",
-    "eng",
-    "engineer",
-    "engineering",
-    "gopher",
-    "hacker",
-    "investigator",
-    "mathematician",
-    "ml=op(s)",
-    "op(s)",
-    "pentester",
-    "ph.d",
-    "pythonist(a)",
-    "programmer",
-    "qa",
+    "dataarchitect",
+    "dbarchitect",
+
+    # DEVS
+    "developer", "dev",
+    "gamedeveloper", "gamedev",
+    "godev", "gopher",
+    "mobiledeveloper", "mobiledev",
+    "phpdeveloper", "phpdev", "phper",
+    "pydev", "pythonist(a)",
+    "rubydev", "rubyist", "rubist",
     "rustacean",
+    "softwaredeveloper", "softwaredev",
+    "systemdeveloper",
+    "webdeveloper", "webdev",
+
+    # ENGINEERS
+    "engineer", "eng",
+    "dataengineer",
+    "mlengineer",
+    "softwareengineer", "swe", "sde",
+    "systemengineer",
+    "webengineer",
+
+    # PROGRAMMERS
+    "programmer", "coder",
+    "gameprogrammer",
+    "phpcoder",
+    "webprogrammer", "webcoder",
+
+    # OPERATIONS & SECURITY
+    "operations", "op(s)",
+    "aiops",
+    "dataops",
+    "dev=op(s)",
+    "dev/sec-ops", "devopssec", "devsecops", "sec/dev-ops", "secdevops",
+    "ml=op(s)",
+    "net=ops",
+    "security", "sec",
+    "sec=op(s)",
+    "sysops",
+
+    # TESTERS & QA
+    "qa",
+    "tester",
+    "pentester",
+    "qatester",
+
+    # SCIENCE & ACADEMY
+    "mathematician",
+    "ph.d",
     "researcher",
     "scientist",
-    "sec",
-    "sec=op(s)",
-    "sde",
-    "swe",
-    "tester",
+
+    # OTHER
+    # expert
+    # generalist
+    "hacker",
+    "investigator",
+    # professional
+    # specialist
   ],
   "FREELANCER": [
     "free=lance(r)",
@@ -52,18 +95,17 @@ LABELED_PHRASES: LabeledPhrases = {
   "LEAD": [
     "lead",
     "leader",
-    ("leading", "VERB"),
+    verb("leading"),
     "leadership",
-    "teamlead",
+    "teamlead", "tl",
     "techlead",
-    "tl",
   ],
   "ORG": [
     "agency",
     "company",
     "community",
     "firm",
-    "organization",
+    "organization", "org",
     "platform",
     "professional network",
     "social network",
@@ -74,40 +116,41 @@ LABELED_PHRASES: LabeledPhrases = {
     "auditor",
     "ceo",
     "coach",
-    "cofounder",
-    "co-founder",
+    "co=founder",
     "cto",
     "dean",
     "designer",
-    ("designing", "VERB"),
+    "gamedesigner",
+    "uidesigner",
+    "webdesigner",
+    verb("designing"),
     "director",
     "educator",
-    "entrepreneur",
+    "entrepreneur", "businessman",
     "founder",
-    ("founding", "VERB"),
+    verb("founding"),
     "head",
-    ("hiring", "VERB"),
+    verb("hiring"),
     "investor",
     "lawyer",
     "lecturer",
-    ("lecturing", "VERB"),
+    verb("lecturing"),
     "owner",
     "president",
     "producer",
-    ("producing", "VERB"),
-    "prof",
-    "professor",
+    verb("producing"),
+    "professor", "prof",
     "postdoc",
     "manager",
-    ("managing", "VERB"),
+    verb("managing"),
     "mentor",
-    ("mentoring", "VERB"),
+    verb("mentoring"),
     "musician",
     "recruiter", # recruiters?
-    ("recruiting", "VERB"),
+    verb("recruiting"),
     "svp",
     "teacher",
-    ("teaching", "VERB"),
+    verb("teaching"),
     "vp",
   ],
   "STUDENT": [
@@ -115,26 +158,27 @@ LABELED_PHRASES: LabeledPhrases = {
     "beginner",
     "graduate",
     "bachelor",
+    "bachelor of science",
     "b.s",
     "freshman",
     "intern",
     "internship",
+    # just "master"
     "master of science",
     "m.s",
     "major",
     "learner",
-    ("learn", "VERB"),
-    ("learning", "VERB"),
-    "newbie",
+    verb("learn"),
+    verb("learning"),
+    "newbie", "noob",
     "new to",
-    "noob",
     "novice",
     "rookie",
     "sophomore",
     "student",
-    ("study", "VERB"),
-    ("studying", "VERB"),
-    "teenage",
+    verb("study"),
+    verb("studying"),
+    "teenage", # TODO should be smth. like "teenage [NOUN]
     "teenager",
     "undergrad(uate)",
   ],
@@ -147,13 +191,17 @@ LABELED_PHRASES: LabeledPhrases = {
     "hire=able",
     "hirable",
     "hire=me",
+    "hire=us",
     "hiring=me",
     "job=seeker",
     "job=seeking",
+    "job=wanted",
     "open=to=work",
     "open=for=work",
   ],
   "OPEN-TO": [
+    "available for",
+    "available to",
     "consider(ing)",
     "look(ing) for",
     "open(ed) for",
@@ -165,5 +213,5 @@ LABELED_PHRASES: LabeledPhrases = {
   ],
 }
 
-# ("specialist", "generalist", "guru", "expert", "ninja", "magician", "professional", "wizard") were previously used
+# ("guru", "expert", "ninja", "magician", "wizard") were previously used
 # to cancel "Student" role. Not applied yet, not sure...

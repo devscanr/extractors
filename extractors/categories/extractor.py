@@ -1,10 +1,11 @@
 from dataclasses import dataclass
+# from pprint import pprint
 import re
 from spacy.pipeline import EntityRuler
 from spacy.tokens import Doc, Token
 from typing import Any, cast, Literal, Sequence
 from ..patterns import to_patterns2
-from ..utils import get_cons_heads, get_cons_words, get_nlp, get_prec_words, get_root, is_word
+from ..utils import Pattern, get_cons_heads, get_cons_words, get_nlp, get_prec_words, get_root, is_word
 from .data import LABELED_PHRASES
 
 __all__ = ["Categorized", "CategoryExtractor", "Role"]
@@ -27,30 +28,14 @@ class CategoryExtractor:
     ruler: EntityRuler = cast(Any, self.nlp.add_pipe("entity_ruler", config={
       "phrase_matcher_attr": "LOWER",
     }, name="entity_ruler"))
-    # self.nlp.add_pipe("merge_entities") # UPDATE entity merging is bug prone (can't check for exact words anymore) TODO so why I continue to work like ENT tokens are not merged?! @_@
     self.nlp.add_pipe("index_tokens_by_sents")
     for label, phrases in LABELED_PHRASES.items():
-      for item in phrases:
-        # TODO refactor like in skills
-        if isinstance(item, str):
-          ruler.add_patterns([{
-            "label": label,
-            "pattern": pattern,
-          } for pattern in to_patterns2(item)])
-        elif isinstance(item, tuple):
-          phrase, pos = item
-          poss: list[str] = []
-          match pos:
-            case "NOUN": poss = ["NOUN", "PROPN", "ADJ"]
-            case "VERB": poss = ["VERB"]
-          ruler.add_patterns([{
-            "label": label,
-            "pattern": (
-              [{ORTH: phrase, POS: {IN: poss}}]
-              if re.search(r"[A-Z]", phrase)
-              else [{LOWER: phrase, POS: {IN: poss}}]
-            )
-          }])
+      for phrase in phrases:
+        if isinstance(phrase, str):
+          assert not re.search("[A-Z]", phrase), f"{phrase!r} contains uppercase character(s), use pattern syntax"
+          ruler.add_patterns(from_phrase(label, phrase))
+        elif isinstance(phrase, list):
+          ruler.add_patterns(from_pattern(label, phrase))
 
   def extract_many(self, text_or_docs: Sequence[str | Doc]) -> list[Categorized]:
     docs = self.nlp.pipe(text_or_docs)
@@ -328,3 +313,15 @@ PROPOSAL_MARKERS = {
   "role", "roles",
   "work",
 }
+
+def from_pattern(label: str, pattern: Pattern) -> Pattern:
+  return [{
+    "label": label,
+    "pattern": pattern
+  }]
+
+def from_phrase(label: str, phrase: str) -> Pattern:
+  return [{
+    "label": label,
+    "pattern": pattern,
+  } for pattern in to_patterns2(phrase)]

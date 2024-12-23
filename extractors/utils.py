@@ -17,6 +17,7 @@ from typing import Any, Callable, Generator, cast, Iterable
 __all__ = [
   "normalize", "uniq", "fix_grammar",
   "get_nlp", "ver1", "noun", "propn", "verb",
+  "Pattern",
 ]
 
 def normalize(text: str, pipechar: str = ".") -> str:

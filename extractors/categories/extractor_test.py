@@ -383,7 +383,7 @@ def describe_Categorizer() -> None:
       def it_handles_mixed7() -> None:
         assert cats("Computer science masters graduate with a specialization in Data Science.").role == "Student"
         assert cats("Data science undergraduate, proficient in Computer Science.").role == "Student"
-        assert cats("Engineering leadership at Square") == Cats("Dev", is_lead=True)
+        assert cats("Engineering leadership at Square") == Cats(is_lead=True)
         assert cats("open to remote work") == Cats(is_remote=True, is_hireable=True)
         assert cats("Opened to remote job offers") == Cats(is_remote=True, is_hireable=True)
         assert cats("Currently open to remote / relocated job offers.") == Cats(is_remote=True, is_hireable=True)
@@ -412,7 +412,7 @@ def describe_Categorizer() -> None:
         assert cats("""
           participated in incubating many projects about zero trust and Web3 organization
         """).role is None
-        assert cats("Software development done right").role == "Dev"
+        assert cats("Software development done right").role is None
 
       def it_handles_mixed10() -> None:
         assert cats("Aspiring Analyst").role == "Student"
