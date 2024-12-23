@@ -96,8 +96,6 @@ SKILLS: list[Skill] = [
 
   Skill("AI", ["ai", "artificial-intelligence"], "Topic"),
 
-  Skill("Algorithm", ["algorithm(s)", "algorithmic"], "Topic"),
-
   Skill("Analysis", ["analysis", "analytics", "analytical", "analyst"], "Topic"),
   # TODO: -"issue analysis"
   # analyses (plural, appears in vacancies)
@@ -120,8 +118,13 @@ SKILLS: list[Skill] = [
 
   Skill("BigData", ["big=data"], "Topic"),
 
-  Skill("Blockchain", [
-    "blockchain",
+  Skill("Biochemistry", ["bio=chemistry", "bio=chemist"], resolve=["Biology", "Chemistry"]),
+  Skill("Bioinformatics", ["bio=informatics", "bio=informatician"], resolve=["Biology", "Informatics"]),
+
+  Skill("Biology", ["biology", "biologist"], "Topic"),
+
+  Skill("Blockchains", [
+    "blockchain(s)",
     "on-chain", "off-chain",
     "litecoin",
   ], "Topic"),
@@ -135,6 +138,8 @@ SKILLS: list[Skill] = [
   ], resolve=["Business", "Analysis"]),
   # TODO business intelligence, BI
   # TODO nonprofit(s) ?
+
+  Skill("Chemistry", ["chemistry", "chemist"], "Topic"),
 
   Skill("Computer", ["computer", "computing"], "Topic"),
   Skill("Computer-Science", [
@@ -154,7 +159,7 @@ SKILLS: list[Skill] = [
   Skill("-Data", [
     "personal=data", "user=data",
     "my=data", "your=data", "our=data", "their=data",
-    "data=graph", "data-querying", "data-storage",
+    "data=graph", "data-querying", "data-storage", # vs database?
   ], resolve=[]), # oversimplified, will update later
   Skill("Data-Analysis", ["dataanalysis", "dataanalytics", "dataanalyst"], resolve=["Data", "Analysis"]),
   Skill("Data-Operations", ["dataoperations", "dataops"], resolve=["Data", "Operations"]),
@@ -165,7 +170,7 @@ SKILLS: list[Skill] = [
   Skill("Data-Science", [
     "datascience", "datascientist", "data=sci", literal("DS")
   ], resolve=["Data", "Science"]),
-  Skill("Data-Visualization", ["data=viz",], resolve=["Data", "Visualization"]),
+  Skill("Data-Visualization", ["data=viz",], resolve=["Data", "Visualizations"]),
 
   Skill("Databases", ["database(s)"], "Topic"),
   Skill("Database-Administration", [
@@ -202,13 +207,13 @@ SKILLS: list[Skill] = [
 
   Skill("Electrics", ["electrics", "electrical"], "Topic"),
 
-  Skill("Electronics", ["electronics", "electronical"], "Topic"),
+  Skill("Electronics", ["electronic(s)", "electronical"], "Topic"),
 
   Skill("Embedded", ["embedded"], "Topic"),
   Skill("Embedded-Engineering", [
-    "embeddedengineering", "embeddedengineer",
-    "embeddedprogramming", "embeddedprogrammer",
-    "embeddeddeveloper", "embeddeddev",
+    "embeddedengineer", "embeddedprogramming", "embeddeddev",
+    # Rare:
+    # embeddedengineering, embeddedprogrammer, embeddeddeveloper
   ], resolve=["Embedded", "Engineering"]),
 
   Skill("Engineering", [
@@ -224,7 +229,11 @@ SKILLS: list[Skill] = [
     "team development",
     "development team",
   ], resolve=[]),
-  Skill("Engineering-Operations", ["devoperations", "devops"], resolve=["Engineering", "Operations"]),
+  Skill("Engineering-Operations", [
+    "devops",
+    # Rare:
+    # devoperations
+  ], resolve=["Engineering", "Operations"]),
   Skill("Engineering-Security-Operations", [
     "dev/sec-ops", "sec/dev-ops",
     "dev-sec-ops", "sec-dev-ops",
@@ -281,13 +290,8 @@ SKILLS: list[Skill] = [
   Skill("Low-Code", ["low=code", "no=code"], "Topic"),
 
   Skill("Machine-Learning", ["machine-learning", "ml"], "Topic"),
-  # ^ loses "ML" in "Machine and Deep Learning"
-  Skill("ML-Engineering", [
-    "mobileengineering", "mobileengineer",
-    "mobileprogramming", "mobileprogrammer",
-    "mobiledeveloper", "mobiledev",
-  ], resolve=["ML", "Engineering"]),
-  Skill("ML-Operations", ["mloperations", "mlops", "ai=ops"], resolve=["ML", "Operations"]),
+  Skill("Machine-Learning-Engineering", ["mlengineer"], resolve=["Machine-Learning", "Engineering"]),
+  Skill("Machine-Learning-Operations", ["mlops", "mldevops", "ai=ops"], resolve=["Machine-Learning", "Operations"]),
 
   Skill("Management", ["management", "manager"], "Topic", disambiguate=dis_management()),
 
@@ -295,6 +299,8 @@ SKILLS: list[Skill] = [
     "marketing", "marketer",
     "seo", "smo",
   ], "Topic"),
+
+  Skill("Mathematics", ["mathematics", "mathematical", "math", "mathematician"], "Topic"),
 
   Skill("Medicine", [
     "medicine", "medical", "medic",
@@ -304,9 +310,11 @@ SKILLS: list[Skill] = [
   Skill("Mobile", ["mobile", "mobileapp"], "Topic"),
   Skill("Mobile-Design", ["mobiledesign", "mobiledesigner"], resolve=["Mobile", "Design"]),
   Skill("Mobile-Engineering", [
-    "mobileengineering", "mobileengineer",
+    "mobileengineer",
     "mobileprogramming", "mobileprogrammer",
     "mobiledeveloper", "mobiledev",
+    # Rare:
+    # mobileengineering
   ], resolve=["Mobile", "Engineering"]),
 
   Skill("Modeling", ["datamodeling"], "Topic"),
@@ -346,6 +354,8 @@ SKILLS: list[Skill] = [
   Skill("QA", ["quality-assurance", "qa"], "Topic"),
   Skill("AQA", ["aqa"], resolve=["Automation", "QA"]),
 
+  Skill("Physics", ["physics", "physical", "physicist"], "Topic"),
+
   Skill("Recruitment", ["recruitment", "recruiter", "staffing"], "Topic"),
 
   Skill("Reliability", ["reliability", "reliable"], "Topic"),
@@ -374,7 +384,9 @@ SKILLS: list[Skill] = [
   ], "Topic"),
   Skill("Security", ["sec"], disambiguate=neighbour(2)),
   Skill("Security-Operations", [
-    "securityoperations", "secoperations", "secops"
+    "securityoperations", "secops"
+    # Rare:
+    # secoperations
   ], resolve=["Security", "Operations"]),
   Skill("Security-Cyber", [
     "cyber=security", "cyber=sec", "cyber=defence"
@@ -388,8 +400,9 @@ SKILLS: list[Skill] = [
   Skill("Software-Design", ["softwaredesign", "softwaredesigner"], resolve=["Software", "Design"]),
   Skill("Software-Engineering", [
     "softwareengineering", "softwareengineer",
-    "softwareprogramming", "softwareprogrammer",
     "softwaredeveloper", "softwaredev",
+    # Rare:
+    # softwareprogramming,  softwareprogrammer
     literal("SDE"), literal("SWE"), # sometimes SE @_@
   ], resolve=["Software", "Engineering"]),
 
@@ -412,7 +425,7 @@ SKILLS: list[Skill] = [
 
   Skill("SRE", [literal("SRE")], resolve=["Reliability", "Engineering"]),
 
-  Skill("Startup", ["startup(s)"], "Topic"),
+  Skill("Startups", ["startup(s)"], "Topic"),
 
   Skill("Statistics", [
     "statistic(s)", "statistician", "statistical",
@@ -420,21 +433,25 @@ SKILLS: list[Skill] = [
     "probability", "regression", "classification", "clustering",
   ], "Topic"),
 
-  Skill("System", ["system(s)"], "Topic"), # TODO many FPs e.g. "information systems"
+  Skill("Systems", ["system(s)"], "Topic"), # TODO many FPs e.g. "information systems"
   Skill("System-Administration", [
     "systemadministration", "systemadministrator", "sysadmin"
-  ], resolve=["System", "Administration"]),
+  ], resolve=["Systems", "Administration"]),
   Skill("System-Architecture", [
     "systemarchitecture", "systemarchitect"
-  ], resolve=["System", "Architecture"]),
+  ], resolve=["Systems", "Architecture"]),
   Skill("System-Engineering", [
     "systemengineering", "systemengineer",
-    "systemprogramming", "systemprogrammer",
+    "systemprogramming",
     "systemdeveloper", "systemdev",
-  ], resolve=["System", "Engineering"]),
+    # Rare:
+    # systemprogrammer
+  ], resolve=["Systems", "Engineering"]),
   Skill("System-Operations", [
-    "systemoperations", "systemops", "sysops",
-  ], resolve=["System", "Operations"]),
+    "sysops",
+    # Rare:
+    # systemoperations, systemops
+  ], resolve=["Systems", "Operations"]),
 
   Skill("Telecom", ["telecom", "telecommunication(s)"], "Topic"),
 
@@ -452,7 +469,7 @@ SKILLS: list[Skill] = [
   Skill("Videography", ["videography", "videographer", "video(s)"], "Topic"),
   # Medical Imaging, Audio
 
-  Skill("Visualization", ["visualization", "visualizer"], "Topic"),
+  Skill("Visualizations", ["visualization", "visualizer"], "Topic"),
 
   Skill("Web", ["web", "website", "webapp"], "Topic"),
   Skill("Web3", ["web3"], "Topic"),
@@ -465,6 +482,8 @@ SKILLS: list[Skill] = [
   ], resolve=["Web", "Engineering"]),
   Skill("Web-Security", ["websecurity", "web=sec"], resolve=["Web", "Security"]),
 ]
+
+# TODO phpdeveloper, dataarchitect, webarchitect, phpcoder, dbadmin, rubydev
 
 # TODO split into inside (dev) and outside topics
 

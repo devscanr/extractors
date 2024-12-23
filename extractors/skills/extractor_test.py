@@ -113,7 +113,7 @@ def describe_SkillExtractor() -> None:
       assert extract("visual design") == ["Design"]
 
     def it_handles_adhoc_set13() -> None:
-      assert extract("system administration") == ["System", "Administration"]
+      assert extract("system administration") == ["Systems", "Administration"]
       assert extract("database administration") == ["Databases", "Administration"]
       assert extract("senior dba") == ["Databases", "Administration"]
 
@@ -174,7 +174,7 @@ def describe_SkillExtractor() -> None:
 
     def it_handles_natural_set4() -> None:
       assert extract("Web & Blockchain Developer 🎨React(Next), Vue(Nuxt), 🎄Laravel") == [
-        "Web", "Blockchain", "Engineering", "React", "NextJS", "VueJS", "NuxtJS", "Laravel"
+        "Web", "Blockchains", "Engineering", "React", "NextJS", "VueJS", "NuxtJS", "Laravel"
       ]
       assert extract("NumPy, SciPy, Numba, Conda, PyData, NumFocus, Anaconda, Quansight, OpenTeams") == [
         "NumPy", "SciPy", "Numba", "Anaconda"
@@ -322,7 +322,7 @@ def describe_SkillExtractor() -> None:
       """) == ["Engineering", "Security", "VA/PT"]
 
     def it_handles_set15() -> None:
-      assert extract("Blockchain developer, bulding for DeFi.") == ["Blockchain", "Engineering", "DeFi"]
+      assert extract("Blockchain developer, bulding for DeFi.") == ["Blockchains", "Engineering", "DeFi"]
       assert extract("""
         FullStack Web Developer | Penetration Tester
       """) == ["Backend", "Frontend", "Web", "Engineering", "VA/PT"]
@@ -370,7 +370,7 @@ def describe_SkillExtractor() -> None:
         "Research", "Security"
       ]
       assert extract("CS PhD student at Stony Brook University, new to Distributed System.") == [
-        "Computer", "Science", "Distributed", "System"
+        "Computer", "Science", "Distributed", "Systems"
       ]
       assert extract("Building Distributed SQL Database") == [
         "Distributed", "SQL", "Databases"

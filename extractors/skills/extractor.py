@@ -48,12 +48,12 @@ class SkillExtractor:
         assert skill.name not in self.resolvers, f"duplicate `resolve` at {skill.name!r}"
         self.resolvers[skill.name] = create_resolve(skill.resolve) if isinstance(skill.resolve, list) else skill.resolve
       # Update rulers with patterns:
-      for item in skill.phrases:
-        if isinstance(item, str):
-          assert not re.search("[A-Z]", item), f"{item!r} contains uppercase character(s), use pattern syntax"
-          ruler.add_patterns(from_phrase(skill, item))
-        elif isinstance(item, list):
-          ruler.add_patterns(from_pattern(skill, item))
+      for phrase in skill.phrases:
+        if isinstance(phrase, str):
+          assert not re.search("[A-Z]", phrase), f"{phrase!r} contains uppercase character(s), use pattern syntax"
+          ruler.add_patterns(from_phrase(skill, phrase))
+        elif isinstance(phrase, list):
+          ruler.add_patterns(from_pattern(skill, phrase))
 
   def extract_many(self, text_or_docs: Sequence[str | Doc]) -> list[list[str]]:
     docs = self.nlp.pipe(text_or_docs)

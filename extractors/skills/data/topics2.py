@@ -32,7 +32,7 @@ SKILLS: list[Skill] = [
   # YAGNI, DRY, KISS
   # (software) design patterns
 
-  Skill("Algorithms", ["algorithm(s)"], "Topic"),
+  Skill("Algorithms", ["algorithm(s)", "algorithmic"], "Topic"),
   Skill("Data-Structures", ["data=structure(s)", "data=type(s)", "data=class(es)"], "Topic"),
   Skill("Devices", ["device(s)"], "Topic"),
   Skill("Markup", ["markup"], "Topic"),
@@ -101,7 +101,7 @@ SKILLS: list[Skill] = [
   ], "Topic"),
   Skill("Deployment", ["deployment", "deploy"], "Topic"),
   Skill("Gitops", ["gitops"], "Topic"),
-  Skill("Monorepo", ["monorepo(s)", "monorepository", "monorepositories"], "Topic"),
+  Skill("Monorepos", ["monorepo(s)", "monorepository", "monorepositories"], "Topic"),
   Skill("Containerization", ["containerization", "containerized"], "Topic"), # TODO container with disambig.
   Skill("Orchestration", ["orchestration"], "Topic"),
   Skill("Provisioning", ["provisioning"], "Topic"),
@@ -110,7 +110,7 @@ SKILLS: list[Skill] = [
   Skill("Integration", ["integration"], "Topic"),
 
   # NETWORKS
-  Skill("Firewall", ["firewall(s)"], "Topic"), # also SECURITY
+  Skill("Firewalls", ["firewall(s)"], "Topic"), # also SECURITY
   Skill("VLAN", ["vlan"], "Virtual LAN: a way to logically separate a group of computers into a network"),
   Skill("VPN", ["vpn(s)"], "Topic"), # also SECURITY
   Skill("Wireless", ["wireless"], "Topic"),
@@ -151,8 +151,10 @@ SKILLS: list[Skill] = [
   Skill("Load-Testing", ["load=testing", "load=test(s)"], "Topic"),
 
   # ...
-  Skill("Large-Language-Models", ["large-language-model(s)", "llm(s)"], "Topic"),
-  Skill("Multimodal-Large-Language-Models", ["multimodal-large-language-model(s)", "mllm(s)"], "Topic"),
+  Skill("Large-Language-Models", [
+    "large-language-model(s)", "llm(s)",
+    "multimodal-large-language-model(s)", "mllm(s)"
+  ], "Topic"),
   # Motion-Prediction
   # Sensor-Fusion
 
@@ -160,7 +162,7 @@ SKILLS: list[Skill] = [
   Skill("Open-Source", ["open=source", "oss"], "Topic"),
 
   # INDUSTRIES -- I think that maybe INDUSTRIES and SCIENCES should be separated from SKILLS
-  # Skill("Advertisement", ["advertising", "advertisement"], "Topic"),
+  # Skill("Advertisements", ["advertising", "advertisement"], "Topic"),
   # Academy (doc, post-doc, etc)
   # Skill("Ecology", ["ecology", "ecologist"], "Topic"),
   # Skill("Energy", ["energy"], "Topic"), # FPs
@@ -172,15 +174,6 @@ SKILLS: list[Skill] = [
   # ANALYSIS
   Skill("AB-Testing", ["a/b-test(s)", "a/b-testing", "ab-test(s)", "ab-testing"], "Topic"),
   Skill("Hypothesis", ["hypothesis", "hypotheses"], "Topic"),
-
-  # SCIENCES
-  # Skill("Biochemistry", ["bio=chemistry"], "Topic"),
-  # Skill("Bioinformatics", ["bio=informatics", "bio=informatician"], "Topic"),
-  # Skill("Biology", ["biology", "biologist"], "Topic"),
-  # Skill("Electronics", ["electronic(s)"], "Topic"),
-  # Skill("Informatics", ["informatics"], "Topic"),
-  Skill("Mathematics", ["mathematics", "mathematical", "math", "mathematician"], "Topic"),
-  Skill("Physics", ["physics", "physical", "physicist"], "Topic"),
 
   # UNSORTED
   Skill("CPU", ["cpu", "central-processing-unit"], ""),
@@ -197,7 +190,6 @@ SKILLS: list[Skill] = [
 
   # ??
   # blue green deployments
-
 
   # Skill("2D", ["2d"], ""), -- too widespread
   # Skill("3D", ["3d"], ""), -- too widespread
