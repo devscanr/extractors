@@ -1,6 +1,13 @@
 from extractors.utils import Pattern, verb
 
-__all__ = ["LABELED_PHRASES"]
+__all__ = [
+  "LABELED_PHRASES",
+  "DEV_CANCELING_ROLES",
+  "STUDENT_CANCELING_ROLES",
+  "ORG_CANCELING_ROLES",
+  "LEAD_CANCELING_ROLES",
+  "FREELANCER_CANCELING_ROLES",
+]
 
 type LabeledPhrases = dict[str, list[str | Pattern]]
 
@@ -26,8 +33,8 @@ LABELED_PHRASES: LabeledPhrases = {
     "dataarchitect",
     "dbarchitect",
 
-    # DEVS
-    "developer", "dev",
+    # DEVELOPERS
+    "developer", "dev", "dev.", # TODO verify how "dev." is parsed
     "gamedeveloper", "gamedev",
     "godev", "gopher",
     "mobiledeveloper", "mobiledev",
@@ -55,12 +62,12 @@ LABELED_PHRASES: LabeledPhrases = {
 
     # OPERATIONS & SECURITY
     "operations", "op(s)",
-    "aiops",
-    "dataops",
+    "ai=op(s)",
+    "dataop(s)",
     "dev=op(s)",
     "dev/sec-ops", "devopssec", "devsecops", "sec/dev-ops", "secdevops",
     "ml=op(s)",
-    "net=ops",
+    "net=op(s)",
     "security", "sec",
     "sec=op(s)",
     "sysops",
@@ -74,8 +81,10 @@ LABELED_PHRASES: LabeledPhrases = {
     # SCIENCE & ACADEMY
     "mathematician",
     "ph.d",
+    "ph.d candidate",
     "researcher",
     "scientist",
+    "statistician",
 
     # OTHER
     # expert
@@ -93,22 +102,13 @@ LABELED_PHRASES: LabeledPhrases = {
     "consulting",
   ],
   "LEAD": [
+    "co-lead",
     "lead",
     "leader",
     verb("leading"),
     "leadership",
     "teamlead", "tl",
     "techlead",
-  ],
-  "ORG": [
-    "agency",
-    "company",
-    "community",
-    "firm",
-    "organization", "org",
-    "platform",
-    "professional network",
-    "social network",
   ],
   "NONDEV": [
     "academic",
@@ -155,6 +155,7 @@ LABELED_PHRASES: LabeledPhrases = {
   ],
   "STUDENT": [
     "alumni", "alumnus", "alum",
+    "amateur",
     "beginner",
     "graduate",
     "bachelor",
@@ -181,6 +182,17 @@ LABELED_PHRASES: LabeledPhrases = {
     "teenage", # TODO should be smth. like "teenage [NOUN]
     "teenager",
     "undergrad(uate)",
+  ],
+  "ORG": [
+    "agency",
+    "company",
+    "community",
+    "firm",
+    "organization", "org",
+    "platform",
+    "professional network",
+    "social network",
+    "team",
   ],
   "REMOTE": [
     "remote",
@@ -215,3 +227,28 @@ LABELED_PHRASES: LabeledPhrases = {
 
 # ("guru", "expert", "ninja", "magician", "wizard") were previously used
 # to cancel "Student" role. Not applied yet, not sure...
+
+DEV_CANCELING_ROLES = [
+  n for n in LABELED_PHRASES["STUDENT"] + LABELED_PHRASES["ORG"]
+  if isinstance(n, str)
+]
+
+STUDENT_CANCELING_ROLES = [
+  n for n in LABELED_PHRASES["ORG"]
+  if isinstance(n, str)
+]
+
+ORG_CANCELING_ROLES = [
+  n for n in ["contributor"] + LABELED_PHRASES["STUDENT"] + LABELED_PHRASES["DEV"] + LABELED_PHRASES["NONDEV"]
+  if isinstance(n, str)
+]
+
+LEAD_CANCELING_ROLES = [
+  n for n in LABELED_PHRASES["STUDENT"] + LABELED_PHRASES["ORG"]
+  if isinstance(n, str)
+]
+
+FREELANCER_CANCELING_ROLES = [
+  n for n in LABELED_PHRASES["STUDENT"] + LABELED_PHRASES["ORG"]
+  if isinstance(n, str)
+]

@@ -116,7 +116,7 @@ SKILLS: list[Skill] = [
 
   Skill("Backend", ["back=end", "backender", noun("BE")], "Topic"), # not detected as PROPN, needs to be retrained
 
-  Skill("BigData", ["big=data"], "Topic"),
+  Skill("Big-Data", ["big=data"], "Topic"),
 
   Skill("Biochemistry", ["bio=chemistry", "bio=chemist"], resolve=["Biology", "Chemistry"]),
   Skill("Bioinformatics", ["bio=informatics", "bio=informatician"], resolve=["Biology", "Informatics"]),

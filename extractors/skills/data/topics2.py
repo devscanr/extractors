@@ -132,14 +132,14 @@ SKILLS: list[Skill] = [
   Skill("GDPR", ["gdpr"], "Security Compliance"),
   Skill("NIST", ["nist"], "Security Compliance"),
 
-  # GAMES
-  Skill("Pixel", ["pixel(s)"], ""),
-  Skill("-Pixel", ["google=pixel"]),
+  # GAMES (Graphics)
+  # Skill("Pixel", ["pixel(s)"], ""),
+  # Skill("-Pixel", ["google=pixel"]),
   # Polygon -- disambig.
   Skill("Shaders", ["shader(s)"], ""),
-  Skill("Sprite", ["sprite(s)"], ""),
-  Skill("Texture", ["texture(s)"], ""),
-  Skill("Voxel", ["voxel(s)"], ""),
+  Skill("Sprites", ["sprite(s)"], ""),
+  Skill("Textures", ["texture(s)"], ""),
+  # Skill("Voxel", ["voxel(s)"], ""),
 
   # QA
   Skill("E2E-Testing", ["end=to=end=testing", "e2e=testing", "e2e=test(s)"], "Topic"), # TODO capture split words

@@ -18,7 +18,6 @@ class SkillExtractor:
     self.disambiguates: dict[str, Disambiguate] = {}
     self.resolvers: dict[str, Resolve] = {}
     self.nlp = get_nlp(name)
-    self.nlp.add_pipe("index_tokens_by_sents")
     skills: list[Skill] = []
     mskills: list[Skill] = []
     for skill in SKILLS:
@@ -64,7 +63,7 @@ class SkillExtractor:
     # print("Debug tokens:", list(self.nlp.tokenizer.explain(text_or_doc)))
     # print("Debug poss:", list((token, token.pos_) for token in doc if not token.is_punct))
     # print("Debug deps:")
-    # pprint(list({"token": token, "pos": token.pos_, "dep": token.dep_, "head": token.head} for token in doc if not token.is_punct))
+    # pprint([{"token": token, "pos": token.pos_, "dep": token.dep_, "head": token.head} for token in doc if not token.is_punct])
     # print("Debug ents:", list(ent.label_ for ent in doc.ents))
 
     # Disambiguate entities

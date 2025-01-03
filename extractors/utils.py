@@ -4,20 +4,21 @@ from pathlib import Path
 import re
 import spacy
 from spacy import Language
-from spacy.tokens import Doc, Span, Token
+from spacy.tokens import Doc, Token
 from typing import Any, Callable, Generator, cast, Iterable
 
 # RESOURCES
 # - https://stackoverflow.com/questions/15388831/what-are-all-possible-pos-tags-of-nltk
+# - https://corenlp.run/
 
 (IN, IS_PUNCT, IS_SENT_START, LOWER, OP, ORTH, POS, REGEX, TAG) = (
   "IN", "IS_PUNCT", "IS_SENT_START", "LOWER", "OP", "ORTH", "POS", "REGEX", "TAG"
 )
 
 __all__ = [
-  "normalize", "uniq", "fix_grammar",
+  "normalize", "uniq", "omit_parens", "fix_grammar",
   "get_nlp", "ver1", "noun", "propn", "verb",
-  "Pattern",
+  "Pattern", "LB", "RB"
 ]
 
 def normalize(text: str, pipechar: str = ".") -> str:
@@ -63,6 +64,60 @@ def uniq[T](arr: list[T] | Generator[str, Any, Any]) -> list[T]:
   keys = cast(Iterable[T], d.keys()) # Looks like MyPy (or something) is improperly typing this
   return list(keys)
 
+def omit_parens(input: str) -> str:
+  output = ""
+  paren = 0
+  for ch in input:
+    if ch == "(":
+      paren += 1
+    elif ch == ")" and paren:
+      paren -= 1
+    elif not paren:
+      output += ch
+  return re.sub(r"\s+", " ", output)
+
+# def get[T](seq: Sequence[T], offset: int) -> T | None:
+#   try:
+#     return seq[offset]
+#   except Exception:
+#     return None
+#
+# def get_prev[T](seq: Sequence[T], offset: int) -> T | None:
+#   prev = get(seq, offset - 1)
+#   return prev
+#
+# def get_next[T](seq: Sequence[T], offset: int) -> T | None:
+#   next = get(seq, offset + 1)
+#   return next
+#
+# def get_prevnext[T](seq: Sequence[T], offset: int) -> tuple[T | None, T | None]:
+#   prev = get(seq, offset - 1)
+#   next = get(seq, offset + 1)
+#   return prev, next
+
+def prev_token(token: Token) -> Token | None:
+  sent = list(token.sent)
+  try:
+    return sent[token.i - 1]
+  except Exception:
+    return None
+
+def next_token(token: Token) -> Token | None:
+  sent = list(token.sent)
+  try:
+    return sent[token.i + 1]
+  except Exception:
+    return None
+
+def prev_next_tokens(token: Token) -> tuple[Token | None, Token | None]:
+  sent = list(token.sent)
+  prev, next = None, None
+  try: prev = sent[token.i - 1]
+  except Exception: pass
+  try: next = sent[token.i + 1]
+  except Exception: pass
+  return prev, next
+
 # --------------------------------------------------------------------------------------------------
 # Invalid grammar, especially punctuation, ruins Spacy analysis. I've found that
 # it's much easier to fix common errors preventively, than to fight them post-factum.
@@ -73,18 +128,15 @@ RB = r"(?!\w)"
 
 GRAMMAR_FIXES: list[tuple[str, str, re.RegexFlag | int]] = [
   (rf"{LB}free[-\s]+lanc([edring]*){RB}", r"freelanc\1", re.IGNORECASE),
-  (rf"{LB}B\.?[sS]\.?[cC]?\.?|S[cC]?\.?[bB]\.?{RB}", r"B.S", 0), # B.S  = Bachelor of Science
-  (rf"{LB}M\.?[sS]\.?[cC]?\.?|S[cC]\.?[mM]\.?{RB}", r"M.S", 0),  # M.S  = Master of Science (not handling "SM" forms for now)
-  (rf"{LB}P\.?[hH]\.?[dD]?\.?{RB}", r"Ph.D", 0),                 # Ph.D = Doctor of Philosophy
+  (rf"{LB}B\.?S\.?C?\.?{RB}|{LB}SC?\.?B\.?{RB}", r"B.S", re.IGNORECASE), # B.S  = Bachelor of Science
+  (rf"{LB}M\.?S\.?C?\.?{RB}|{LB}SC\.?M\.?{RB}", r"M.S", re.IGNORECASE),  # M.S  = Master of Science (not handling "SM" forms for now)
+  (rf"{LB}P\.?H\.?D?\.?{RB}", r"Ph.D", re.IGNORECASE),                   # Ph.D = Doctor of Philosophy
+  (rf"{LB}eng.{RB}", r"eng", re.IGNORECASE),
+  (rf"{LB}ex\s*[-.]\s*(?=\w)", r"ex ", re.IGNORECASE),
   (r" @ ", r" at ", 0),
-  # (r"wanna be", r"wannabe", re.IGNORECASE),
-  # (r"engineer student", r"engineering student", re.IGNORECASE),
-  # ...
-  # TODO devops, mlops, sec-ops (insane number of varieties here)
-]
-GRAMMAR_FIXES = [
-  (pattern, replacement, flags)
-  for (pattern, replacement, flags) in GRAMMAR_FIXES
+  (r" & ", r" and ", 0),
+  (r"(?<=[\w\s])/co-founder", r" / co-founder", re.IGNORECASE),
+  (r"(?<=[\w\s])/\.net", r" / .net", re.IGNORECASE),
 ]
 
 def fix_grammar(text: str) -> str:
@@ -169,9 +221,8 @@ def add_jj_exceptions2(nlp: Language, items: list[str]) -> None:
       ruler.add([pattern], jj, index=1)
 
 def get_nlp(name: str | Path = "en_core_web_sm") -> Language:
-  nlp = spacy.load(name, exclude=["lemmatizer", "ner"])
-  # nlp.add_pipe("index_tokens_by_sents", after="parser")
-  # ^ can't add here as we sometimes merge ENT tokens -- UPDATE: not anymore, merging is problematic
+  nlp = spacy.load(name, exclude=["ner"]) # "lemmatizer",
+  nlp.add_pipe("index_tokens_by_sents", after="parser")
 
   prefixes = list(nlp.Defaults.prefixes or [])
   prefixes.append(r"[-=/(](?=[a-zA-Z(])")
@@ -192,10 +243,12 @@ def get_nlp(name: str | Path = "en_core_web_sm") -> Language:
   # Tokenizer exceptions (sometimes are applied after prefix/suffix, sometimes before – wtf)
   def token_match(token: str) -> bool | None:
     lower = token.lower()
-    if lower in {"c+", "c++", "c#", ".net", "ex.", "ph.d"}:
+    if lower in {"c+", "c++", "c#", ".net", "ph.d"}:
+      return True
+    if lower.startswith("co-"):
       return True
     # For cases like "@foo-bar" to keep it together
-    if lower.startswith(("@",)):
+    if lower.startswith(("@",)) and not lower.endswith((",", ".")):
       return True
     if lower.endswith((".js", ".py", ".net")) and (lower.count(".") == 1) and ("/" not in lower):
       return True
@@ -203,9 +256,14 @@ def get_nlp(name: str | Path = "en_core_web_sm") -> Language:
   nlp.tokenizer.token_match = token_match # type: ignore
 
   infixes = list(nlp.Defaults.infixes or [])
-  infixes.append(r"(?<=[a-zA-Z)])[&+()](?=[a-zA-Z(])") # /
+  infixes.append(r"(?<=[a-zA-Z)])[&+()/](?=[a-zA-Z(])")
   infix_finditer = spacy.util.compile_infix_regex(infixes)
   nlp.tokenizer.infix_finditer = infix_finditer.finditer # type: ignore
+
+  # `add_special_case` is strictly case-sensitive :(
+  # for abbr in ["Eng.", "eng.", "Ex.", "ex."]:
+  #   nlp.tokenizer.add_special_case(abbr, [{ORTH: abbr}])
+  # Affects sentence boundaries, unlike `token_match`
 
   # Make the following PROPER NOUNs
   add_dev_exceptions(nlp)
@@ -321,11 +379,5 @@ def get_cons_heads(_token: Token) -> list[Token]:
 
 def is_word(token: Token) -> bool:
   return not token.is_punct and not token.is_space
-
-def get_root(sent: Span) -> Token | None:
-  for token in sent:
-    if token.dep_ == "ROOT":
-      return token
-  return None
 
 # TODO remove `_.used` extension if it's no longer necessary :)
