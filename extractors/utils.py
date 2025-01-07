@@ -4,21 +4,26 @@ from pathlib import Path
 import re
 import spacy
 from spacy import Language
-from spacy.tokens import Doc, Token
+from spacy.tokens import Doc
 from typing import Any, Callable, Generator, cast, Iterable
 
 # RESOURCES
 # - https://stackoverflow.com/questions/15388831/what-are-all-possible-pos-tags-of-nltk
 # - https://corenlp.run/
 
-(IN, IS_PUNCT, IS_SENT_START, LOWER, OP, ORTH, POS, REGEX, TAG) = (
-  "IN", "IS_PUNCT", "IS_SENT_START", "LOWER", "OP", "ORTH", "POS", "REGEX", "TAG"
+(DEP, IN, IS_PUNCT, IS_SENT_START, LOWER, OP, ORTH, POS, REGEX, TAG) = (
+  "DEP", "IN", "IS_PUNCT", "IS_SENT_START", "LOWER", "OP", "ORTH", "POS", "REGEX", "TAG"
+)
+(LEFT_ID, REL_OP, RIGHT_ID, RIGHT_ATTRS) = (
+  "LEFT_ID", "REL_OP", "RIGHT_ID", "RIGHT_ATTRS"
 )
 
 __all__ = [
-  "normalize", "uniq", "omit_parens", "fix_grammar",
+  "normalize", "uniq", "omit_parens",
+  "fix_grammar",
   "get_nlp", "ver1", "noun", "propn", "verb",
-  "Pattern", "LB", "RB"
+  "Pattern", "LB", "RB",
+  "orth", "lookslike",
 ]
 
 def normalize(text: str, pipechar: str = ".") -> str:
@@ -95,28 +100,28 @@ def omit_parens(input: str) -> str:
 #   next = get(seq, offset + 1)
 #   return prev, next
 
-def prev_token(token: Token) -> Token | None:
-  sent = list(token.sent)
-  try:
-    return sent[token.i - 1]
-  except Exception:
-    return None
+# def prev_token(token: Token) -> Token | None:
+#   sent = list(token.sent)
+#   try:
+#     return sent[token._.i - 1]
+#   except Exception:
+#     return None
+#
+# def next_token(token: Token) -> Token | None:
+#   sent = list(token.sent)
+#   try:
+#     return sent[token._.i + 1]
+#   except Exception:
+#     return None
 
-def next_token(token: Token) -> Token | None:
-  sent = list(token.sent)
-  try:
-    return sent[token.i + 1]
-  except Exception:
-    return None
-
-def prev_next_tokens(token: Token) -> tuple[Token | None, Token | None]:
-  sent = list(token.sent)
-  prev, next = None, None
-  try: prev = sent[token.i - 1]
-  except Exception: pass
-  try: next = sent[token.i + 1]
-  except Exception: pass
-  return prev, next
+# def prev_next_tokens(token: Token) -> tuple[Token | None, Token | None]:
+#   sent = list(token.sent)
+#   prev, next = None, None
+#   try: prev = sent[token._.i - 1]
+#   except Exception: pass
+#   try: next = sent[token._.i + 1]
+#   except Exception: pass
+#   return prev, next
 
 # --------------------------------------------------------------------------------------------------
 # Invalid grammar, especially punctuation, ruins Spacy analysis. I've found that
@@ -340,44 +345,42 @@ def verb(word: str) -> Pattern:
       {LOWER: word, POS: {IN: poss}}
     ]
 
-def get_prec_tokens(token: Token) -> list[Token]:
-  return list(token.doc[token.sent.start : token.i])
-
-def get_cons_tokens(token: Token) -> list[Token]:
-  return list(token.doc[token.i+1 : token.sent.end])
-
-def get_prec_words(token: Token) -> list[str]:
-  return [
-    token.lower_ for token in get_prec_tokens(token)
-    if is_word(token)
-  ]
-
-def get_cons_words(token: Token) -> list[str]:
-  return [
-    token.lower_ for token in get_cons_tokens(token)
-    if is_word(token)
-  ]
-
-def get_heads(_token: Token) -> list[Token]:
-  token = _token
-  tokens: list[Token] = []
-  while token != token.head:
-    token = token.head
-    tokens.append(token)
-  return tokens
-
-def get_cons_heads(_token: Token) -> list[Token]:
-  token = _token
-  tokens: list[Token] = []
-  while token != token.head:
-    token = token.head
-    if token.i > _token.i:
-      tokens.append(token)
-    else:
-      break
-  return tokens
-
-def is_word(token: Token) -> bool:
-  return not token.is_punct and not token.is_space
-
 # TODO remove `_.used` extension if it's no longer necessary :)
+
+def orth(phrase: str) -> dict[str, str]:
+  return {ORTH: phrase} if re.search(r"[A-Z]", phrase) else {LOWER: phrase}
+
+def lookslike(lower: str, patt: re.Pattern[str]) -> bool:
+  for match in re.finditer(patt, lower):
+    start, end = match.span()
+    lb = (lower[start-1] if start > 0 else "", lower[start])
+    rb = (lower[end-1], lower[end] if end < len(lower) else "")
+    is_left_bounded = (
+      not lb[0].isalpha() or
+      lb[0].islower() and lb[1].isupper() or
+      lb[0].isupper() and lb[1].islower()
+    )
+    is_right_bounded = (
+      not rb[1].isalpha() or
+      rb[0].islower() and rb[1].isupper() or
+      rb[0].isupper() and rb[1].islower()
+    )
+    if is_left_bounded and is_right_bounded:
+      return True
+  return False
+  # print(is_separated("amazon"), "-- Should be True")
+  # print(is_separated("Amazon"), "-- Should be True")
+  # print(is_separated("amazon-foo"), "-- Should be True")
+  # print(is_separated("foo-amazon"), "-- Should be True")
+  #
+  # print(is_separated("amazonFoo"), "-- Should be True")
+  # print(is_separated("barAmazon"), "-- Should be True")
+  #
+  # print(is_separated("amazon_foo"), "-- Should be True")
+  # print(is_separated("bar_amazon"), "-- Should be True")
+  #
+  # print(is_separated("AMAZONFOO"), "-- Should be False")
+  # print(is_separated("amazonfoo"), "-- Should be False")
+  # print(is_separated("baramazon"), "-- Should be False")
+  # print(is_separated("BARAMAZON"), "-- Should be False")
+  # print(is_separated("zzz"), "-- Should be False")

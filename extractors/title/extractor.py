@@ -1,36 +1,42 @@
 from itertools import dropwhile
 import re
-# from spacy.matcher import PhraseMatcher
 from spacy.pipeline import EntityRuler
 from spacy.tokens import Doc, Span, Token
 from typing import Any, Literal, cast, Sequence
 from ..categories.extractor import is_hashtagged
 from ..markers import is_future, is_metaphorical, is_negated, is_past
-from ..patterns import to_patterns2
+from ..patterns import expand_phrase12
 from ..utils import LB, RB, get_nlp
 from .data import LABELED_PHRASES
 
 __all__ = ["TitleExtractor", "fix_more_grammar"]
 
-# IN, LOWER, ORTH, POS = "IN", "LOWER", "ORTH", "POS"
-
 class TitleExtractor:
   def __init__(self, name: str = "en_core_web_lg") -> None:
     self.nlp = get_nlp(name)
+    self.init_eruler("entity_ruler", LABELED_PHRASES)
+
+  def init_eruler(self, name: str, labeled_phrases: dict[str, list[str]]) -> None:
     ruler: EntityRuler = cast(Any, self.nlp.add_pipe("entity_ruler", config={
       "phrase_matcher_attr": "LOWER",
-    }, name="entity_ruler"))
-    for label, phrases in LABELED_PHRASES.items():
+    }, name=name))
+    for label, phrases in labeled_phrases.items():
       for phrase in phrases:
-        ruler.add_patterns([{
-          "label": label,
-          "pattern": pattern,
-        } for pattern in to_patterns2(phrase)])
-    # self.pmatcher = PhraseMatcher(self.nlp.vocab, attr="LOWER")
-    # self.pmatcher.add("PAST", [self.nlp(m) for m in PAST_MARKERS])
-    # self.pmatcher.add("PRESENT", [self.nlp(m) for m in PRESENT_MARKERS])
-    # self.pmatcher.add("FUTURE", [self.nlp(m) for m in FUTURE_MARKERS | INTENT_MARKERS])
-    # self.pmatcher.add("METAPHORIC", [self.nlp(m) for m in METAPHORIC_MARKERS])
+        if isinstance(phrase, str):
+          assert not re.search("[A-Z]", phrase), f"{phrase!r} contains uppercase character(s), use pattern syntax"
+          ruler.add_patterns([{
+            "label": label,
+            "pattern": pattern
+          } for pattern in expand_phrase12(phrase)])
+        else:
+          raise Exception("not supported")
+
+  # def init_pmatcher(..):
+  #   self.pmatcher = PhraseMatcher(self.nlp.vocab, attr="LOWER")
+  #   self.pmatcher.add("PAST", [self.nlp(m) for m in PAST_MARKERS])
+  #   self.pmatcher.add("PRESENT", [self.nlp(m) for m in PRESENT_MARKERS])
+  #   self.pmatcher.add("FUTURE", [self.nlp(m) for m in FUTURE_MARKERS | INTENT_MARKERS])
+  #   self.pmatcher.add("METAPHORIC", [self.nlp(m) for m in METAPHORIC_MARKERS])
 
   def extract_many(self, text_or_docs: Sequence[str | Doc], category: Literal["HUMAN", "ORG"]) -> list[str]:
     docs = self.nlp.pipe(text_or_docs)
@@ -38,10 +44,10 @@ class TitleExtractor:
 
   def extract(self, text_or_doc: str | Doc, category: Literal["HUMAN", "ORG"]) -> str:
     doc = self.nlp(text_or_doc) if isinstance(text_or_doc, str) else text_or_doc
+    # print("Debug tokenization:", list(self.nlp.tokenizer.explain(text_or_doc)))
     # print("Debug tokens:")
-    # pprint([{"token": token, "pos": token.pos_, "dep": token.dep_, "head": token.head} for token in doc if not token.is_punct])
-    # for ent in doc.ents:
-    #   print(ent, ent.root, ent.root.dep_)
+    # pprint([{"token": tok, "pos": tok.pos_, "dep": tok.dep_, "head": tok.head} for tok in doc if not tok.is_punct])
+    # print("Debug ents:", [ent.label_ for ent in doc.ents])
     ents = [
       ent for ent in doc.ents
       if ent.label_ == category and ent.root.pos_ in {"NOUN", "PROPN"}
@@ -77,7 +83,7 @@ class TitleExtractor:
       ts2 = list(dropwhile(is_hanging, ts1))
       ts3 = list(dropwhile(is_hanging, reversed(ts2)))
       results.append(""
-        .join(get_token_text(token) + token.whitespace_ for token in reversed(ts3))
+        .join(get_token_text(tok) + tok.whitespace_ for tok in reversed(ts3))
         .strip()
       )
     return " | ".join(results[0:3]).strip() # the slice length should depend on how long the items are...

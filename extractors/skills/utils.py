@@ -1,13 +1,18 @@
 from dataclasses import dataclass
 import re
-from spacy.tokens import Span, Token
+from spacy.tokens import Token
 from typing import Callable
-from ..utils import Pattern, get_cons_tokens, get_prec_tokens
+from ..patterns import expand_phrases12
+from ..spacyhelpers import left_token, right_token
+from ..utils import Pattern, lookslike
 
-__all__ = ["Skill", "Disambiguate", "contextual", "neighbour"]
+__all__ = [
+  "Skill", "Term", "Topic",
+  "Disambiguate",
+]
 
-type Disambiguate = Callable[[Span], bool]
-type Resolve = Callable[[Span], list[str]]
+type Disambiguate = Callable[[Token], bool]
+type Resolve = Callable[[Token], list[str]]
 
 @dataclass
 class Skill:
@@ -17,64 +22,77 @@ class Skill:
     Pattern # Spacy pattern
   ]
   descr: str | None = None
-  disambiguate: Disambiguate | None = None
+  disambiguate: Disambiguate | list[Disambiguate] | None = None
   resolve: Resolve | list[str] | None = None
 
-def contextual_or_neighbour(skills: list[str], distance: int) -> Disambiguate:
-  fn1 = contextual(*skills)
-  fn2 = neighbour(distance)
-  def disambiguate(ent: Span) -> bool:
-    return fn1(ent) or fn2(ent)
+@dataclass
+class Term(Skill):
+  pass
+
+@dataclass
+class Topic(Skill):
+  descr: None = None
+
+def dis_context(*phrases: str) -> Disambiguate:
+  regmarkers = [
+    re.compile(rf"{re.escape(marker)}", re.IGNORECASE)
+    for marker in expand_phrases12(phrases)
+  ]
+  def disambiguate(token: Token) -> bool:
+    ltoken = left_token(token)
+    if ltoken and ltoken.lower_ == "#":
+      # Hashtagged
+      return True
+    for tok in token.sent:
+      if tok != token:
+        lower = tok.lower_
+        if any(True for regmarker in regmarkers if lookslike(lower, regmarker)):
+          return True
+    return False
   return disambiguate
 
-def contextual(*skills: str) -> Disambiguate:
-  ctx_skills = set(skills)
-  def disambiguate(ent: Span) -> bool:
-    # TODO consider only words within the same paragraph
-    doc = ent[0].doc
-    skill = ent[0].ent_type_
-    other_skills = [ent.label_ for ent in doc.ents if ent.label_ != skill]
-    return any(
-      True for skill in other_skills if any(
-        skill == cs or skill.startswith(cs + "-") and not ":maybe:" in skill
-        for cs in ctx_skills
-      )
-    )
+def dis_sequence() -> Disambiguate:
+  def disambiguate(token: Token) -> bool:
+    ltoken = left_token(token)
+    rtoken = right_token(token)
+    ltoken2 = left_token(ltoken) if ltoken else None
+    rtoken2 = right_token(rtoken) if rtoken else None
+    if ltoken and ltoken.lower_ == "#":
+      # Hashtagged
+      return True
+    elif re.match("[A-Z]", token.text):
+      # Capitalized
+      if ltoken and ltoken.text == "," and ltoken2 and re.match("[A-Z#]", ltoken2.text):
+        # And the prev word is capitalized or hashtagged
+        return True
+      elif rtoken and rtoken.text == "," and rtoken2 and re.match("[A-Z#]", rtoken2.text):
+        # And the next word is capitalized or hashtagged
+        return True
+    return False
   return disambiguate
 
-def neighbour(distance: int) -> Disambiguate:
-  # TODO next word as "Developer", "Dev", "Engineer" (maybe all DEV & STUDENT roles)
-  # should also disambiguate the skill
-  def disambiguate(ent: Span) ->bool:
-    doc = ent[0].doc
-    tis = [
-      t.i for t in ent
-    ] # indexes of tokens of the given ent
-    otis = [
-      t.i for e in doc.ents for t in e
-      if e != ent and (":maybe:" not in e.label_)
-    ] # indexes of other (non-maybe) ent tokens
-    return any(
-      True for ti in tis
-      if any(abs(oti - ti) <= distance for oti in otis)
-    )
-  return disambiguate
-
-def singleletter() -> Disambiguate:
-  def disambiguate(ent: Span) -> bool:
-    # doc = ent[0].doc
-    prec_tokens = get_prec_tokens(ent[0])
-    cons_tokens = get_cons_tokens(ent[-1])
+def dis_letter() -> Disambiguate:
+  markers = {"lang", "language"}
+  def disambiguate(token: Token) -> bool:
+    print("@ disambiguate letter", token)
+    ltoken = left_token(token)
+    if ltoken and ltoken.lower_ == "#":
+      return True
+    rtoken = right_token(token)
     # Avoid highly ambiguos cases, at the cost of some FNs:
-    if gets(prec_tokens, -1) == "-":
+    if ltoken and ltoken.lower_ in {"-", "@"}:
       return False # foo-c, bar-v
-    if gets(cons_tokens, 0) == "-" and gets(cons_tokens, 1) not in {"lang", "language"}:
-      return False # c-foo, v-bar
+    elif rtoken and rtoken.lower_ == "-":
+      rtoken2 = right_token(rtoken)
+      if rtoken2 and rtoken2.lower_ not in markers:
+        return False # c-foo, v-bar
     return True
   return disambiguate
 
-def gets(tokens: list[Token], index: int) -> str:
-  return tokens[index].lower_ if -len(tokens) <= index < len(tokens) else ""
+# def oneof(*dis_fns) -> Disambiguate:
+#   def disambiguate(token: Token) -> bool:
+#     return any(dis_fn(token) for dis_fn in dis_fns)
+#   return disambiguate
 
 def clean(label: str) -> str:
   return re.sub(r":maybe:.+$", "", label)

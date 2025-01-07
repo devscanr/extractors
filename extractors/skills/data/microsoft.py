@@ -1,21 +1,9 @@
-from spacy.tokens import Span
 from ...utils import ver1, propn
-from ..utils import Disambiguate, Skill, clean, contextual, contextual_or_neighbour
+from ..utils import Skill, dis_context, dis_sequence
 
 __all__ = ["SKILLS"]
 
-ctx = contextual("Microsoft")
-ctxn = contextual_or_neighbour(["Microsoft"], 2)
-
-def dis_arm() -> Disambiguate:
-  def disambiguate(ent: Span) -> bool:
-    for e in ent.sent.ents:
-      if e == ent: continue
-      label = clean(e.label_)
-      if label in {"CPU", "x86", "x32", "x64", "RISC", "ARC"}:
-        return True
-    return False
-  return disambiguate
+dis_ctx = dis_context("microsoft")
 
 SKILLS: list[Skill] = [
   Skill("Microsoft", ["(@)microsoft"], "Company"),
@@ -30,7 +18,10 @@ SKILLS: list[Skill] = [
   # TODO T-SQL
   Skill("MS-Sharepoint", ["microsoft-sharepoint", "ms-sharepoint", "sharepoint"], ""),
   Skill("MS-365", ["microsoft=365", "ms=365"], "New name for MS-Office"),
-  Skill("MS-365", ["365"], disambiguate=ctx),
+  Skill("MS-365", ["365"], disambiguate=[
+    dis_sequence(),
+    dis_context("microsoft", "office")
+  ]),
 
   Skill("Power-Platform", ["power-platform"], ""),
   Skill("Power-Apps", ["power=apps"], ""),
@@ -47,7 +38,10 @@ SKILLS: list[Skill] = [
   Skill(".NET MAUI", [".net maui", "maui"], "Multi-platform app UI, evolution of Xamarin.Forms"),
   Skill("Blazor", ["blazor"], ".NET-based framework to create fullstack apps"),
   Skill("Unity", ["unity-engine", "unity-platform", "unity=3d", propn("unity")], "Gamedev engine"),
-  Skill("Unity", ["unity"], disambiguate=ctxn),
+  Skill("Unity", ["unity"], disambiguate=[
+    dis_sequence(),
+    dis_context("microsoft", "framework")
+  ]),
   Skill("WCF", ["wcf"], "Windows Communication Foundation: framework for service-oriented apps"),
   Skill("WPF", ["wpf"], "Windows Presentation Foundation: UI framework for desktop apps"),
   Skill("Xamarin", ["xamarin"], "Cross-platform and mobile app development"),
@@ -85,5 +79,8 @@ SKILLS: list[Skill] = [
     "aarch32", "arm32",
     "aarch64", "arm64",
   ], "CPU family"),
-  Skill("ARM", ["arm"], disambiguate=dis_arm()),
+  Skill("ARM", ["arm"], disambiguate=[
+    dis_sequence(),
+    dis_context("microsoft", "cpu", "x86", "x32", "x64", "risc", "arc", "processor(s)")
+  ]),
 ]

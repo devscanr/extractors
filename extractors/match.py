@@ -1,27 +1,27 @@
-import re
-from typing import Pattern
-
-__all__ = ["to_variants", "words_to_regex"]
-
-SEPS = ["", "-", " "]
-
-def to_variants(phrase: str) -> list[str]:
-  if "=" in phrase:
-    [head, tail] = phrase.split("=", maxsplit = 1)
-    tail_variants = to_variants(tail)
-    return [
-      head + x + variant for variant in tail_variants
-      for x in SEPS
-    ]
-  else:
-    return [phrase]
-
-def words_to_regex(words: list[str] | set[str]) -> Pattern[str]:
-  return re.compile(r"(?<!\w)(?:" + r"|".join(
-    variant
-    for word in words
-    for variant in to_variants(word)) + r")(?!\w)"
-  )
+# import re
+# from typing import Pattern
+#
+# __all__ = ["to_variants", "words_to_regex"]
+#
+# SEPS = ["", "-", " "]
+#
+# def to_variants(phrase: str) -> list[str]:
+#   if "=" in phrase:
+#     [head, tail] = phrase.split("=", maxsplit = 1)
+#     tail_variants = to_variants(tail)
+#     return [
+#       head + x + variant for variant in tail_variants
+#       for x in SEPS
+#     ]
+#   else:
+#     return [phrase]
+#
+# def words_to_regex(words: list[str] | set[str]) -> Pattern[str]:
+#   return re.compile(r"(?<!\w)(?:" + r"|".join(
+#     variant
+#     for word in words
+#     for variant in to_variants(word)) + r")(?!\w)"
+#   )
 
 # def to_patterns(phrase: str) -> list[list[dict[str, Any]]]:
 #   if "=" in phrase:
@@ -58,8 +58,8 @@ def words_to_regex(words: list[str] | set[str]) -> Pattern[str]:
 #
 # # doc = nlp("Go to school, learn Go, JS, HTML languages") # , Chrome (Google Chrome)
 # doc = nlp("life-long lifelong life    long sophomore student") # , Chrome (Google Chrome)
-# for token in doc:
-#   print(token, token.pos_)
+# for tok in doc:
+#   print(tok, tok.pos_)
 # #
 # matcher.add("lifelong", [
 #   [{"LOWER": "lifelong"}],

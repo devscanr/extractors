@@ -4,8 +4,9 @@ from spacy.pipeline import EntityRuler
 from spacy.tokens import Doc, Token
 from typing import Any, cast, Literal, Sequence
 from ..markers import is_future, is_hashtagged, is_metaphorical, is_negated, is_past
-from ..patterns import to_patterns2
-from ..utils import Pattern, get_cons_heads, get_cons_words, get_nlp, get_prec_words
+from ..patterns import expand_phrase12
+from ..spacyhelpers import left_lowerwords, right_anc_heads, right_lowerwords
+from ..utils import Pattern, get_nlp
 from .data import DEV_CANCELING_ROLES, FREELANCER_CANCELING_ROLES, LABELED_PHRASES, LEAD_CANCELING_ROLES, ORG_CANCELING_ROLES, STUDENT_CANCELING_ROLES
 
 __all__ = ["Categorized", "CategoryExtractor", "Role"]
@@ -25,20 +26,33 @@ class Categorized:
 class CategoryExtractor:
   def __init__(self, name: str = "en_core_web_sm") -> None:
     self.nlp = get_nlp(name)
+    self.init_eruler("entity_ruler", LABELED_PHRASES)
+
+  def init_eruler(self, name: str, labeled_phrases: dict[str, list[str | Pattern]]) -> None:
     ruler: EntityRuler = cast(Any, self.nlp.add_pipe("entity_ruler", config={
       "phrase_matcher_attr": "LOWER",
-    }, name="entity_ruler"))
-    for label, phrases in LABELED_PHRASES.items():
+    }, name=name))
+    for label, phrases in labeled_phrases.items():
       for phrase in phrases:
         if isinstance(phrase, str):
           assert not re.search("[A-Z]", phrase), f"{phrase!r} contains uppercase character(s), use pattern syntax"
-          ruler.add_patterns(from_phrase(label, phrase))
+          ruler.add_patterns([{
+            "label": label,
+            "pattern": pattern
+          } for pattern in expand_phrase12(phrase)])
         elif isinstance(phrase, list):
-          ruler.add_patterns(from_pattern(label, phrase))
-    # self.pmatcher = PhraseMatcher(self.nlp.vocab, attr="LOWER")
-    # self.pmatcher.add("FUTURE", [self.nlp(m) for m in FUTURE_MARKERS | INTENT_MARKERS])
-    # self.pmatcher.add("PAST", [self.nlp(m) for m in PAST_MARKERS])
-    # self.pmatcher.add("METAPHORIC", [self.nlp(m) for m in METAPHORIC_MARKERS])
+          ruler.add_patterns([{
+            "label": label,
+            "pattern": phrase
+          }])
+        else:
+          raise Exception("not supported")
+
+  # def init_pmatcher(..):
+  #   self.pmatcher = PhraseMatcher(self.nlp.vocab, attr="LOWER")
+  #   self.pmatcher.add("PAST", [self.nlp(m) for m in PAST_MARKERS])
+  #   self.pmatcher.add("FUTURE", [self.nlp(m) for m in FUTURE_MARKERS | INTENT_MARKERS])
+  #   self.pmatcher.add("METAPHORIC", [self.nlp(m) for m in METAPHORIC_MARKERS])
 
   def extract_many(self, text_or_docs: Sequence[str | Doc]) -> list[Categorized]:
     docs = self.nlp.pipe(text_or_docs)
@@ -47,10 +61,9 @@ class CategoryExtractor:
   def extract(self, text_or_doc: str | Doc) -> Categorized:
     doc = self.nlp(text_or_doc) if isinstance(text_or_doc, str) else text_or_doc
     # print("Debug tokenization:", list(self.nlp.tokenizer.explain(text_or_doc)))
-    # print("Debug poss:", list((token, token.pos_) for token in doc if not token.is_punct))
     # print("Debug tokens:")
-    # pprint([{"token": token, "pos": token.pos_, "dep": token.dep_, "head": token.head} for token in doc if not token.is_punct])
-    # print("Debug ents:", list(ent.label_ for ent in doc.ents))
+    # pprint([{"token": tok, "pos": tok.pos_, "dep": tok.dep_, "head": tok.head} for tok in doc if not tok.is_punct])
+    # print("Debug ents:", [ent.label_ for ent in doc.ents])
     role: Role | None = None
     is_freelancer, is_lead, is_remote, is_hireable = None, None, None, None
     for ent in doc.ents:
@@ -105,17 +118,17 @@ class CategoryExtractor:
       #   return "Student"
       # if "PAST" in matches:
       #   return None
-      cons_heads = get_cons_heads(token)
-      if len(cons_heads) and cons_heads[-1].lower_ in DEV_CANCELING_ROLES:
+      rheads = right_anc_heads(token)
+      if rheads and rheads[-1].lower_ in DEV_CANCELING_ROLES:
         return None
       # Special rules for "Head" ---
-      prec_words = get_prec_words(token)
+      lwords = left_lowerwords(token)
       sent = token.sent
       j = cast(int, token._.i)
       if label == "NONDEV" and token.lower_ == "head":
         if j < sent.end and sent[j + 1].lower_ in {"@", "at", "of"}:
           return "Nondev"
-        if any(True for word in prec_words if word in HEAD_MARKERS):
+        if any(True for word in lwords if word in HEAD_MARKERS):
           return "Nondev"
         return None
       # ---
@@ -134,8 +147,8 @@ class CategoryExtractor:
         return None
       elif is_metaphorical(token):
         return None
-      cons_heads = get_cons_heads(token)
-      if len(cons_heads) and cons_heads[-1].lower_ in STUDENT_CANCELING_ROLES:
+      rheads = right_anc_heads(token)
+      if rheads and rheads[-1].lower_ in STUDENT_CANCELING_ROLES:
         return None
       return "Student"
     return None
@@ -143,8 +156,8 @@ class CategoryExtractor:
   def check_org(self, label: str, token: Token) -> Literal["Org", None]:
     if label == "ORG":
       root = token.sent.root
-      cons_heads = get_cons_heads(token)
-      if len(cons_heads) and cons_heads[-1].lower_ in ORG_CANCELING_ROLES:
+      rheads = right_anc_heads(token)
+      if rheads and rheads[-1].lower_ in ORG_CANCELING_ROLES:
         return None
       if root and (root == token or root.lower_ in {"is"}):
         return "Org"
@@ -164,8 +177,8 @@ class CategoryExtractor:
       # matches = self.pmatch(token.sent)
       # if {"PAST", "FUTURE"} & matches:
       #   return False
-      cons_heads = get_cons_heads(token)
-      if cons_heads and cons_heads[-1].lower_ in FREELANCER_CANCELING_ROLES:
+      rheads = right_anc_heads(token)
+      if rheads and rheads[-1].lower_ in FREELANCER_CANCELING_ROLES:
         return None
       return True
     return None
@@ -183,8 +196,8 @@ class CategoryExtractor:
       # matches = self.pmatch(token.sent)
       # if {"PAST", "FUTURE"} & matches:
       #   return False
-      cons_heads = get_cons_heads(token)
-      if cons_heads and cons_heads[-1].lower_ in LEAD_CANCELING_ROLES:
+      rheads = right_anc_heads(token)
+      if rheads and rheads[-1].lower_ in LEAD_CANCELING_ROLES:
         return None
       return True
     return None
@@ -195,15 +208,15 @@ class CategoryExtractor:
         return True
       elif is_negated(token):
         return False
-      cons_heads = get_cons_heads(token)
-      if any(True for tok in cons_heads if tok.lower_ in REMOTE_JOB_MARKERS):
+      rheads = right_anc_heads(token)
+      if any(True for tok in rheads if tok.lower_ in REMOTE_JOB_MARKERS):
         return True
-      cons_words = get_cons_words(token)
-      if not cons_words or cons_words[0] in {"friendly", "only", "online"}:
+      rwords = right_lowerwords(token)
+      if not rwords or rwords[0] in {"friendly", "only", "online"}:
         return True
       return None
     elif label == "OPEN-TO":
-      if not any(True for word in get_cons_words(token) if word in LABELED_PHRASES["REMOTE"]):
+      if not any(True for word in right_lowerwords(token) if word in LABELED_PHRASES["REMOTE"]):
         return None
       if is_negated(token):
         return False
@@ -218,7 +231,7 @@ class CategoryExtractor:
         return False
       return True
     elif label == "OPEN-TO":
-      if not any(True for word in get_cons_words(token) if word in PROPOSAL_MARKERS):
+      if not any(True for word in right_lowerwords(token) if word in PROPOSAL_MARKERS):
         return None
       if is_negated(token):
         return False
@@ -272,15 +285,3 @@ PROPOSAL_MARKERS = {
   "role", "roles",
   "work",
 }
-
-def from_pattern(label: str, pattern: Pattern) -> Pattern:
-  return [{
-    "label": label,
-    "pattern": pattern
-  }]
-
-def from_phrase(label: str, phrase: str) -> Pattern:
-  return [{
-    "label": label,
-    "pattern": pattern,
-  } for pattern in to_patterns2(phrase)]

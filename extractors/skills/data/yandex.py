@@ -1,9 +1,8 @@
-from ..utils import Skill, contextual, contextual_or_neighbour
+from ..utils import Skill, dis_context
 
 __all__ = ["SKILLS"]
 
-ctx = contextual("Apache")
-ctxn = contextual_or_neighbour(["Apache"], 2)
+dis_ctx = dis_context("yandex")
 
 SKILLS: list[Skill] = [
   Skill("Yandex", ["yandex"], "Company"),

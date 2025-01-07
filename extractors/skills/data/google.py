@@ -1,17 +1,19 @@
-from ...utils import propn
-from ..utils import Skill, contextual, contextual_or_neighbour, neighbour
+from ...utils import literal
+from ..utils import Skill, dis_context, dis_sequence
 
 __all__ = ["SKILLS"]
 
-ctx = contextual("Google")
-ctxn = contextual_or_neighbour(["Google"], 2)
+dis_ctx = dis_context("google")
 
 SKILLS: list[Skill] = [
   Skill("Google", ["(@)google"], "Company"),
 
   Skill("Flax", ["flax"], "NN for Jax"),
-  Skill("JAX", [propn("JAX")], "TensorFlow alternative"),
-  Skill("JAX", ["jax"], disambiguate=neighbour(2)),
+  Skill("JAX", [literal("JAX")], "TensorFlow alternative"),
+  Skill("JAX", ["jax"], disambiguate=[
+    dis_sequence(),
+    dis_context("google", "flax", "tensorflow"),
+  ]),
   Skill("TensorFlow", ["tensorflow"], ""),
 
   Skill("Flutter", ["flutter"], ""),
@@ -19,7 +21,10 @@ SKILLS: list[Skill] = [
   # CLOUD
   Skill("Google-BigQuery", ["google-bigquery", "bigquery"], ""), # EE data warehouse
   Skill("Google-Cloud", ["google=cloud", "gcp"], ""),
-  Skill("Google-Cloud", ["gc"], disambiguate=contextual("AWS", "Azure")),
+  Skill("Google-Cloud", ["gc"], disambiguate=[
+    dis_sequence(),
+    dis_context("aws", "azure"),
+  ]),
   Skill("Google-Firebase", ["google=firebase", "firebase"], ""),
   Skill("Google-CloudStorage", ["google-cloud=storage", "gcs"], ""),
   Skill("Google-Pub/Sub", ["google-pub/sub"], ""),

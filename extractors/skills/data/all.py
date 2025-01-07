@@ -1,6 +1,6 @@
-from spacy.tokens import Span
+from spacy.tokens import Token
 from ...utils import IN, LOWER, OP, literal, propn, ver1
-from ..utils import Disambiguate, Skill, contextual, contextual_or_neighbour, neighbour, singleletter
+from ..utils import Disambiguate, Skill, dis_context, dis_letter, dis_sequence
 from .adobe import SKILLS as ADOBE_SKILLS
 from .amazon import SKILLS as AMAZON_SKILLS
 from .apache import SKILLS as APACHE_SKILLS
@@ -10,16 +10,17 @@ from .companies import SKILLS as COMPANIES_SKILLS
 from .google import SKILLS as GOOGLE_SKILLS
 from .hashicorp import SKILLS as HASHICORP_SKILLS
 from .microsoft import SKILLS as MICROSOFT_SKILLS
-from .topics1 import SKILLS as TOPICS1_SKILLS
-from .topics2 import SKILLS as TOPICS2_SKILLS
+from .industries import SKILLS as INDUSTRIES_SKILLS
+from .topics import SKILLS as TOPICS_SKILLS
 from .yandex import SKILLS as YANDEX_SKILLS
 
 __all__ = ["SKILLS"]
 
 def dis_julia() -> Disambiguate:
-  def disambiguate(ent: Span) -> bool:
-    for token in ent.sent:
-      if token.lower_ in {"'m", "am", "name"}:
+  # dis_seq = dis_sequence()
+  def disambiguate(token: Token) -> bool:
+    for tok in token.sent:
+      if tok.lemma_ in {"be", "name"}:
         return False
     return True
   return disambiguate
@@ -35,8 +36,8 @@ SKILLS: list[Skill] = [
   *HASHICORP_SKILLS,
   *MICROSOFT_SKILLS,
   *YANDEX_SKILLS,
-  *TOPICS1_SKILLS,
-  *TOPICS2_SKILLS,
+  *INDUSTRIES_SKILLS,
+  *TOPICS_SKILLS,
 
   # ANALYSIS
   Skill("Tableau", ["tableau"], ""),
@@ -136,7 +137,10 @@ SKILLS: list[Skill] = [
   Skill("Seaborn", ["seaborn"], ""),
   Skill("ShowFlake", ["snowflake"], ""), # ~ MS Databricks, ~ AWS Redshift
   Skill("Spacy", ["spacy"], ""),
-  Skill("Stan", ["stan"], "", disambiguate=contextual("R", "Python")),
+  Skill("Stan", ["stan"], "", disambiguate=[
+    dis_sequence(),
+    dis_context("r", "python")
+  ]),
   Skill("Stata", ["stata"], ""),
   Skill("TensorRT", ["tensorrt"], ""), # NVidia
 
@@ -156,6 +160,7 @@ SKILLS: list[Skill] = [
   Skill("OpenGL", ["opengl"], ""),
 
   # WEB BACKEND
+  Skill("Auth0", ["auth0"], ""), # also SECURITY
   Skill("Bun", ["bun"], ""),
   Skill("CakePHP", ["cake=php"], ""),
   Skill("CherryPy", ["cherry=py"], ""),
@@ -176,7 +181,6 @@ SKILLS: list[Skill] = [
   Skill("Phoenix", ["phoenix"], ""),
   Skill("Ruby-on-Rails", ["ruby-on-rails", "rails", "ror"], ""),
   Skill("SailsJS", ["sails.=js"], ""),
-  Skill("SMTP", ["smtp"], ""),
   Skill("Spring", [
     ver1("spring"), "spring-framework", "spring-boot", "spring-cloud",
     "spring-mvc", "spring-security", "spring-webflux"
@@ -202,6 +206,7 @@ SKILLS: list[Skill] = [
   Skill("Astro", ["astro.=js", "astro"], "Web framework for content-driven websites, server-first"),
   Skill("Bootstrap", ["bootstrap"], ""),
   Skill("Chakra-UI", ["chakra=ui", "chakra"], ""),
+  Skill("ChartJS", ["chart.=js"], ""),
   Skill("D3JS", ["d3.=js", "d3"], ""),
   Skill("EmberJS", ["ember.=js", "ember"], ""),
   Skill("Figma", ["figma"], ""),
@@ -235,17 +240,20 @@ SKILLS: list[Skill] = [
   Skill("PERN-Stack", ["pern=stack", "pern"], resolve=["PostgreSQL", "Express", "React", "NodeJS"]),
   Skill("LAMP-Stack", ["lamp=stack", propn("LAMP")], resolve=["Linux", "MySQL", "PHP"]), # Apache
 
-#   Skill("Chrome", ["chrome"], ""),
-#   Skill("Firefox", ["firefox"], ""),
-#   Skill("Safari", ["safari"], ""),
-#   Skill("WebKit", ["webkit"], ""), # browser engine
+  Skill("Chrome", ["chrome"], ""),
+  Skill("Firefox", ["firefox"], ""),
+  Skill("Safari", ["safari"], ""),
+  Skill("WebKit", ["webkit"], ""), # browser engine
 
   Skill("Apollo", ["apollo.=js", "apollo=client", "apollo=server", "apollo"], "GraphQL-centric fullstack tools for web and mobile"),
   Skill("HTMX", ["htmx"], ""),
   Skill("Meteor", ["meteor", "meteor.=js"], ""),
   Skill("Ktor", ["ktor"], ""), # fullstack framework in Kotlin
   Skill("NextJS", ["next.=js", propn("next")], ""),
-  Skill("NextJS", ["next"], disambiguate=neighbour(1)), # /
+  Skill("NextJS", ["next"], disambiguate=[
+    dis_sequence(),
+    dis_context("framework", "nuxt")
+  ]),
   Skill("NuxtJS", ["nuxt.=js", propn("nuxt")], ""),
   Skill("NodeJS", ["node.=js", propn("node")], ""),
   Skill("SvelteKit", ["svelte=kit"], ""),
@@ -313,10 +321,16 @@ SKILLS: list[Skill] = [
   Skill("Codeception", ["codeception"], ""),
   Skill("Cucumber", ["cucumber"], ""),
   Skill("Cypress", ["cypress", "cypress.=js"], ""),
-  Skill("Jasmine", ["jasmine"], "", disambiguate=contextual_or_neighbour(["Jest", "Karma", "QA"], 2)),
+  Skill("Jasmine", ["jasmine"], "", disambiguate=[
+    dis_sequence(),
+    dis_context("Jest", "Karma", "QA")
+  ]),
   Skill("Jest", ["jest"], ""),
   Skill("JUnit", ["junit"], ""),
-  Skill("Karma", ["karma"], "", disambiguate=contextual_or_neighbour(["Jasmine", "Jest", "QA"], 2)),
+  Skill("Karma", ["karma"], "", disambiguate=[
+    dis_sequence(),
+    dis_context("Jasmine", "Jest", "QA")
+  ]),
   Skill("PHPUnit", ["php=unit"], ""),
   Skill("Playwright", ["playwright"], ""),
   Skill("Protractor", ["protractor"], ""),
@@ -373,8 +387,6 @@ SKILLS: list[Skill] = [
   Skill("JWT", ["jwt"], ""),
   Skill("Metasploit", ["metasploit"], ""),
   Skill("Nessus", ["nessus"], ""),
-  Skill("OAuth", [ver1("oauth")], ""),
-  Skill("OpenID", ["openid"], ""),
   Skill("SAML", ["saml"], ""),
   Skill("Snort", [propn("snort")], ""),
   Skill("SSCP", ["sscp"], ""), # certificate
@@ -410,7 +422,6 @@ SKILLS: list[Skill] = [
   Skill("Clang", ["clang"], ""),
   Skill("MicroPython", ["micropython"], ""), # compiler
   Skill("GCC", ["gcc"], ""), # compiler
-  Skill("Kernel", ["kernel"], ""),
   Skill("LLVM", ["llvm"], ""),
 
   # HARDWARE & EMBEDDED
@@ -418,7 +429,10 @@ SKILLS: list[Skill] = [
   Skill("Arduino", ["arduino"], "Controller brand"),
   Skill("ASIC", ["asic"], ""), # ASICs are custom-designed circuits for specific applications, offering high performance and efficiency
   Skill("ARC", [propn("ARC")], "CPU family"),
-  Skill("ARC", ["arc"], disambiguate=neighbour(2)),
+  Skill("ARC", ["arc"], disambiguate=[
+    dis_sequence(),
+    dis_context("cpu", "arm", "processor(s)")
+  ]),
   Skill("AutoCAD", ["autocad"], ""),
   Skill("AVR", ["avr"], "Controller family"),
   Skill("Elbrus-2000", ["elbrus=2000", "e2k"], "CPU"),
@@ -440,7 +454,10 @@ SKILLS: list[Skill] = [
   Skill("Altium-365", ["altium=365"], ""), # tool
   Skill("Autodesk-Fusion", ["autodesk-fusion", "fusion=360"], ""), # tool
   Skill("Autodesk-Eagle", ["autodesk-eagle"], ""), # tool
-  Skill("Autodesk-Eagle", ["eagle"], disambiguate=contextual("Autodesk", "AutoCAD")), # /
+  Skill("Autodesk-Eagle", ["eagle"], disambiguate=[
+    dis_sequence(),
+    dis_context("Autodesk", "AutoCAD")
+  ]),
   Skill("Touchdesigner", ["touchdesigner"], "Visual development platform"), #
   Skill("Solidworks", ["solidworks-pcb", "solidworks"], "CB design tool"),
   Skill("STM32", ["stm=32"], ""), # platform
@@ -460,7 +477,7 @@ SKILLS: list[Skill] = [
   Skill("Ada", ["ada"], ""),
   Skill("Apex", ["apex"], ""),
   Skill("C", ["c-lang"], ""),
-  Skill("C", ["c"], disambiguate=singleletter()),
+  Skill("C", ["c"], disambiguate=dis_letter()),
   Skill("C++", ["c++", "cpp", "c=plus=plus"], ""),
   Skill("C#", ["c#", "csharp"], ""),
   Skill("Cairo", ["cairo"], ""),
@@ -471,7 +488,7 @@ SKILLS: list[Skill] = [
   Skill("CSS", [ver1("css")], ""),
   Skill("CSV", ["csv"], ""),
   Skill("D", ["d=lang"], ""),
-  Skill("D", ["d"], disambiguate=singleletter()),
+  Skill("D", ["d"], disambiguate=dis_letter()),
   Skill("Dart", ["dart"], ""),
   Skill("Delphi", ["delphi"], ""),
   Skill("Elixir", ["elixir"], ""),
@@ -507,7 +524,7 @@ SKILLS: list[Skill] = [
   Skill("Prolog", ["prolog"], ""),
   Skill("Python", [ver1("python"), "py", "pythonist(a)"], ""),
   Skill("R", ["r=lang"], "Programming language for statistical computing and data visualization"),
-  Skill("R", ["r"], disambiguate=singleletter()),
+  Skill("R", ["r"], disambiguate=dis_letter()),
   Skill("Ruby", ["ruby=lang", "ruby", "rubyist", "rubist"], ""),
   Skill("Rust", ["rust", "rustacean"], ""),
   Skill("SASS", ["sass", "scss"], ""),
@@ -515,21 +532,16 @@ SKILLS: list[Skill] = [
   Skill("Solidity", ["solidity"], ""),
   Skill("TypeScript", ["type=script", "ts"], ""),
   Skill("Shell", ["shell", "bash", "zsh"], ""),
+  Skill("SVG", ["svg"], ""),
   Skill("XML", ["xml"], ""),
   Skill("YAML", ["yaml"], ""),
   Skill("V", ["vlang"], ""),
-  Skill("V", ["v"], disambiguate=singleletter()),
+  Skill("V", ["v"], disambiguate=dis_letter()),
   Skill("Vala", ["vala"], ""),
   Skill("Vyper", ["vyper"], ""),
   Skill("Visual-Basic", ["visual=basic", "vb(a)", "vb.net"], ""),
   Skill("WebAssembly", ["wasm", "web=assembly"], ""),
   Skill("Zig", ["zig"], ""),
-
-  # LANGUAGE UMBRELLAS
-  Skill("Assembly", ["assembly"], "PL category"),
-  Skill("GraphQL", ["graphql", "graphiql"], "QL"),
-  Skill("SQL", ["sql"], "QL/DB category"),
-  Skill("NoSQL", ["nosql"], "DB category"),
 
   # UNSORTED
   Skill("Blender", ["blender"], ""),
@@ -562,35 +574,22 @@ SKILLS: list[Skill] = [
 #   "Web3.js": {pattern: "web3.js", category: "tech"},
 #
 #   // TOPICS ----------------------------------------------------------------------------------------
-#   "Security": {pattern: "cyber=security, cyber=sec, it=security, security", category: "topic"},
-#   "Performance": {pattern: "performance", category: "topic"},
-#   "Scalability": {pattern: "scalability", category: "topic"},
 #   "Vulnerability": {pattern: "vulnerability, penetration, VA/PT", category: "topic"},
-#   "Testing": {pattern: "testing", category: "topic"},
-#   "Business": {pattern: "business, biz, !BI", category: "topic"},
-#   "Biotech": {pattern: "biotech", category: "topic"},
-#   "Fintech": {pattern: "fintech", category: "topic"},
-#   "Edtech": {pattern: "edtech", category: "topic"},
 #   "E-commerce": {pattern: "e=commerce", category: "topic"},
 #   "Open Source": {pattern: "open=source, fl?oss, f?oss", category: "topic"},
 #   "Mathematics": {pattern: "mathematics, maths?", category: "topic"},
 #   "CI/CD": {pattern: "ci/=cd", category: "topic"},
-#   "Chemistry": {pattern: "chemistry", category: "topic"}, "chemist"
-#   "Physics": {pattern: "physics", category: "topic"},
 #   "Photography": {pattern: "photography", category: "topic"},
 #   "2D": {pattern: "2d", category: "topic"},
 #   "3D": {pattern: "3d", category: "topic"},
 #   // "Font": {pattern: "fonts?", category: "topic"}, // disambiguate?
 #   "Animation": {pattern: "animation, motion", category: "topic"},
-#   "Graphic": {pattern: "graphics?", category: "topic", role: "Designer"},
 #   "Enterprise": {pattern: "enterprise", category: "topic"},
 #
 #   // Role-agnostic (multi-role) topics
 #   "Manual": {pattern: "manual", category: "topic"},
 #   "R&D": {pattern: "r ?& ?d", category: "topic"},
 #   "Sales": {pattern: "sales", category: "topic"}, // another problematic word @_@
-#   "Typography": {pattern: "typography", category: "topic"},
-#   "Startup": {pattern: "startups?", category: "topic"},
 #   "Team": {pattern: "!Teams?", category: "topic"},
 #   "Functional Programming": {pattern: "functional-programming, fp", category: "topic"},
 #   "Crypto": {pattern: "crypto, defi, web=3", category: "topic"}, // crypto enthusiast = crypto-currencies + decentralized finance (DeFi)
@@ -612,11 +611,10 @@ SKILLS: list[Skill] = [
 #   FRONTEND specific words
 #   image, img, gif, jpg, jpeg, png, woff
 #   svg
-#   canvas
 #
 # OS specific words
-#   stdin, stdout, terminal, filesystem, socket, stream, thread, process
-#   cli, command line, shell, runtime, schedule
+#   filesystem
+#   shell, runtime
 #
 #   SECURITY specific words
 #   ssh, tls, ssl
@@ -627,12 +625,10 @@ SKILLS: list[Skill] = [
 #   development, production, staging
 #
 #   ARCHITECT specific words
-#   microservice, monolith, monorepo, Event-Driven, Vertical Slice
+#   monolith, monorepo, Event-Driven, Vertical Slice
 #   Distributed
 #   large-scale
 #   architectures?
-#   scalability
-#   performance
 #   self-hosted
 #
 #   QA specific words
@@ -650,7 +646,6 @@ SKILLS: list[Skill] = [
 #   ecommerce
 #   Vulnerability
 #   scanner
-#   auth0, aws cognito, firebase auth
 #   OpenID Connect Identity Provider
 #   network
 #   command

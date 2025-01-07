@@ -40,7 +40,7 @@ INTENT_MARKERS = set([
   for intent in [
     "going",
     "strive", "strives", "striving",
-    "plan", "plans", "planning"
+    "plan", "plans", "planning",
     "want", "wants", "wanting",
     "wish", "wishes", "wishing",
   ]

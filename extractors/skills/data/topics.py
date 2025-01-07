@@ -1,0 +1,572 @@
+from ...utils import literal, noun
+from ..utils import Topic, dis_context, dis_sequence
+
+__all__ = ["SKILLS"]
+
+SKILLS: list[Topic] = [
+  # ANALYSIS >
+  Topic("AB-Testing", ["a/b-test(s)", "a/b-testing", "ab-test(s)", "ab-testing"]),
+  Topic("Hypothesis", ["hypothesis", "hypotheses"]),
+
+  # ENGINEERING / ARCHITECTURE >
+  Topic("Accessibility", ["accessibility", "accessible"]),
+  Topic("Availability", ["availability"]),
+  Topic("Performance", [
+    "performance", "performant",
+    "benchmarking", "benchmark(s)",
+  ]),
+  Topic("Scalability", ["scalability", "scalable"]),
+  Topic("Reliability", ["reliability", "reliable"]),
+  Topic("Usability", ["usability", "usable"]),
+  # Highly Available, High Availability
+  # High Performance, High Traffic
+  # Bandwidth, Throughput -- also specific to NETWORKS
+
+  # SOFTWARE >
+  Topic("Agile", ["agile", "kanban", "scrum"]),
+  Topic("APIs", ["api(s)"]),
+  Topic("Client-Server", ["client", "server(s)"]), # FPs for "clients"
+  Topic("Computing", ["computer(s)", "computing"]),
+  Topic("BDD", ["bdd"]),
+  Topic("DDD", ["ddd"]),
+  Topic("TDD", ["tdd"]),
+  # YAGNI, DRY, KISS
+  # (software) design patterns
+  Topic("Algorithms", ["algorithm(s)", "algorithmic"]),
+  Topic("Big-O", ["big-o"]),
+  Topic("Data-Structures", ["data=structure(s)", "data=type(s)", "data=class(es)"]),
+  Topic("Debugging", ["debugging", "debugger"]),
+  Topic("FP", ["functional=programming", "fp", "фп"]),
+  Topic("I18n", ["i18n", "l10n"]),
+  Topic("MVC", ["mvc", "mvvm", "model-view-controller"]),
+  Topic("OOP", [
+    "object=oriented( programming)", "oop",
+    # literal("SOLID"), literal("S.O.L.I.D"),
+    "ооп"
+  ]),
+  Topic("Open-Source", ["open=source", "oss"]),
+  Topic("SDKs", ["sdk(s)"]),
+  Topic("VCSs", ["version=control(=system)", "vcs(s)", "branching", "versioning"]),
+
+  ## DESIGN >
+  Topic("Animation", ["animation", "animated", "animating", "animator"]),
+  Topic("Typography", ["typography"]),
+  Topic("UI/UX", [
+    "ui=ux", "ui/ux", "uix", "ui", "ux", "user=interface", "human=interface", "user=experience"
+  ]),
+
+  # BACKEND
+  Topic("Backend", [
+    "back=end", "backender",
+    # noun("BE")
+  ]), # not detected as PROPN, needs to be retrained
+  Topic("Access-Control", ["rbac", "abac", "acl"]), # also SECURITY
+  Topic("Authentication", ["authentication", "auth", "sign=in", "sign=out"]), # also SECURITY
+  Topic("Authorization", ["authorization"]), # also SECURITY
+  Topic("BaaS", ["baas", "mbaas"]),
+  Topic("GraphQL", ["graphql", "graphiql"]),
+  Topic("Microservices", ["micro=service(s)"]),
+  Topic("Middlewares", ["middleware(s)"]),
+  Topic("OAuth", ["oauth", "oauth1", "oauth2"]), # also SECURITY
+  Topic("OpenID", ["openid"]), # also SECURITY
+  Topic("OpenAPI", ["openapi"]), # TODO more like this
+  Topic("REST", [
+    "rest=api", "restful",
+    literal("REST"),
+  ]),
+  Topic("REST", ["rest"], disambiguate=[
+    dis_sequence(),
+    dis_context("api", "graphql", "rpc", "framework", "#go", "php")
+  ]),
+  Topic("-REST", [
+    "rest=in=peace"
+  ]),
+  Topic("RPC", ["rpc=api", "rpc"]),
+  Topic("Serverless", ["serverless"]),
+  Topic("SOAP", ["soap"]),
+  Topic("SSG", ["ssg"]),
+  Topic("SSR", ["ssr"]),
+  Topic("SSO", ["sso"]), # also SECURITY
+
+  # BLOCKCHAINS
+  Topic("Blockchains", [
+    "blockchain(s)",
+    "on-chain", "off-chain",
+    "litecoin",
+  ]),
+  Topic("Crypto", ["crypto"]),
+  Topic("dApps", ["decentralized-application(s)", "dapp(s)"]),
+  Topic("DeFi", ["decentralized-finance", "de=fi"]),
+  Topic("P2P", ["peer=2=peer", "peer=to=peer", "p2p"]), # also NETWORKS
+  Topic("Smart-Contracts", ["smart=contract(s)"]),
+  Topic("Web3", ["web3"]),
+
+  # DATA
+  Topic("Data", ["data"]), # maybe a whitelist will work better here
+  Topic("-Data", [
+    "personal=data", "user=data",
+    "my=data", "your=data", "our=data", "their=data",
+    "data=graph", "data-querying", "data-storage", # vs database?
+  ], resolve=[]), # oversimplified, will update later
+  Topic("Big-Data", ["big=data"]),
+  Topic("Data-Mining", ["data=mining", "data=extraction"]),
+  Topic("Data-Visualization", ["data=visualization(s)", "data=visualisation(s)", "data=viz"]),
+  Topic("ETL", ["etl(s)", "elt"]),
+
+  # DATABASES
+  Topic("Databases", ["database(s)"]),
+  Topic("Datalakes", ["data=lake(s)"]),
+  Topic("ORM", ["orm"]),
+  Topic("SQL", ["sql"]),
+  Topic("NoSQL", ["nosql"]),
+  Topic("Warehouses", ["warehouse(s)"]),
+
+  # FRONTEND
+  Topic("Frontend", [
+    "front=end", "frontender",
+    noun("FE"),
+  ]), # not detected as PROPN, needs to be retrained
+  # BEM, БЭМ
+  Topic("Browser", ["browser"]),
+  Topic("Canvas", ["canvas"]),
+  Topic("DevTools", ["dev=tools"]),
+  Topic("DOM", ["dom"]),
+  Topic("Flexbox", ["flex=box"]),
+  Topic("MPA", ["mpa"]),
+  Topic("SPA", ["spa"]),
+  Topic("-SPA", ["med spa", "medical spa"], resolve=[]),
+  Topic("Markup", ["markup"]),
+  Topic("WebGL", ["webgl"]),
+  Topic("Web-Components", ["web=component(s)"]),
+
+  # GAMES
+  Topic("Games", [
+    "game(s)", "gamer", "gameplay",
+    "arcanoid", "minecraft", "tetris", "tictactoe",
+    "single=player", "multi-player",
+  ]),
+  Topic("-Games", ["game=theory"], resolve=[]), # oversimplified, will update later
+  # Topic("Pixel", ["pixel(s)"]),
+  # Topic("-Pixel", ["google=pixel"]),
+  # Topic("Voxel", ["voxel(s)"]),
+  # Polygon -- disambig.
+  Topic("Shaders", ["shader(s)"]),
+  Topic("Sprites", ["sprite(s)"]),
+  Topic("Textures", ["texture(s)"]),
+  # TODO add game-specific non-graphic topics
+
+  # HARDWARE >
+  Topic("Assembly", ["assembly"]), # also SYSTEMS
+  Topic("CPU", ["cpu", "central-processing-unit"]),  # also SYSTEMS
+  Topic("CPU", ["micro=processor(s)"]),
+  Topic("CPU", ["processor(s)"], disambiguate=[
+    dis_sequence(),
+    dis_context("amd", "intel", "arm", "arc", "risc", "x86", "x32", "x64")
+  ]),
+  Topic("Embedded", ["embedded"]),
+  Topic("Firmware", ["firmware"]),
+  Topic("GPU", ["gpu"]),         # also SYSTEMS
+  Topic("HDD", ["hdd", "hmdd"]), # also SYSTEMS
+  Topic("IoT", ["iot", "internet-of-things"]),
+  Topic("Kernel", ["kernel"]), # also SYSTEMS
+  Topic("Motherboard", ["motherboards"]),
+  Topic("PCB", ["pcb"]),
+  Topic("PCI", ["pci"]), # also SYSTEMS
+  Topic("RAM", [literal("RAM")]), # also SYSTEMS
+  Topic("SSD", ["hdd"]), # also SYSTEMS
+
+  # LOW-CODE
+  Topic("Low-Code", ["low=code", "no=code"]),
+  Topic("SaaS", ["saas"]),
+  Topic("CMS", ["cms", "content=management=system"]),
+  Topic("CRM", ["crm", "customer=relationship=management"]),
+  Topic("ERP", ["erp"]),
+
+  # MACHINE-LEARNING
+  Topic("Machine-Learning", ["machine-learning", "ml"]),
+  Topic("AI", ["ai", "artificial-intelligence"]),
+  Topic("Deep-Learning", ["deep=learning", "deep=reinforcement=learning", "dl"]), # not sure about FPs for "dl"
+  Topic("Large-Language-Models", [
+    "large-language-model(s)", "llm(s)",
+    "multimodal-large-language-model(s)", "mllm(s)"
+  ]),
+  Topic("Natural-Language-Processing", ["natural=language=processing", "nlp"]),
+  Topic("Neural-Networks", ["(deep=)neural-networks", "nn", "dnn"]), # not sure about FPs
+  # Signal Processing, Face Detection
+
+  # MOBILE
+  Topic("Mobile", ["mobile", "mobileapp"]),
+  Topic("Cross-Platform", ["cross=platform"]), # also SYSTEMS
+  Topic("Desktop", ["desktop"]),
+  Topic("Devices", ["device(s)"]),
+  # TODO more topics
+
+  # NETWORKS >
+  Topic("CDN", ["cdn(s)"]),
+  Topic("DNS", ["dns"]),
+  Topic("Firewalls", ["firewall(s)"]), # also SECURITY
+  Topic("FTP", ["ftp"]),
+  Topic("SFTP", ["sftp"]), # also SECURITY
+  Topic("HighLoad", ["high=load"]),
+  Topic("HTTP", ["http"]),
+  Topic("HTTPS", ["https"]), # also SECURITY
+  Topic("IP", ["ip", "ip(v)4", "ip(v)6"]),
+  Topic("Proxies", ["proxy", "proxies"]),
+  Topic("SMTP", ["smtp"]),
+  Topic("SOCKS", ["socks", "socks4", "socks5"]),
+  Topic("SSL", ["ssl"]),
+  Topic("TCP", ["tcp"]),
+  Topic("UDP", ["udp"]),
+  Topic("VLAN", ["vlan"]),
+  Topic("VPN", ["vpn(s)"]), # also SECURITY
+  Topic("Wireless", ["wireless"]),
+
+  # OPERATIONS >
+  Topic("CI/CD", [
+    "continuous=integration", "continuous=delivery", "continuous=deployment",
+    "ci/cd", "ci",
+  ]),
+  Topic("Cloud", ["cloud(s)"]),
+  Topic("Deployment", ["deployment(s)", "deploy(s)"]),
+  Topic("Gitops", ["gitops"]),
+  Topic("IaaS", ["iaas", "caas", "haas"]),
+  Topic("PaaS", ["paas"]),
+  Topic("IAC", ["iac", "infrastructure=as=code"]),
+  Topic("Monorepos", ["mono=repo(s)", "mono=repository", "mono=repositories"]),
+  Topic("Containerization", ["containerization", "containerized"]), # TODO container with disambig.
+  Topic("Integrations", ["integration(s)"]),
+  Topic("Orchestration", ["orchestration"]),
+  Topic("Provisioning", ["provisioning"]),
+  # certificates: AWS Certified Solutions Architect Professional, AWS Certified DevOps Engineer Professional
+  Topic("Virtualization", ["virtualization", "virtual=machine(s)", "vm(s)"]),
+  Topic("VPCs", ["vpc(s)"]),
+  # blue green deployments
+
+  # ROBOTICS >
+  Topic("Computer-Vision", ["computer << vision"]),
+  Topic("RTOS", ["rtos"]),
+  Topic("GPOS", ["gpos"]),
+  Topic("Sensors", ["sensor(s)"]),
+  # Motion-Prediction
+  # Sensor-Fusion
+  # Radar, lidar, Quadro-Copters
+  # Self-Driving cars
+
+  # SECURITY >
+  # offensive security, audit
+  Topic("Cyber-Security", [
+    "cyber=security", "cyber=sec", "cyber=defence",
+    "exploit(s)", "malware", "malicious",
+    "vulnerability", "vulnerabilities",
+  ]),
+  Topic("Info-Security", [
+    "information=security", "info=security", "info=sec",
+    "it=security", "it=sec",
+  ]),
+  # Identity and Access management
+  Topic("Antiviruses", ["anti=virus(es)"]),
+  Topic("Bruteforce", ["bruteforce"]),
+  Topic("DDOS", ["ddos"]), # also NETWORKs
+  Topic("Encryption", ["encryption"]), # also NETWORKs
+  Topic("Phishing", ["phishing"]),
+  Topic("Social-Engineering", ["social=engineering"]),
+  Topic("VA/PT", [
+    "penetration=testing", "penetration=test(s)", "penetration=tester",
+    "pen=testing", "pen=test", "pen=tester",
+    "vapt",
+    "vulnerability=assessment",
+    "vulnerability=scanning", "vulnerability=scan(ner)",
+    "vulnerability=testing", "vulnerability=test(s)", "vulnerability=tester",
+  ]), # also NETWORKs
+  Topic("ISO-27001", ["iso-27001"]), # "Security Compliance"
+  Topic("GDPR", ["gdpr"]), # "Security Compliance"
+  Topic("NIST", ["nist"]), # "Security Compliance"
+  # Familiarity with industry standards like MITRE ATT&CK and D3FEND,
+  # the NIST Cybersecurity Framework, STIX/TAXII, and OpenIOC
+  # "Privacy"
+
+  # SYSTEMS
+  Topic("Systems", ["system(s)"]), # TODO many FPs e.g. "information systems"
+  Topic("ASTs", ["ast(s)"]),
+  Topic("Compilers", ["compiler(s)", "compiling", "compilation", "compile-time", "run=time"]),
+  Topic("CLI", ["cli", "stdin", "stdout", "stderr", "command=line", "terminal"]),
+  Topic("GUI", ["gui"]),
+  Topic("Cron", ["cron(s)", "crond", "cronjob(s)"]),
+  Topic("Decentralized", ["decentralized"]),
+  Topic("Distributed", ["distributed"]),
+  Topic("Logging", ["logging"]),       # also OPERATIONS
+  Topic("Monitoring", ["monitoring"]), # also OPERATIONS
+  Topic("Parsers", ["parser(s)", "parsing"]),
+  Topic("Processes", ["process(es)", "processing", "multi=processing"]),
+  Topic("SSH", ["ssh"]), # also OPERATIONS
+  Topic("Sockets", ["socket(s)"]),
+  Topic("Streams", ["stream(s)"]),
+  Topic("Threads", ["thread(s)", "threading", "multi=threading"]),
+  # Computer(s) (computing) (from CS)
+  # Scheduler / Scheduling
+
+  # TESTING & QA
+  Topic("QA", ["quality-assurance", "qa"]),
+  Topic("AQA", ["aqa"], resolve=["Automation", "QA"]),
+  Topic("E2E-Testing", ["end=to=end=testing", "e2e=testing", "e2e=test(s)"]), # TODO capture split words
+  Topic("Load-Testing", ["load=testing", "load=test(s)"]),
+  Topic("Functional-Testing", ["functional=testing", "functional=test(s)"]),
+  Topic("Regression-Testing", ["regression=testing", "regression=test(s)"]),
+  Topic("Unit-Testing", ["unit=testing", "unit=test(s)"]),
+
+  # WEB
+  Topic("Web", ["web", "website", "webapp"]),
+  Topic("CORS", ["cors"]), # also SECURITY
+  Topic("WebSockets", ["websocket(s)", "ws"]), # also NETWORKS
+
+  # UNSORTED
+  Topic("AR/VR", [
+    "augmented=reality", "mixed=reality", "virtual=reality",
+    "vr/ar", "vr/mr", "ar/vr", "mr/vr", "vr",
+  ]),
+  Topic("Graphics", ["graphic(s)"]),
+  Topic("Leadership", ["leadership", "leader", "lead", "leading role"]),
+  # Topic("Modeling", ["datamodeling"]), - "database=modeling" is now translated to [Databases, Engineering]
+  Topic("Scraping", ["scraping", "webscraping"]),
+  Topic("Videography", ["videography", "videographer", "video(s)"]),
+  # Audio, Sound, Image(s), Video(s)
+  Topic("Visualizations", ["visualization", "visualizer"]),
+  # Bot(s)
+
+  # Topic("2D", ["2d"]), -- too widespread
+  # Topic("3D", ["3d"]), -- too widespread
+  # Topic("Ray-Tracing", ["ray=tracing"]),
+
+  # Topic("Entity-Component-System", ["entity-component-system", "ecs"]), -- conflicts with AWS-ECS
+
+  # COMBINED ---------------------------------------------------------------------------------------
+  Topic("Business-Analysis", [
+    "businessanalysis", "businessanalytics", "businessanalyst"
+  ], resolve=["Business", "Analysis"]),
+  # TODO business intelligence, BI
+  # TODO nonprofit(s) ?
+
+  Topic("Cloud-Architecture", ["cloudarchitecture", "cloudarchitect"], resolve=["Cloud", "Architecture"]),
+
+  Topic("Data-Analysis", ["dataanalysis", "dataanalytics", "dataanalyst"], resolve=["Data", "Analysis"]),
+  Topic("Data-Design", ["data=design", "data=designer"], resolve=["Data", "Engineering"]),
+  Topic("Data-Engineering", [
+    "dataengineering", "dataengineer",
+    "datadeveloper", "datadev",
+  ], resolve=["Data", "Engineering"]),
+  Topic("Data-Operations", ["dataoperations", "dataops"], resolve=["Data", "Operations"]),
+  Topic("Data-Security", ["datasecurity", "data=sec", "data=protection"], resolve=["Data", "Security"]),
+  Topic("Data-Warehouses", ["data=warehouse(s)", "dwh"], resolve=["Data", "Warehouses"]),
+
+   Topic("Database-Administration", [
+    "databaseadministration", "databaseadministrator", "dba"
+  ], resolve=["Databases", "Administration"]),
+  Topic("Database-Design", [
+    "database=design", "database=designer",
+    "db=design", "db=designer",
+  ], resolve=["Databases", "Engineering"]),
+  Topic("Database-Engineering", [
+    "databaseengineering", "databaseengineer", "db=engineering",
+    "database=modeling", "db=modeling",
+  ], resolve=["Databases", "Engineering"]),
+
+  Topic("Embedded-Engineering", [
+    "embeddedengineer", "embeddedprogramming", "embeddeddev",
+  ], resolve=["Embedded", "Engineering"]),
+
+  Topic("Engineering-Management", [
+    "engineering << management", "engineering << manager",
+  ], resolve=["Engineering", "Management"]),
+  Topic("Engineering-Operations", [
+    "devop(s)",
+  ], resolve=["Engineering", "Operations"]),
+  Topic("Engineering-Security-Operations", [
+    "dev/sec-ops", "sec/dev-ops",
+    "dev-sec-ops", "sec-dev-ops",
+    "devsecop(s)", "secdevop(s)", "devop(s)sec",
+  ], resolve=["Engineering", "Security", "Operations"]),
+
+  Topic("Fullstack", ["full=stack(er)"], resolve=["Backend", "Frontend"]),
+
+  Topic("Games-Design", [
+    "game(s) << design",
+    # "game(s) << designer",
+  ], resolve=["Games", "Design"]),
+  Topic("Games-Engineering", [
+    "gameengineering", "gameengineer",
+    "gameprogramming", "gameprogrammer",
+    "gamedeveloper", "gamedev",
+  ], resolve=["Games", "Engineering"]),
+  Topic("Games-Testing", [
+    "playtest(s)",
+  ], resolve=["Games", "Testing"]),
+
+  Topic("Graphics-Design", [
+    "graphic(s) << design", "graphic(s) << designer",
+  ], resolve=["Graphics", "Design"]),
+
+  Topic("Machine-Learning-Engineering", ["ml=engineer(ing)"], resolve=["Machine-Learning", "Engineering"]),
+  Topic("Machine-Learning-Operations", ["mlops", "mldevops", "ai=ops"], resolve=["Machine-Learning", "Operations"]),
+
+  Topic("Marketing-Management", [
+    "marketing << management", "marketing << manager",
+  ], resolve=["Marketing", "Management"]),
+
+  Topic("Mobile-Design", [
+    "mobile << design", "mobile << designer", # Mobile-Design is not UI-Design
+  ], resolve=["Mobile", "Engineering"]),
+  Topic("Mobile-Engineering", [
+    "mobile << developer", "mobile << dev",
+    "mobile << engineer",
+    "mobile << programming", "mobile << programmer",
+  ], resolve=["Mobile", "Engineering"]),
+
+  Topic("Network-Operations", ["networkoperations", "networkops", "netops"], resolve=["Networks", "Operations"]),
+  Topic("Network-Security", ["networksecurity", "netsecurity", "net=sec"], resolve=["Networks", "Security"]),
+
+  Topic("Operations-Management", [
+    "operations << management", "operations << manager",
+  ], resolve=["Operations", "Management"]),
+
+  Topic("Security-Operations", [
+    "securityoperations", "secops"
+  ], resolve=["Security", "Operations"]),
+
+  Topic("SDET", ["sdet"], resolve=["Software", "Engineering", "Testing"]),
+  Topic("SDLC", ["sdlc"], resolve=["Software", "Engineering", "Testing", "Deployment"]),
+
+  Topic("Solution-Architecture", [
+    "solution=architecture", "solution=architect"
+  ], resolve=["Business", "Software", "Architecture"]),
+
+  Topic("SRE", [literal("SRE")], resolve=["Reliability", "Software", "Engineering"]),
+
+  Topic("System-Administration", [
+    "systemadministration", "systemadministrator", "sysadmin"
+  ], resolve=["Systems", "Administration"]),
+  Topic("System-Architecture", [
+    "systemarchitecture", "systemarchitect"
+  ], resolve=["Systems", "Architecture"]),
+  Topic("System-Engineering", [
+    "systemengineering", "systemengineer",
+    "systemprogramming",
+    "systemdeveloper", "systemdev",
+  ], resolve=["Systems", "Engineering"]),
+  Topic("System-Operations", [
+    "sysops",
+    "system-operations", # TEMP
+  ]), # , resolve=["Systems", "Operations"]
+
+  # UI/UX-Architecture
+  Topic("UI/UX-Design", [
+    "ui << design", "ui << designer",
+    "ux << design", "ux << designer",
+    "uiux << design", "uiux << designer",
+  ], resolve=["UI/UX", "Design"]),
+  Topic("UI/UX-Testing", [
+    "uitesting", "uitester",
+    "uxtesting", "uxtesting",
+  ], resolve=["UI/UX", "Testing"]),
+
+  Topic("Warehouses-Management", [
+    "warehouse << management", "warehouse << manager",
+  ], resolve=["Warehouses", "Management"]),
+
+  Topic("Web-APIs", ["webapi(s)"], resolve=["Web", "APIs"]),
+  Topic("Web-Design", [
+    "web << design", "web << designer",
+  ], resolve=["Web", "Design"]),
+  Topic("Web-Engineering", [
+    "webengineering", "webengineer",
+    "webprogramming", "webprogrammer",
+    "webdeveloper", "webdev",
+    "webcoding", "webcoder",
+  ], resolve=["Web", "Engineering"]),
+  Topic("Web-Security", ["websecurity", "web=sec"], resolve=["Web", "Security"]),
+]
+
+# TODO phpdeveloper, dataarchitect, webarchitect, phpcoder, dbadmin, rubydev
+
+# TODO split into inside (dev) and outside topics
+
+# malware-analysis = security-research
+
+# Topic("Resilience", ["resilience", "resilient"]),
+# Topic("Observability", ["observability", "observable"]),
+# Clustering, Sharding, load balancing
+# Replication, Partitioning | Enterprise, large-scale
+# Topic("Resiliency", ["resiliency", "resilient"]),
+# Topic("Cluster", ["cluster"]),
+# 3D modeling
+# Hacking
+# Quantum Computing
+# Threat-intelligence
+# Grid, Layout(s), Responsive, Flexible
+
+# Non-skills (words that look like skills but are not, might be useful to help with them in UI)
+# SOTA: state of the art
+# neuroscience, neuroscientist +1
+# transportation industry
+# digital illustration
+# cognitive science, cog-sci
+# "5 yrs teaching FinTech and Market Operations. 30 yrs PMO Digital Transformations of Wall St. Investment Banks
+# Talend
+# Crucible
+# Involved with VNFs, Cloud, etc
+# I automate the web and moble-web; making bots and working in the cloud. Lately, I have been hired to make some anti-bots.
+# Trade Settlements Analyst
+# A tech-savvy story teller who loves to tell stories, not verbally, but through data.
+# I am a LINUX/UNIX Administratory
+# Biomedical Engineer
+# Interest in Bioinformatics/Biostatistics
+# has worked as a Director, Cinematographer, Sound Mixer, Videographer, Editor, and Producer for 10 years.
+# analytical
+# sales
+# implementation of COTS software
+# CPA turned developer
+# Information Science != Informatics (1st is broader)
+# "Python, STATA, SQL, R, SPSS, NVivo.", -- STATA? SPSS? NVivo?
+# Information Technology
+# 'Rohit Kabra (Masters in information System)
+# data extraction/modeling, visualization (Tableau, Power BI)
+# edge (ambiguous)
+# Astrophysics
+# HRD term
+# Real-Time x 2
+# OCR models
+# Familiarity with ConvNeXt and similar models
+# • Extensive hands-on experience with BGP, OSPF, and EIGRP routing protocols in large-scale, enterprise environments.
+# • In-depth knowledge of Layer 2 and Layer 3 network technologies, including VLANs, spanning-tree, and routing.
+# • Proven expertise in SD-WAN architecture and deployment.
+# • Proficiency with networking products and solutions from Cisco, Meraki, Fortinet, Palo Alto, and other leading vendors.
+# • In-depth knowledge of VoIP protocols (e.g., SIP, RTP, H.323) and their application in diverse environments.
+# • Strong experience in unified communications platforms (e.g., Cisco, Avaya, Asterisk, Microsoft Teams).
+# • Advanced understanding of VoIP hardware and software, including PBX systems, softphones, and gateways.
+# ISTQB Performance testing experience
+# • Knowledge of DoD STIGs, STIG vulnerabilities, and remediation strategies
+# President at Intellect Neurosciences, Inc. | Business Officer and Co-Founder at Various Life Science Companies | Former Chief Executive Officer at Immune Pharma
+# Data Scientist actively looking for a position within the pharma/healthcare industry.
+# I am currently a Ph.D. candidate in a Geosciences program, seismology in particular.
+# I have a mixed background in Biology and Computer Science. I also work in an animal hospital and love being around my dogs and cats.
+# I am a newbie Data Analyst who likes to explore data concerning cognitive neuroscience, psychology, gaming, anime and book publishing.
+# News, publishing, and media industry experience.
+# I am an oceanographer and climate scientist who investigates the interactions between the ocean, the atmosphere, and the rest of the Earth System.
+# Astronomy PhD student and data scientist.
+# Ph.D. Candidate in Systems Engineering with focus in Optimization of Distributed Spacecraft Missions.
+# Electrical Engineer interested in the intersection of software and hardware to build better healthcare technologies including diagnostics, robotics, and devices
+# Sensor Fusion and Navigation Engineer at Kearfott, previous experiences at @American-Robotics, @fdcl-gwu
+# Design verification engineer working with ORAN/LTE/5g radio hardware
+# HPC (high performance computing)
+# Electrician by trade, Electrical & Computer Engineering Student, Programmer, Maker, Photographer by Hobby.
+# Seasoned IT Storage Architect specializing in SAN and NAS infrastructure design , migration and deployment strategies
+# Pro tinkerer- Odroid, Pi, Pine- ARM Boards. Virtualization, LXC
+# I'm an ASU graduate with a degree in Graphic Information Technology.
+# WordPress, PHP, Stellar Lumens, XDC, XRPL, Python and Solidity. Rodi Software.
+# Software Developer, I like to use GNU Emacs and NixOS.
+
+# HIREABLE
+# "#OpenToWork"
+
+# Counter-cases for "Architecture"
+# licensed architect, architectural designer and web developer/programmer
+# UI Architect
