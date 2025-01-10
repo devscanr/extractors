@@ -1,8 +1,6 @@
 import re
 from ..utils import uniq
 
-__all__ = ["parse_phones"]
-
 TRIGGERS = [
   r"(?:phone|mobile|tel)(?:\s*-?\s*(?:num\.?|numbers?))?\s*[:=-]{0,2}\s*",
   r"(?:to\s+reach\s+me)\s*[:=-]{0,2}\s*",

@@ -1,8 +1,6 @@
 from urlextract import URLExtract # type: ignore
 from ..utils import uniq
 
-__all__ = ["parse_urls"]
-
 extractor = URLExtract()
 
 def parse_urls(ntext: str) -> list[str]:

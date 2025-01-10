@@ -1,17 +1,5 @@
 from spacy.tokens import Token
 
-__all__ = [
-  "IN", "IS_PUNCT", "IS_SENT_START", "LOWER", "OP", "ORTH", "POS", "REGEX", "TAG",
-  "LEFT_ID", "REL_OP", "RIGHT_ID", "RIGHT_ATTRS",
-  "is_word",
-  "left_tokens", "left_lowers", "left_lowerwords",
-  "left_token", "left_lower", "left_lowerword",
-  "right_tokens", "right_lowers", "right_lowerwords",
-  "right_token", "right_lower", "right_lowerword",
-  "anc_heads", "right_anc_heads",
-  "token_level",
-]
-
 (IN, IS_PUNCT, IS_SENT_START, LOWER, OP, ORTH, POS, REGEX, TAG) = (
   "IN", "IS_PUNCT", "IS_SENT_START", "LOWER", "OP", "ORTH", "POS", "REGEX", "TAG"
 )
@@ -75,7 +63,7 @@ def right_lowerword(token: Token) -> str | None:
   return rwords[0] if rwords else None
 
 # LEVELS
-def anc_heads(token: Token) -> list[Token]:
+def ancestors(token: Token) -> list[Token]:
   tok = token
   toks: list[Token] = []
   while tok != tok.head:
@@ -83,7 +71,7 @@ def anc_heads(token: Token) -> list[Token]:
     toks.append(tok)
   return toks
 
-def right_anc_heads(token: Token) -> list[Token]:
+def right_ancestors(token: Token) -> list[Token]:
   tok = token
   toks: list[Token] = []
   while tok != tok.head:

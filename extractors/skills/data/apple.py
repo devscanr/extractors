@@ -1,8 +1,6 @@
 # from ...utils import propn
 from ..utils import Skill #, contextual, contextual_or_neighbour, neighbour
 
-__all__ = ["SKILLS"]
-
 SKILLS: list[Skill] = [
   Skill("Apple", ["(@)apple"], "Company"),
 

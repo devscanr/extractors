@@ -1,7 +1,4 @@
-from ...utils import literal
-from ..utils import Skill, dis_context, dis_sequence
-
-__all__ = ["SKILLS"]
+from ..utils import Skill, dis_context, dis_neighbours
 
 dis_ctx = dis_context("google")
 
@@ -9,9 +6,9 @@ SKILLS: list[Skill] = [
   Skill("Google", ["(@)google"], "Company"),
 
   Skill("Flax", ["flax"], "NN for Jax"),
-  Skill("JAX", [literal("JAX")], "TensorFlow alternative"),
+  Skill("JAX", ["JAX"], "TensorFlow alternative"),
   Skill("JAX", ["jax"], disambiguate=[
-    dis_sequence(),
+    dis_neighbours(),
     dis_context("google", "flax", "tensorflow"),
   ]),
   Skill("TensorFlow", ["tensorflow"], ""),
@@ -22,7 +19,7 @@ SKILLS: list[Skill] = [
   Skill("Google-BigQuery", ["google-bigquery", "bigquery"], ""), # EE data warehouse
   Skill("Google-Cloud", ["google=cloud", "gcp"], ""),
   Skill("Google-Cloud", ["gc"], disambiguate=[
-    dis_sequence(),
+    dis_neighbours(),
     dis_context("aws", "azure"),
   ]),
   Skill("Google-Firebase", ["google=firebase", "firebase"], ""),

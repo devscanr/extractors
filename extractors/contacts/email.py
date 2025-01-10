@@ -1,8 +1,6 @@
 import re
 from ..utils import uniq
 
-__all__ = ["parse_emails"]
-
 # Taken from https://github.com/fabian-hiller/valibot
 EMAIL = r"[\w+-]+(?:\.[\w+-]+)*@[\da-z]+(?:[.-][\da-z]+)*\.[a-z]{2,}"
 

@@ -1,8 +1,6 @@
 from lingua import Language, LanguageDetectorBuilder
 from typing import Literal, cast
 
-__all__ = ["detect_language_iso639"]
-
 # https://github.com/pemistahl/lingua-py/discussions/240
 
 detector = LanguageDetectorBuilder.from_languages(*[

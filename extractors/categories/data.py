@@ -1,17 +1,8 @@
 from extractors.utils import Pattern, verb
 
-__all__ = [
-  "LABELED_PHRASES",
-  "DEV_CANCELING_ROLES",
-  "STUDENT_CANCELING_ROLES",
-  "ORG_CANCELING_ROLES",
-  "LEAD_CANCELING_ROLES",
-  "FREELANCER_CANCELING_ROLES",
-]
+type TaggedPhrases = dict[str, list[str | Pattern]]
 
-type LabeledPhrases = dict[str, list[str | Pattern]]
-
-LABELED_PHRASES: LabeledPhrases = {
+TAGGED_PHRASES: TaggedPhrases = {
   "DEV": [
     verb("coding"),
     verb("developing"),
@@ -228,27 +219,14 @@ LABELED_PHRASES: LabeledPhrases = {
 # ("guru", "expert", "ninja", "magician", "wizard") were previously used
 # to cancel "Student" role. Not applied yet, not sure...
 
-DEV_CANCELING_ROLES = [
-  n for n in LABELED_PHRASES["STUDENT"] + LABELED_PHRASES["ORG"]
-  if isinstance(n, str)
-]
-
-STUDENT_CANCELING_ROLES = [
-  n for n in LABELED_PHRASES["ORG"]
-  if isinstance(n, str)
-]
-
-ORG_CANCELING_ROLES = [
-  n for n in ["contributor"] + LABELED_PHRASES["STUDENT"] + LABELED_PHRASES["DEV"] + LABELED_PHRASES["NONDEV"]
-  if isinstance(n, str)
-]
-
-LEAD_CANCELING_ROLES = [
-  n for n in LABELED_PHRASES["STUDENT"] + LABELED_PHRASES["ORG"]
-  if isinstance(n, str)
-]
-
-FREELANCER_CANCELING_ROLES = [
-  n for n in LABELED_PHRASES["STUDENT"] + LABELED_PHRASES["ORG"]
-  if isinstance(n, str)
-]
+CANCELING_TAGS = {
+  "DEV": {"DEV", "NONDEV", "ORG", "STUDENT"},
+  "NONDEV": {"DEV", "NONDEV", "ORG", "STUDENT"},
+  "STUDENT": {"ORG", "STUDENT"},
+  "ORG": {"DEV", "NONDEV", "ORG", "STUDENT"},
+  "LEAD": {"ORG", "STUDENT"},
+  "FREELANCER": {"FREELANCER", "ORG"},
+  "HIREABLE": {"ORG"},
+  "REMOTE": {"ORG"},
+  "OPEN-TO": {},
+}

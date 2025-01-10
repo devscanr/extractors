@@ -1,7 +1,5 @@
 from ..utils import Skill
 
-__all__ = ["SKILLS"]
-
 SKILLS: list[Skill] = [
   # == Companies not (yet/intentionally) extracted into their own modules ==
 

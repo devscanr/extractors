@@ -2,10 +2,6 @@ import re
 from typing import Sequence
 from .utils import IN, LEFT_ID, POS, Pattern, REL_OP, RIGHT_ATTRS, RIGHT_ID, orth
 
-__all__ = [
-  "expand_phrase1", "expand_phrase2", "expand_phrase12", "to_deppatterns",
-]
-
 # expand_phrase1
 def expand_phrase1(phrase: str) -> list[str]:
   if not phrase:
@@ -105,53 +101,50 @@ def to_deppatterns(phrase: str) -> list[Pattern]:
       ]
     case 2:
       (modifier, anchor) = parts
-      # print("modifier:", modifier)
-      # print("anchor:", anchor)
       return [
         [{
           # (modifier_anchor)
           RIGHT_ID: "modifier",
           RIGHT_ATTRS: orth(modifier + anchor)
-        }],
-        [{
-          # (modifier)
+        }], [{
+          # (modifier) << (anchor)
           RIGHT_ID: "modifier",
           RIGHT_ATTRS: orth(modifier)
         }, {
-          # (modifier) << (anchor)
           LEFT_ID: "modifier",
           REL_OP: "<<",
           RIGHT_ID: "anchor",
           RIGHT_ATTRS: orth(anchor) # & {DEP: {IN: ["ROOT", "pobj", "dobj"]}}
-        }],
-        # [{ -- I think it's mostly covered by the next graph pattern
-        #   # (modifier)
-        #   RIGHT_ID: "modifier",
-        #   RIGHT_ATTRS: orth(modifier)
-        # }, {
-        #   # (modifier) . (anchor)
-        #   LEFT_ID: "modifier",
-        #   REL_OP: ".",
-        #   RIGHT_ID: "anchor",
-        #   RIGHT_ATTRS: orth(anchor)
-        # }],
-        [{
-          # (modifier)
+        }], [{
+          # (modifier) << (other_anchor) > (anchor)
           RIGHT_ID: "modifier",
-          RIGHT_ATTRS: orth(modifier) # game(s)
+          RIGHT_ATTRS: orth(modifier)
         }, {
-          # (modifier) < (other_anchor)
           LEFT_ID: "modifier",
           REL_OP: "<<",
-          RIGHT_ID: "other_anchor", # dev
+          RIGHT_ID: "other_anchor",
           RIGHT_ATTRS: {POS: {IN: ["NOUN", "PROPN", "PRON"]}},
         }, {
-          # (other_anchor) [appos]> (anchor)
+          LEFT_ID: "other_anchor",
+          REL_OP: ">",
+          RIGHT_ID: "anchor",
+          RIGHT_ATTRS: orth(anchor)
+        }],
+        [{
+          # (modifier) < (other_anchor) >> (anchor)
+          RIGHT_ID: "modifier",
+          RIGHT_ATTRS: orth(modifier)
+        }, {
+          LEFT_ID: "modifier",
+          REL_OP: "<",
+          RIGHT_ID: "other_anchor",
+          RIGHT_ATTRS: {POS: {IN: ["NOUN", "PROPN", "PRON"]}},
+        }, {
           LEFT_ID: "other_anchor",
           REL_OP: ">>",
-          RIGHT_ID: "anchor", # design
+          RIGHT_ID: "anchor",
           RIGHT_ATTRS: orth(anchor)
-        }]
+        }],
       ]
     case _:
       raise Exception("only '(modifier) << (anchor)' format is currently supported")

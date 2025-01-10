@@ -1,8 +1,6 @@
 from ...utils import ver1
 from ..utils import Skill
 
-__all__ = ["SKILLS"]
-
 SKILLS: list[Skill] = [
   Skill("Adobe", ["(@)adobe"], "Company"),
 

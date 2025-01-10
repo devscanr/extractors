@@ -8,13 +8,13 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.12"
-pytest-describe = "^2.2.0"
 markdown = "^3.7"
 spacy = "^3.8.2"
 lingua-language-detector = "^2.0.2"
 urlextract = "^1.9.0"
 beautifulsoup4 = "^4.12.3"
 emoji = "^2.14.0"
+spacy-universal-sentence-encoder = "^0.4.6"
 
 [tool.poetry.group.dev.dependencies]
 mypy = "^1.13.0"
@@ -23,6 +23,7 @@ ruff = "^0.7.1"
 types-beautifulsoup4 = "^4.12.0.20240907"
 types-markdown = "^3.7.0.20240822"
 # jupyterlab = "^4.2.5"
+psutil = "^6.1.1"
 
 [tool.poe.env]
 PYTHONPATH = "."
@@ -51,6 +52,8 @@ per-file-ignores = {"__init__.py" = ["F403"]}
 testpaths = ["extractors"]
 # addopts = "--ignore=ignore"
 python_files = "*_test.py"
+#python_classes = ["*__*"]
+#python_functions = ["*__*"]
 
 [build-system]
 requires = ["poetry-core"]

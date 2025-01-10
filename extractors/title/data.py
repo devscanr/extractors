@@ -1,10 +1,8 @@
-__all__ = [
-  "LABELED_PHRASES",
-]
+from ..utils import Pattern
 
-type LabeledPhrases = dict[str, list[str]]
+type TaggedPhrases = dict[str, list[str | Pattern]]
 
-LABELED_PHRASES: LabeledPhrases = {
+TAGGED_PHRASES: TaggedPhrases = {
   "HUMAN": [
     # ADMININSTRATORS
     "administrator", "admin",
@@ -22,7 +20,7 @@ LABELED_PHRASES: LabeledPhrases = {
     "dbarchitect",
 
     # DEVELOPERS
-    "developer", "dev", "dev.", # TODO verify how "dev." is parsed
+    "developer", "dev",
     "gamedeveloper", "gamedev",
     "godev", "gopher",
     "mobiledeveloper", "mobiledev",
@@ -163,7 +161,8 @@ LABELED_PHRASES: LabeledPhrases = {
   ],
 
   "SKIP": [
-    "head first"
+    "every student",
+    "head first",
   ],
 
   "ORG": [

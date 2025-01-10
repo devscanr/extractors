@@ -1,7 +1,5 @@
 from ...utils import ver1, propn
-from ..utils import Skill, dis_context, dis_sequence
-
-__all__ = ["SKILLS"]
+from ..utils import Skill, dis_context, dis_neighbours
 
 dis_ctx = dis_context("microsoft")
 
@@ -19,7 +17,7 @@ SKILLS: list[Skill] = [
   Skill("MS-Sharepoint", ["microsoft-sharepoint", "ms-sharepoint", "sharepoint"], ""),
   Skill("MS-365", ["microsoft=365", "ms=365"], "New name for MS-Office"),
   Skill("MS-365", ["365"], disambiguate=[
-    dis_sequence(),
+    dis_neighbours(),
     dis_context("microsoft", "office")
   ]),
 
@@ -37,10 +35,10 @@ SKILLS: list[Skill] = [
   Skill("ML.NET", ["ml.net"], "ML framework for .NET"),
   Skill(".NET MAUI", [".net maui", "maui"], "Multi-platform app UI, evolution of Xamarin.Forms"),
   Skill("Blazor", ["blazor"], ".NET-based framework to create fullstack apps"),
-  Skill("Unity", ["unity-engine", "unity-platform", "unity=3d", propn("unity")], "Gamedev engine"),
+  Skill("Unity", ["unity-engine", "unity-platform", "unity=3d"], "Gamedev engine"), # , propn("unity")
   Skill("Unity", ["unity"], disambiguate=[
-    dis_sequence(),
-    dis_context("microsoft", "framework")
+    dis_neighbours(),
+    dis_context("c#", "microsoft", "framework")
   ]),
   Skill("WCF", ["wcf"], "Windows Communication Foundation: framework for service-oriented apps"),
   Skill("WPF", ["wpf"], "Windows Presentation Foundation: UI framework for desktop apps"),
@@ -80,7 +78,7 @@ SKILLS: list[Skill] = [
     "aarch64", "arm64",
   ], "CPU family"),
   Skill("ARM", ["arm"], disambiguate=[
-    dis_sequence(),
+    dis_neighbours(),
     dis_context("microsoft", "cpu", "x86", "x32", "x64", "risc", "arc", "processor(s)")
   ]),
 ]

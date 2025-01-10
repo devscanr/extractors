@@ -1,6 +1,4 @@
-from ..utils import Skill, dis_context, dis_sequence
-
-__all__ = ["SKILLS"]
+from ..utils import Skill, dis_context, dis_neighbours
 
 dis_ctx = dis_context("amazon", "aws")
 
@@ -13,12 +11,12 @@ SKILLS: list[Skill] = [
   Skill("Amazon-WebServices", ["amazon-web=services", "aws"], "AWS"),
   Skill("Amazon-Athena", ["aws=athena"], "Analytics, ML + SQL over S3"),
   Skill("Amazon-Athena", ["athena"], disambiguate=[
-    dis_sequence(),
+    dis_neighbours(),
     dis_ctx,
   ]),
   Skill("Amazon-Aurora", ["aws=aurora"], "Managed DB"),
   Skill("Amazon-Aurora", ["aurora"], disambiguate=[
-    dis_sequence(),
+    dis_neighbours(),
     dis_ctx,
   ]),
   Skill("Amazon-Beanstalk", ["aws=beanstalk", "beanstalk"], "Webapp deployment"),
@@ -34,22 +32,22 @@ SKILLS: list[Skill] = [
   Skill("Amazon-ElastiCache", ["aws=elasticache", "elasticache"], "Caching"),
   Skill("Amazon-Glue", ["aws=glue"], "Batch data ingestion, data pipeline orchestration"),
   Skill("Amazon-Glue", ["glue"], disambiguate=[
-    dis_sequence(),
+    dis_neighbours(),
     dis_ctx,
   ]),
   Skill("Amazon-IAM", ["aws=iam"], "Identity and access management"),
   Skill("Amazon-IAM", ["iam"], disambiguate=[
-    dis_sequence(),
+    dis_neighbours(),
     dis_ctx,
   ]),
   Skill("Amazon-Lambda", ["aws=lambda"], "Lambda service"),
   Skill("Amazon-Lambda", ["lambda"], disambiguate=[
-    dis_sequence(),
+    dis_neighbours(),
     dis_ctx,
   ]),
   Skill("Amazon-KMS", ["aws=kms"], "Streaming data ingestion & analytics"),
   Skill("Amazon-KMS", ["kms"], disambiguate=[
-    dis_sequence(),
+    dis_neighbours(),
     dis_ctx,
   ]),
   Skill("Amazon-Kinesis", ["aws=kinesis", "kinesis"], "Streaming data ingestion & analytics"),
@@ -62,7 +60,7 @@ SKILLS: list[Skill] = [
   Skill("Amazon-SageMaker", ["aws=sagemaker", "sagemaker"], "Deploy ML"),
   Skill("Amazon-VPC", ["aws=vpc"], "Virtual private cloud"),
   Skill("Amazon-VPC", ["vpc"], disambiguate=[
-    dis_sequence(),
+    dis_neighbours(),
     dis_ctx,
   ]),
 

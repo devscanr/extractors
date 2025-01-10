@@ -1,8 +1,6 @@
 # import re
 # from typing import Pattern
 #
-# __all__ = ["to_variants", "words_to_regex"]
-#
 # SEPS = ["", "-", " "]
 #
 # def to_variants(phrase: str) -> list[str]:

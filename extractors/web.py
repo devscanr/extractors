@@ -2,11 +2,6 @@ from bs4 import BeautifulSoup, Comment, NavigableString, ParserRejectedMarkup, T
 from markdown import markdown
 import re
 
-__all__ = [
-  "html2text", "html2text_",
-  "markdown2text", "markdown2text_",
-]
-
 def html2text(html: str) -> str:
   soup = BeautifulSoup(html, features="html.parser")
   texts: list[str] = []

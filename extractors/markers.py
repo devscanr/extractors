@@ -1,17 +1,6 @@
 from spacy.tokens import Token
 from typing import cast
 
-__all__ = [
-  # "EX_MARKERS",
-  # "PAST_MARKERS",
-  # "FUTURE_MARKERS",
-  "is_hashtagged",
-  "is_negated",
-  "is_past",
-  "is_future",
-  "is_metaphorical",
-]
-
 # EX_MARKERS = {
 #   "ex"
 # }
@@ -65,7 +54,6 @@ def is_hashtagged(token: Token) -> bool:
 #   return False
 
 def is_negated(noun: Token) -> bool:
-  # print("@ is_negated", noun)
   root = noun.sent.root
   for tok in noun.sent:
     if tok.is_punct:

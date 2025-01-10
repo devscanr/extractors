@@ -4,12 +4,7 @@ from spacy.tokens import Token
 from typing import Callable
 from ..patterns import expand_phrases12
 from ..spacyhelpers import left_token, right_token
-from ..utils import Pattern, lookslike
-
-__all__ = [
-  "Skill", "Term", "Topic",
-  "Disambiguate",
-]
+from ..utils import Pattern, hash_skillname, lookslike
 
 type Disambiguate = Callable[[Token], bool]
 type Resolve = Callable[[Token], list[str]]
@@ -31,7 +26,7 @@ class Term(Skill):
 
 @dataclass
 class Topic(Skill):
-  descr: None = None
+  descr = "Topic"
 
 def dis_context(*phrases: str) -> Disambiguate:
   regmarkers = [
@@ -51,7 +46,7 @@ def dis_context(*phrases: str) -> Disambiguate:
     return False
   return disambiguate
 
-def dis_sequence() -> Disambiguate:
+def dis_neighbours() -> Disambiguate:
   def disambiguate(token: Token) -> bool:
     ltoken = left_token(token)
     rtoken = right_token(token)
@@ -62,11 +57,14 @@ def dis_sequence() -> Disambiguate:
       return True
     elif re.match("[A-Z]", token.text):
       # Capitalized
-      if ltoken and ltoken.text == "," and ltoken2 and re.match("[A-Z#]", ltoken2.text):
+      if ltoken and ltoken.text in {",", ")"} and ltoken2 and re.match("[A-Z#]", ltoken2.text):
         # And the prev word is capitalized or hashtagged
         return True
-      elif rtoken and rtoken.text == "," and rtoken2 and re.match("[A-Z#]", rtoken2.text):
+      elif rtoken and rtoken.text in {",", "("} and rtoken2 and re.match("[A-Z#]", rtoken2.text):
         # And the next word is capitalized or hashtagged
+        return True
+      elif ltoken and rtoken and ltoken.text == "(" and rtoken.text == ")":
+        # And the token is within parentheses
         return True
     return False
   return disambiguate
@@ -74,7 +72,6 @@ def dis_sequence() -> Disambiguate:
 def dis_letter() -> Disambiguate:
   markers = {"lang", "language"}
   def disambiguate(token: Token) -> bool:
-    print("@ disambiguate letter", token)
     ltoken = left_token(token)
     if ltoken and ltoken.lower_ == "#":
       return True
@@ -94,5 +91,11 @@ def dis_letter() -> Disambiguate:
 #     return any(dis_fn(token) for dis_fn in dis_fns)
 #   return disambiguate
 
-def clean(label: str) -> str:
+def label(skill: Skill) -> str:
+  if skill.disambiguate:
+    return skill.name + ":maybe:" + hash_skillname(skill.name)
+  else:
+    return skill.name
+
+def unlabel(label: str) -> str:
   return re.sub(r":maybe:.+$", "", label)

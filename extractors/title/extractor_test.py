@@ -1,304 +1,314 @@
+# mypy: disable-error-code=no-untyped-def
+import pytest
+from spacy import Language
 from ..utils import fix_grammar, normalize, omit_parens
 from .extractor import TitleExtractor, fix_more_grammar
 
-categorizer = TitleExtractor()
+class Test_TitleExtractor:
+  @pytest.fixture(scope="class")
+  def extract(self, nlp: Language):
+    ex = TitleExtractor(nlp)
+    def extract(text: str) -> str:
+      ntext = omit_parens(fix_more_grammar(fix_grammar(normalize(text))))
+      return ex.extract(ntext, fortag="HUMAN")
+    return extract
 
-def extract(text: str) -> str:
-  ntext = omit_parens(fix_more_grammar(fix_grammar(normalize(text))))
-  return categorizer.extract(ntext, category="HUMAN")
+  def test_extract_smoke(self, extract) -> None:
+    assert extract("A developer") == "Developer"
+    assert extract("Django developer") == "Django Developer"
+    assert extract("other remote Engineer") == "Other Remote Engineer"
+    assert extract("I'm a junior PHP coder") == "Junior PHP Coder"
+    assert extract("developer, engineer") == "Developer | Engineer"
+    assert extract("developer and engineer") == "Developer | Engineer"
+    assert extract("Developer | Engineer") == "Developer | Engineer"
 
-def describe_TitleExtractor() -> None:
-  def describe_extract() -> None:
-    def it_works() -> None:
-      assert extract("A developer") == "Developer"
-      assert extract("Django developer") == "Django Developer"
-      assert extract("other remote Engineer") == "Other Remote Engineer"
-      assert extract("I'm a junior PHP coder") == "Junior PHP Coder"
-      assert extract("developer, engineer") == "Developer | Engineer"
-      assert extract("developer and engineer") == "Developer | Engineer"
-      assert extract("Developer | Engineer") == "Developer | Engineer"
+  def test_extract_negation(self, extract) -> None:
+    assert extract("not developer") == ""
+    assert extract("not a developer") == ""
+    assert extract("non-engineer") == ""
+    assert extract("a non-engineer") == ""
 
-    def it_handles_negation_indicators() -> None:
-      assert extract("I am a web engineer") == "Web Engineer"
-      assert extract("I am not a web engineer") == ""
+  def test_extract_past(self, extract) -> None:
+    assert extract("A former php engineer") == ""
+    assert extract("Former engineer") == ""
+    assert extract("An ex-php engineer") == ""
+    assert extract("Ex engineer") == ""
+    assert extract("I was a php developer") == ""
+    assert extract("A retired php developer") == ""
 
-    def it_handles_past_indicators() -> None:
-      assert extract("A php engineer") == "Php Engineer"
-      assert extract("A former php engineer") == ""
-      assert extract("I am a php developer") == "Php Developer"
-      assert extract("I was a php developer") == ""
+  def test_extract_future(self, extract) -> None:
+    assert extract("I will be a Laravel developer") == ""
+    assert extract("I am going to be a Laravel developer") == ""
+    assert extract("Gonna become a Blockchain dev") == ""
+    assert extract("Carl is a striving Blockchain dev") == ""
+    assert extract("Future Mobile engineer") == ""
+    assert extract("Aspiring Mobile engineer") == ""
 
-    def it_handles_future_indicators() -> None:
-      assert extract("I am a Laravel developer") == "Laravel Developer"
-      assert extract("I will be a Laravel developer") == ""
-      assert extract("I am going to be a Laravel developer") == ""
-      assert extract("Carl is a striving Laravel developer") == ""
-      assert extract("Future Laravel developer") == ""
-      assert extract("Aspiring Laravel developer") == ""
+  def test_extract_bios1(self, extract) -> None:
+    assert extract("full-stack quantum chemist") == "Full-Stack Quantum Chemist"
+    assert extract("Senior SWE, CS undergraduate") == "Senior SWE | CS Undergraduate"
+    assert extract("Healthcare data analyst & freelancer") == "Healthcare Data Analyst | Freelancer"
+    assert extract("Machine Learning Engineer (Remote Worker)") == "Machine Learning Engineer"
+    assert extract("""
+      IT CONSULTANT | REMOTE SENIOR JAVA SOFTWARE ENGINEER
+    """) == "IT CONSULTANT | Remote SENIOR JAVA SOFTWARE ENGINEER"
+    # ^ another Spacy bug, triggerd by REMOTE capitalization (workarounded in `fix_more_grammar`)
 
-    def it_handles_real_set1() -> None:
-      assert extract("full-stack quantum chemist") == "Full-Stack Quantum Chemist"
-      assert extract("Senior SWE, CS undergraduate") == "Senior SWE | CS Undergraduate"
-      assert extract("Healthcare data analyst & freelancer") == "Healthcare Data Analyst | Freelancer"
-      assert extract("Machine Learning Engineer (Remote Worker)") == "Machine Learning Engineer"
-      assert extract("""
-        IT CONSULTANT | REMOTE SENIOR JAVA SOFTWARE ENGINEER
-      """) == "IT CONSULTANT | Remote SENIOR JAVA SOFTWARE ENGINEER"
-      # ^ another Spacy bug, triggerd by REMOTE capitalization (workarounded in `fix_more_grammar`)
+  def test_extract_bios2(self, extract) -> None:
+    assert extract("""
+      Head of Mobile, #Android, #Engineer, #Consultant, #Remote
+    """) == "Head of Mobile | Engineer | Consultant"
+    assert extract("CEO/co-founder of Tuple, a tool for remote pair programming") == "CEO | Co-Founder of Tuple"
+    assert extract("CTO | Senior Systems Analyst | Hybrid Remote") == "CTO | Senior Systems Analyst"
+    assert extract("Senior Android Developer(Looking for Remote Role)") == "Senior Android Developer"
+    assert extract("""
+      Full Stack Web Developer | Remote enthusiast | Associate
+    """) == "Full Stack Web Developer | Remote Enthusiast"
 
-    def it_handles_real_set2() -> None:
-      assert extract("""
-        Head of Mobile, #Android, #Engineer, #Consultant, #Remote
-      """) == "Head of Mobile | Engineer | Consultant"
-      assert extract("CEO/co-founder of Tuple, a tool for remote pair programming") == "CEO / Co-Founder of Tuple"
-      assert extract("CTO | Senior Systems Analyst | Hybrid Remote") == "CTO | Senior Systems Analyst"
-      assert extract("Senior Android Developer(Looking for Remote Role)") == "Senior Android Developer"
-      assert extract("""
-        Full Stack Web Developer | Remote enthusiast | Associate
-      """) == "Full Stack Web Developer | Remote Enthusiast"
+  def test_extract_bios3(self, extract) -> None:
+    assert extract("Professor, Remote Sensing") == "Professor"
+    assert extract("""
+      Digital Entrepreneur | Code Lover | Open for New Opportunities
+    """) == "Digital Entrepreneur"
+    assert extract("Student. Looking for internships.") == "Student"
+    assert extract("Software Developer, seeking new employment possibilities") == "Software Developer"
+    assert extract("Professional UI/UX Designer, I Am Ready for hire.") == "Professional UI/UX Designer"
 
-    def it_handles_real_set3() -> None:
-      assert extract("Professor, Remote Sensing") == "Professor"
-      assert extract("""
-        Digital Entrepreneur | Code Lover | Open for New Opportunities
-      """) == "Digital Entrepreneur"
-      assert extract("Student. Looking for internships.") == "Student"
-      assert extract("Software Developer, seeking new employment possibilities") == "Software Developer"
-      assert extract("Professional UI/UX Designer, I Am Ready for hire.") == "Professional UI/UX Designer"
+  def test_extract_bios4(self, extract) -> None:
+    assert extract("🏻 Web Developer | JS ❤ ~ Always open to learn") == "Web Developer"
+    assert extract("""
+      I'm a highly motivated Ninja. Always looking for new things to learn.
+    """) == "Motivated Ninja"
+    assert extract("Freelance Programmer | Not for Hire") == "Freelance Programmer"
+    assert extract("AI Thought Leader | Cognitive Architecture | Heuristic Imperatives") == "AI Thought Leader"
+    assert extract("""
+      Open Source Enthusiast, Project Leader @OWASP Chapter Leader @OWASP
+    """) == "Open Source Enthusiast | Project Leader @OWASP Chapter Leader"
 
-    def it_handles_real_set4() -> None:
-      assert extract("🏻 Web Developer | JS ❤ ~ Always open to learn") == "Web Developer"
-      assert extract("""
-        I'm a highly motivated Ninja. Always looking for new things to learn.
-      """) == "Highly Motivated Ninja"
-      assert extract("Freelance Programmer | Not for Hire") == "Freelance Programmer"
-      assert extract("AI Thought Leader | Cognitive Architecture | Heuristic Imperatives") == "AI Thought Leader"
-      assert extract("""
-        Open Source Enthusiast, Project Leader @OWASP Chapter Leader @OWASP
-      """) == "Open Source Enthusiast | Project Leader @OWASP Chapter Leader"
+  def test_extract_bios5(self, extract) -> None:
+    assert extract("""
+      Mobile Platform Technical Leader - iOS Engineer
+    """) == "Mobile Platform Technical Leader - iOS Engineer"
+    assert extract("Designer Developer from Ireland") == "Designer Developer"
+    assert extract("Captain leading from the front!") == ""
+    assert extract("CTO at entro.solutions") == "CTO at Entro.Solutions" # Python `.title()` capitalizes like that :shrug:
+    assert extract("Physics research head at nvidia") == "Physics Research Head at Nvidia"
 
-    def it_handles_real_set5() -> None:
-      assert extract("""
-        Mobile Platform Technical Leader - iOS Engineer
-      """) == "Mobile Platform Technical Leader - iOS Engineer"
-      assert extract("Designer Developer from Ireland") == "Designer Developer"
-      assert extract("Captain leading from the front!") == ""
-      assert extract("CTO at entro.solutions") == "CTO at Entro.Solutions" # Python `.title()` capitalizes like that :shrug:
-      assert extract("Physics research head at nvidia") == "Physics Research Head at Nvidia"
+  def test_extract_bios6(self, extract) -> None:
+    assert extract("""
+      Author of Head First Ruby and Head First Go, published by O'Reilly Media.
+    """) == "Author of Head First Ruby"
+    assert extract("""
+      Web (php) engineer and entrepreneur caring about the quality
+    """) == "Web Engineer | Entrepreneur"
+    assert extract("""
+      Cloud, DB and Security analyst.
+    """) == "DB and Security Analyst"
+    assert extract("""
+      VP Eng. at MedScout, storyteller, student of disasters.
+    """) == "VP Eng at MedScout | Student of Disasters"
+    assert extract("""
+      Healthcare data analyst freelancer
+    """) == "Healthcare Data Analyst Freelancer"
 
-    def it_handles_real_set7() -> None:
-      assert extract("""
-        Author of Head First Ruby and Head First Go, published by O'Reilly Media.
-      """) == "Author of Head First Ruby"
-      assert extract("""
-        Web (php) engineer and entrepreneur caring about the quality
-      """) == "Web Engineer | Entrepreneur"
-      assert extract("""
-        Cloud, DB and Security analyst.
-      """) == "DB and Security Analyst"
-      assert extract("""
-        VP Eng. at MedScout, storyteller, student of disasters.
-      """) == "VP Eng at MedScout | Student of Disasters"
-      assert extract("""
-        Healthcare data analyst freelancer
-      """) == "Healthcare Data Analyst Freelancer"
+  def test_extract_bios7(self, extract) -> None:
+    assert extract("PHP phper, Python pythonista") == "PHP Phper | Python Pythonista"
+    assert extract("Head of Decentralized Identity @ Block, Inc.") == "Head of Decentralized Identity"
+    assert extract("""
+      Campaign Lead, Data Scientist, Statistician
+    """) == "Campaign Lead | Data Scientist | Statistician"
+    assert extract("""
+      Student of secondary programming technical school in Poland
+    """) == "Student of Secondary Programming Technical School"
+    assert extract("Head of Software at Krystal") == "Head of Software at Krystal"
 
-    def it_handles_real_set8() -> None:
-      assert extract("PHP phper, Python pythonista") == "PHP Phper | Python Pythonista"
-      assert extract("Head of Decentralized Identity @ Block, Inc.") == "Head of Decentralized Identity"
-      assert extract("""
-        Campaign Lead, Data Scientist, Statistician
-      """) == "Campaign Lead | Data Scientist | Statistician"
-      assert extract("""
-        Student of secondary programming technical school in Poland
-      """) == "Student of Secondary Programming Technical School"
-      assert extract("Head of Software at Krystal") == "Head of Software at Krystal"
+  def test_extract_bios8(self, extract) -> None:
+    assert extract("ex-game developer") == ""
+    assert extract("Computational Game Theory Researcher") == "Computational Game Theory Researcher"
+    assert extract("SQL Server/Cloud DBA") == "SQL Server/Cloud DBA"
+    assert extract("Aspiring Machine Learning / Data Engineer") == ""
+    assert extract("""
+      Programmer, cybersecurity expert, and 2017 penetration tester
+    """) == "Programmer | Cybersecurity Expert | Penetration Tester"
 
-    def it_handles_real_set9() -> None:
-      assert extract("ex-game developer") == ""
-      assert extract("Computational Game Theory Researcher") == "Computational Game Theory Researcher"
-      assert extract("SQL Server/Cloud DBA") == "SQL Server/Cloud DBA"
-      assert extract("Aspiring Machine Learning / Data Engineer") == ""
-      assert extract("""
-        Programmer, cybersecurity expert, and 2017 penetration tester
-      """) == "Programmer | Cybersecurity Expert | 2017 Penetration Tester"
+  def test_extract_bios9(self, extract) -> None:
+    assert extract("""
+      Frontend Consultant; Web, Mobile and Desktop Applications Developer
+    """) == "Frontend Consultant | Web, Mobile and Desktop Applications Developer"
+    assert extract("""
+      Full-stack web developer and Zend Certified PHP Engineer
+    """) == "Full-Stack Web Developer | Zend Certified PHP Engineer"
+    assert extract("""
+      Founder & CEO @QualiSage | Team Lead | Senior Full-Stack Developer | 10+ Years
+    """) == "Founder | CEO | Team Lead"
+    assert extract("""
+      Software generalist, father of two
+    """) == "Software Generalist"
+    assert extract("""
+      Arduino addict. Java programmer in real life
+    """) == "Java Programmer"
 
-    def it_handles_real_set10() -> None:
-      assert extract("""
-        Frontend Consultant; Web, Mobile and Desktop Applications Developer
-      """) == "Frontend Consultant | Web, Mobile and Desktop Applications Developer"
-      assert extract("""
-        Full-stack web developer and Zend Certified PHP Engineer
-      """) == "Full-Stack Web Developer | Zend Certified PHP Engineer"
-      assert extract("""
-        Founder & CEO @QualiSage | Team Lead | Senior Full-Stack Developer | 10+ Years
-      """) == "Founder | CEO | Team Lead"
-      assert extract("""
-        Software generalist, father of two
-      """) == "Software Generalist"
-      assert extract("""
-        Arduino addict. Java programmer in real life
-      """) == "Java Programmer"
+  def test_extract_bios10(self, extract) -> None:
+    assert extract("""
+      3D game engine development amateur
+    """) == "3D Game Engine Development Amateur"
+    assert extract("""
+      Game Developer, Programmer, Bit of an Artist; C++, Unreal
+    """) == "Game Developer | Programmer"
+    assert extract("Retired backend engineer") == ""
+    assert extract("""
+      Retired backend engineer. Now an educator.
+    """) == "Educator"
+    assert extract("""
+      Full stack software engineer. Freelance. Some time ago: CTO & co-founder at Nightset
+    """) == "Full Stack Software Engineer" # CTO & Co-Founder at Nightset
 
-    def it_handles_real_set11() -> None:
-      assert extract("""
-        3D game engine development amateur
-      """) == "Game Engine Development Amateur"
-      assert extract("""
-        Game Developer, Programmer, Bit of an Artist; C++, Unreal
-      """) == "Game Developer | Programmer"
-      assert extract("Retired backend engineer") == ""
-      assert extract("""
-        Retired backend engineer. Now an educator.
-      """) == "Educator"
-      assert extract("""
-        Full stack software engineer. Freelance. Some time ago: CTO & co-founder at Nightset
-      """) == "Full Stack Software Engineer" # CTO & Co-Founder at Nightset
+  def test_extract_bios11(self, extract) -> None:
+    assert extract("Salesforce Guru") == "Salesforce Guru"
+    assert extract("Great Learning is an online learning platform designed to...") == ""
+    assert extract("the Learning&Training Hub of OS Kernel for Students & Developers") == ""
+    assert extract("Bachelor of Comp Sci student @ Concordia University") == "Bachelor of Comp Sci Student"
+    assert extract("Working as a Technical Recruiter!") == "Technical Recruiter"
 
-    def it_handles_real_set12() -> None:
-      assert extract("Salesforce Guru") == "Salesforce Guru"
-      assert extract("Great Learning is an online learning platform designed to...") == ""
-      assert extract("the Learning&Training Hub of OS Kernel for Students & Developers") == ""
-      assert extract("Bachelor of Comp Sci student @ Concordia University") == "Bachelor of Comp Sci Student"
-      assert extract("Working as a Technical Recruiter!") == "Technical Recruiter"
+  def test_extract_bios12(self, extract) -> None:
+    assert extract("""
+      CS-sophomore | Game-dev (Unity & C#)
+    """) == "CS-Sophomore | Game-Dev"
+    assert extract("""
+      Freelance Programmer | Not for Hire
+    """) == "Freelance Programmer"
+    assert extract("""
+      Computer science newbie
+    """) == "Computer Science Newbie"
+    assert extract("""
+      CMC MSU bachelor's degree, FCS HSE master student, ex-Data Scientist at Tinkoff bank
+    """) == "CMC MSU Bachelor | FCS HSE Master Student"
+    assert extract("Hello. I'am Vadim Tikhonov. I study code, data analysis and data science.") == ""
 
-    def it_handles_real_set13() -> None:
-      assert extract("""
-        CS-sophomore | Game-dev (Unity & C#)
-      """) == "CS-Sophomore | Game-Dev"
-      assert extract("""
-        Freelance Programmer | Not for Hire
-      """) == "Freelance Programmer"
-      assert extract("""
-        Computer science newbie
-      """) == "Computer Science Newbie"
-      assert extract("""
-        CMC MSU bachelor's degree, FCS HSE master student, ex-Data Scientist at Tinkoff bank
-      """) == "CMC MSU Bachelor | FCS HSE Master Student"
-      assert extract("Hello. I'am Vadim Tikhonov. I study code, data analysis and data science.") == ""
+  def test_extract_bios13(self, extract) -> None:
+    assert extract("""
+      I'm a Professional C++ Game and Software Developer from New York.
+    """) == "Professional C++ Game and Software Developer"
+    assert extract("""
+      Father, hacker, blogger, gamer, & nerd. Bounty Hunter
+    """) == "Hacker"
+    assert extract("""
+      iOS/SwiftUI developer and UI/UX designer
+    """) == "iOS/SwiftUI Developer | UI/UX Designer"
+    assert extract("""
+      Ph.D. candidate, interested in software security
+    """) == "Ph.D Candidate"
+    assert extract("""
+      Self-employed web engineer #Rust #Wasm #Go #TypeScript #React #REST
+    """) == "Self-Employed Web Engineer"
 
-    def it_handles_real_set14() -> None:
-      assert extract("""
-        I'm a Professional C++ Game and Software Developer from New York.
-      """) == "Professional C++ Game and Software Developer"
-      assert extract("""
-        Father, hacker, blogger, gamer, & nerd. Bounty Hunter
-      """) == "Hacker"
-      assert extract("""
-        iOS/SwiftUI developer and UI/UX designer
-      """) == "iOS/SwiftUI Developer | UI/UX Designer"
-      assert extract("""
-        Ph.D. candidate, interested in software security
-      """) == "Ph.D Candidate"
-      assert extract("""
-        Self-employed web engineer #Rust #Wasm #Go #TypeScript #React #REST
-      """) == "Self-Employed Web Engineer"
+  def test_extract_bios14(self, extract) -> None:
+    assert extract("Currently studying React Ecosystem") == ""
+    assert extract("""
+      Blockchain developer, bulding for DeFi.
+    """) == "Blockchain Developer"
+    assert extract("""
+      Environmental student, Unreal Engine developer
+    """) == "Environmental Student | Unreal Engine Developer"
+    assert extract("""
+      CS Undergrad at New Jersey Institute of Technology
+    """) == "CS Undergrad at New Jersey Institute"
+    assert extract("""
+      Arman is a full-stack developer who mainly focuses on web development
+    """) == "Full-Stack Developer"
 
-    def it_handles_real_set15() -> None:
-      assert extract("Currently studying React Ecosystem") == ""
-      assert extract("""
-        Blockchain developer, bulding for DeFi.
-      """) == "Blockchain Developer"
-      assert extract("""
-        Environmental student, Unreal Engine developer
-      """) == "Environmental Student | Unreal Engine Developer"
-      assert extract("""
-        CS Undergrad at New Jersey Institute of Technology
-      """) == "CS Undergrad at New Jersey Institute"
-      assert extract("""
-        Arman is a full-stack developer who mainly focuses on web development
-      """) == "Full-Stack Developer"
+  def test_extract_bios15(self, extract) -> None:
+    assert extract("""
+      Software Engineer, Tech Lead in Rust, WASM, TypeScript
+    """) == "Software Engineer | Tech Lead"
+    assert extract("""
+      Head of web engineering at Temporalio.
+    """) == "Head of Web Engineering at Temporalio"
+    assert extract("ex-lead of GitHub QA team") == ""
+    assert extract("A strong conceptual thinker and a constant student") == ""
+    assert extract("""
+      I am Viktor Klang, a finder, researcher, problem solver, improver of things,
+      life-long student, developer/programmer, leader, mentor/advisor, public speaker…
+    """) == "Researcher | Student | Developer"
 
-    def it_handles_real_set16() -> None:
-      assert extract("""
-        Software Engineer, Tech Lead in Rust, WASM, TypeScript
-      """) == "Software Engineer | Tech Lead"
-      assert extract("""
-        Head of web engineering at Temporalio.
-      """) == "Head of Web Engineering at Temporalio"
-      assert extract("ex-lead of GitHub QA team") == ""
-      assert extract("A strong conceptual thinker and a constant student") == ""
-      assert extract("""
-        I am Viktor Klang, a finder, researcher, problem solver, improver of things,
-        life-long student, developer/programmer, leader, mentor/advisor, public speaker…
-      """) == "Researcher | Student, Developer | Leader"
-      # ^ known issue, caused by Spacy wrong dep. parsing
+  def test_extract_bios16(self, extract) -> None:
+    assert extract("""
+      Head of foreign Dev Relations at DXOS.org
+    """) == "Head of Foreign Dev Relations at DXOS.org"
+    # ^ "at DXOS.org" is lost due wrong dep. detection by Scrapy ("at" heads to "Relations" instead of "Head")
+    assert extract("Software Engineer, I was Head of Tech of Shinobi Team") == ""
+    # ^ "Software Engineer" heads to "was", likely a Spacy mistake
+    assert extract("""
+      I'm a JS / TS specialist focused on web and game development
+    """) == "JS / TS Specialist"
+    assert extract("""
+      I am a data scientist with a passion for learning
+    """) == "Data Scientist"
+    assert extract("Business Analyst | MBA Student") == "Business Analyst | MBA Student"
 
-    def it_handles_real_set17() -> None:
-      assert extract("""
-        Head of foreign Dev Relations at DXOS.org
-      """) == "Head of Foreign Dev Relations"
-      # ^ "at DXOS.org" is lost due wrong dep. detection by Scrapy ("at" heads to "Relations" instead of "Head")
-      assert extract("Software Engineer, I was Head of Tech of Shinobi Team") == ""
-      # ^ "Software Engineer" heads to "was", likely a Spacy mistake
-      assert extract("""
-        I'm a JS / TS specialist focused on web and game development
-      """) == "JS / TS Specialist"
-      assert extract("""
-        I am a data scientist with a passion for learning
-      """) == "Data Scientist"
-      assert extract("Business Analyst | MBA Student") == "Business Analyst | MBA Student"
+  def test_extract_bios17(self, extract) -> None:
+    assert extract("""
+      21 year old embedded systems electronics engineer.
+    """) == "Embedded Systems Electronics Engineer"
+    assert extract("Studying to become a therapist.") == ""
+    assert extract("""
+      Game Producer & Lead Development | Network & Systems Admin
+    """) == "Game Producer | Systems Admin"
+    assert extract("""
+      Game developer from New Orlean
+    """) == "Game Developer"
+    assert extract("""
+      freelance math teacher, freelance front-end developer
+    """) == "Freelance Math Teacher | Freelance Front-End Developer"
 
-    def it_handles_real_set18() -> None:
-      assert extract("""
-        21 year old embedded systems electronics engineer.
-      """) == "21 Year Old Embedded Systems Electronics Engineer"
-      assert extract("Studying to become a therapist.") == ""
-      assert extract("""
-        Game Producer & Lead Development | Network & Systems Admin
-      """) == "Game Producer | Systems Admin"
-      assert extract("""
-        Game developer from New Orlean
-      """) == "Game Developer"
-      assert extract("""
-        freelance math teacher, freelance front-end developer
-      """) == "Freelance Math Teacher | Freelance Front-End Developer"
+  def test_extract_bios18(self, extract) -> None:
+    assert extract("""
+      Founder and CEO of @rangle , the leading lean/agile JavaScript consulting firm.
+    """) == "Founder and CEO of @Rangle"
+    assert extract("""
+      Mobile Apps & Web Developer | Freelancer | Ready for Hire
+    """) == "Web Developer | Freelancer"
+    assert extract("""
+      Computer science student with an interest in data science.
+    """) == "Computer Science Student"
+    assert extract("""
+      A student of life, working as a QA at a Bay Area
+    """) == "QA at a Bay Area"
+    assert extract("Former CEO/co-founder of Tuple, a tool for remote pair programming") == "CEO"
+    # ^ known bug caused by Spacy
 
-    def it_handles_real_set19() -> None:
-      assert extract("""
-        Founder and CEO of @rangle , the leading lean/agile JavaScript consulting firm.
-      """) == "Founder and CEO of @Rangle"
-      assert extract("""
-        Mobile Apps & Web Developer | Freelancer | Ready for Hire
-      """) == "Web Developer | Freelancer"
-      assert extract("""
-        Computer science student with an interest in data science.
-      """) == "Computer Science Student"
-      assert extract("""
-        A student of life, working as a QA at a Bay Area
-      """) == "QA at a Bay Area"
-      assert extract("Former CEO/co-founder of Tuple, a tool for remote pair programming") == "CEO"
-      # ^ known bug caused by Spacy
+  def test_extract_bios19(self, extract) -> None:
+    assert extract("""
+      Frontend dev by day, backend student by night
+    """) == "Frontend Dev | Backend Student"
+    assert extract("""
+      a Microsoft Technical Trainer specializing in Data & AI
+    """) == "Microsoft Technical Trainer"
+    assert extract("""
+      ex-Facebook BFDL. Now tech-lead at @AWS
+    """) == "Tech-Lead at @AWS"
+    assert extract("""
+      Technical Artist. Founder of @Golden-Ram-Studio
+    """) == "Technical Artist | Founder of @Golden-Ram-Studio"
+    assert extract("""
+      My name is Devin and I am a Senior Gameplay Designer at
+      CD Projekt Red working on the next Witcher.
+    """) == "Senior Gameplay Designer at CD Projekt Red"
 
-    def it_handles_real_set20() -> None:
-      assert extract("""
-        Frontend dev by day, backend student by night
-      """) == "Frontend Dev | Backend Student"
-      assert extract("""
-        a Microsoft Technical Trainer specializing in Data & AI
-      """) == "Microsoft Technical Trainer"
-      assert extract("""
-        ex-Facebook BFDL. Now tech-lead at @AWS
-      """) == "Tech-Lead at @AWS"
-      assert extract("""
-        Technical Artist. Founder of @Golden-Ram-Studio
-      """) == "Technical Artist | Founder of @Golden-Ram-Studio"
-      assert extract("""
-        My name is Devin and I am a Senior Gameplay Designer at
-        CD Projekt Red working on the next Witcher.
-      """) == "Senior Gameplay Designer at CD Projekt Red"
-
-    def it_handles_real_set21() -> None:
-      assert extract("""
-        Technology leader at Gartner (Managing Vice President).
-        Graduate student at University of Illinois getting my MBA. Forever an engineer.
-      """) == "Technology Leader at Gartner | Graduate Student at University"
-      assert extract("""
-        Computer science masters graduate with a specialization in Data Science.  
-      """) == "Computer Science Masters Graduate"
-      assert extract("""
-        ⭐️ Senior Software Developer ⭐️ Blockchain / Backend / ETL  
-      """) == "Senior Software Developer"
+  def test_extract_bios20(self, extract) -> None:
+    assert extract("""
+      Technology leader at Gartner (Managing Vice President).
+      Graduate student at University of Illinois getting my MBA. Forever an engineer.
+    """) == "Technology Leader at Gartner | Graduate Student at University"
+    assert extract("""
+      Computer science masters graduate with a specialization in Data Science.
+    """) == "Computer Science Masters Graduate"
+    assert extract("""
+      ⭐️ Senior Software Developer ⭐️ Blockchain / Backend / ETL
+    """) == "Senior Software Developer"
+    assert extract("""
+      On a mission to help every student to reach their potential with technologies
+    """) == ""
 
 # On a mission to help every student to reach their potential with technologies - FP, discard dep:nsubj?
 # TOGAF 9 Certified Enterprise Architect, Pragmatist, Economic Student, Biker,

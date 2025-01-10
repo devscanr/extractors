@@ -1,7 +1,5 @@
 from ..utils import Skill, dis_context
 
-__all__ = ["SKILLS"]
-
 dis_ctx = dis_context("yandex")
 
 SKILLS: list[Skill] = [

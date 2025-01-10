@@ -1,7 +1,5 @@
-from ...utils import literal, noun
-from ..utils import Topic, dis_context, dis_sequence
-
-__all__ = ["SKILLS"]
+from ...utils import noun
+from ..utils import Topic, dis_context, dis_neighbours
 
 SKILLS: list[Topic] = [
   # ANALYSIS >
@@ -41,7 +39,8 @@ SKILLS: list[Topic] = [
   Topic("MVC", ["mvc", "mvvm", "model-view-controller"]),
   Topic("OOP", [
     "object=oriented( programming)", "oop",
-    # literal("SOLID"), literal("S.O.L.I.D"),
+    "S.O.L.I.D",
+    # "SOLID",
     "ооп"
   ]),
   Topic("Open-Source", ["open=source", "oss"]),
@@ -58,7 +57,7 @@ SKILLS: list[Topic] = [
   # BACKEND
   Topic("Backend", [
     "back=end", "backender",
-    # noun("BE")
+     noun("BE")
   ]), # not detected as PROPN, needs to be retrained
   Topic("Access-Control", ["rbac", "abac", "acl"]), # also SECURITY
   Topic("Authentication", ["authentication", "auth", "sign=in", "sign=out"]), # also SECURITY
@@ -72,10 +71,10 @@ SKILLS: list[Topic] = [
   Topic("OpenAPI", ["openapi"]), # TODO more like this
   Topic("REST", [
     "rest=api", "restful",
-    literal("REST"),
+    "REST",
   ]),
   Topic("REST", ["rest"], disambiguate=[
-    dis_sequence(),
+    dis_neighbours(),
     dis_context("api", "graphql", "rpc", "framework", "#go", "php")
   ]),
   Topic("-REST", [
@@ -125,7 +124,7 @@ SKILLS: list[Topic] = [
   Topic("Frontend", [
     "front=end", "frontender",
     noun("FE"),
-  ]), # not detected as PROPN, needs to be retrained
+  ]),
   # BEM, БЭМ
   Topic("Browser", ["browser"]),
   Topic("Canvas", ["canvas"]),
@@ -160,7 +159,7 @@ SKILLS: list[Topic] = [
   Topic("CPU", ["cpu", "central-processing-unit"]),  # also SYSTEMS
   Topic("CPU", ["micro=processor(s)"]),
   Topic("CPU", ["processor(s)"], disambiguate=[
-    dis_sequence(),
+    dis_neighbours(),
     dis_context("amd", "intel", "arm", "arc", "risc", "x86", "x32", "x64")
   ]),
   Topic("Embedded", ["embedded"]),
@@ -172,7 +171,7 @@ SKILLS: list[Topic] = [
   Topic("Motherboard", ["motherboards"]),
   Topic("PCB", ["pcb"]),
   Topic("PCI", ["pci"]), # also SYSTEMS
-  Topic("RAM", [literal("RAM")]), # also SYSTEMS
+  Topic("RAM", ["RAM"]), # also SYSTEMS
   Topic("SSD", ["hdd"]), # also SYSTEMS
 
   # LOW-CODE
@@ -202,13 +201,14 @@ SKILLS: list[Topic] = [
   # TODO more topics
 
   # NETWORKS >
+  Topic("Bluetooth", ["bluetooth"]), # also EMBEDDED
   Topic("CDN", ["cdn(s)"]),
   Topic("DNS", ["dns"]),
   Topic("Firewalls", ["firewall(s)"]), # also SECURITY
   Topic("FTP", ["ftp"]),
   Topic("SFTP", ["sftp"]), # also SECURITY
   Topic("HighLoad", ["high=load"]),
-  Topic("HTTP", ["http"]),
+  Topic("HTTP", ["http"]),   # also BACKEND and more
   Topic("HTTPS", ["https"]), # also SECURITY
   Topic("IP", ["ip", "ip(v)4", "ip(v)6"]),
   Topic("Proxies", ["proxy", "proxies"]),
@@ -219,6 +219,7 @@ SKILLS: list[Topic] = [
   Topic("UDP", ["udp"]),
   Topic("VLAN", ["vlan"]),
   Topic("VPN", ["vpn(s)"]), # also SECURITY
+  Topic("Wi-Fi", ["wi=fi"]), # also EMBEDDED
   Topic("Wireless", ["wireless"]),
 
   # OPERATIONS >
@@ -439,7 +440,7 @@ SKILLS: list[Topic] = [
     "solution=architecture", "solution=architect"
   ], resolve=["Business", "Software", "Architecture"]),
 
-  Topic("SRE", [literal("SRE")], resolve=["Reliability", "Software", "Engineering"]),
+  Topic("SRE", ["SRE"], resolve=["Reliability", "Software", "Engineering"]),
 
   Topic("System-Administration", [
     "systemadministration", "systemadministrator", "sysadmin"

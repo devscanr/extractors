@@ -1,6 +1,6 @@
 from spacy.tokens import Token
-from ...utils import IN, LOWER, OP, literal, propn, ver1
-from ..utils import Disambiguate, Skill, dis_context, dis_letter, dis_sequence
+from ...utils import IN, LOWER, OP, propn, ver1
+from ..utils import Disambiguate, Skill, dis_context, dis_letter, dis_neighbours
 from .adobe import SKILLS as ADOBE_SKILLS
 from .amazon import SKILLS as AMAZON_SKILLS
 from .apache import SKILLS as APACHE_SKILLS
@@ -14,8 +14,6 @@ from .industries import SKILLS as INDUSTRIES_SKILLS
 from .topics import SKILLS as TOPICS_SKILLS
 from .yandex import SKILLS as YANDEX_SKILLS
 
-__all__ = ["SKILLS"]
-
 def dis_julia() -> Disambiguate:
   # dis_seq = dis_sequence()
   def disambiguate(token: Token) -> bool:
@@ -24,6 +22,12 @@ def dis_julia() -> Disambiguate:
         return False
     return True
   return disambiguate
+
+# SKILLS: list[Skill] = [
+#   Skill("JAX-Kex", [
+#     "JAX=Kex",
+#   ]),
+# ]
 
 SKILLS: list[Skill] = [
   *ADOBE_SKILLS,
@@ -109,8 +113,7 @@ SKILLS: list[Skill] = [
   Skill("Supabase", ["supabase"], ""),
   Skill("SQLite", [ver1("sqlite")], ""),
   Skill("Trino", ["trino"], ""), # also ANALYTICS (https://trino.io/ Fast distributed SQL query engine for big data analytics)
-
-  # ORM
+  # orms
   Skill("Django-ORM", ["django=orm"], ""),
   Skill("Drizzle", ["drizzle=orm", "drizzle"], ""),
   Skill("Hibernate", ["hibernate"], ""),
@@ -138,7 +141,7 @@ SKILLS: list[Skill] = [
   Skill("ShowFlake", ["snowflake"], ""), # ~ MS Databricks, ~ AWS Redshift
   Skill("Spacy", ["spacy"], ""),
   Skill("Stan", ["stan"], "", disambiguate=[
-    dis_sequence(),
+    dis_neighbours(),
     dis_context("r", "python")
   ]),
   Skill("Stata", ["stata"], ""),
@@ -249,10 +252,10 @@ SKILLS: list[Skill] = [
   Skill("HTMX", ["htmx"], ""),
   Skill("Meteor", ["meteor", "meteor.=js"], ""),
   Skill("Ktor", ["ktor"], ""), # fullstack framework in Kotlin
-  Skill("NextJS", ["next.=js", propn("next")], ""),
+  Skill("NextJS", ["next.=js"], ""), # , propn("next")
   Skill("NextJS", ["next"], disambiguate=[
-    dis_sequence(),
-    dis_context("framework", "nuxt")
+    dis_neighbours(),
+    dis_context("framework", "nuxt", "react")
   ]),
   Skill("NuxtJS", ["nuxt.=js", propn("nuxt")], ""),
   Skill("NodeJS", ["node.=js", propn("node")], ""),
@@ -322,13 +325,13 @@ SKILLS: list[Skill] = [
   Skill("Cucumber", ["cucumber"], ""),
   Skill("Cypress", ["cypress", "cypress.=js"], ""),
   Skill("Jasmine", ["jasmine"], "", disambiguate=[
-    dis_sequence(),
+    dis_neighbours(),
     dis_context("Jest", "Karma", "QA")
   ]),
   Skill("Jest", ["jest"], ""),
   Skill("JUnit", ["junit"], ""),
   Skill("Karma", ["karma"], "", disambiguate=[
-    dis_sequence(),
+    dis_neighbours(),
     dis_context("Jasmine", "Jest", "QA")
   ]),
   Skill("PHPUnit", ["php=unit"], ""),
@@ -365,7 +368,7 @@ SKILLS: list[Skill] = [
   Skill("Netcat", ["netcat", "ncat"], ""), # also SECURITY
   Skill("Proxyman", ["proxyman"], ""),   # also SECURITY
   Skill("Wireshark", ["wireshark"], ""),   # also SECURITY
-  Skill("YANG", [literal("YANG")], "Data modeling language"),
+  Skill("YANG", ["YANG"], "Data modeling language"),
   Skill("Zigbee", ["zigbee"], ""), # protocol spec. also EMBEDDED
 
   # SECURITY
@@ -375,7 +378,7 @@ SKILLS: list[Skill] = [
   Skill("CISM", ["cism"], ""),   # certificate
   Skill("CISSP", ["ciss", "cissp"], "Certified Information Systems Security Professional"), # certificate
   Skill("CSSLP", ["csslp"], "Certified Secure Software Lifecycle Professional"), # certificate
-  Skill("CASE", [literal("CASE")], "Certified Application Security Engineer"), # certificate
+  Skill("CASE", ["CASE"], "Certified Application Security Engineer"), # certificate
   Skill("CompTIA-PenTest+", ["pentest+", "comptia-p(entest)+"], ""), # certificate
   Skill("CompTIA-Security+", ["security+", "comptia-s(ecurity)+"], ""), # certificate
   Skill("GIAC-CIH", ["gcih"], ""),     # certificate
@@ -430,7 +433,7 @@ SKILLS: list[Skill] = [
   Skill("ASIC", ["asic"], ""), # ASICs are custom-designed circuits for specific applications, offering high performance and efficiency
   Skill("ARC", [propn("ARC")], "CPU family"),
   Skill("ARC", ["arc"], disambiguate=[
-    dis_sequence(),
+    dis_neighbours(),
     dis_context("cpu", "arm", "processor(s)")
   ]),
   Skill("AutoCAD", ["autocad"], ""),
@@ -455,7 +458,7 @@ SKILLS: list[Skill] = [
   Skill("Autodesk-Fusion", ["autodesk-fusion", "fusion=360"], ""), # tool
   Skill("Autodesk-Eagle", ["autodesk-eagle"], ""), # tool
   Skill("Autodesk-Eagle", ["eagle"], disambiguate=[
-    dis_sequence(),
+    dis_neighbours(),
     dis_context("Autodesk", "AutoCAD")
   ]),
   Skill("Touchdesigner", ["touchdesigner"], "Visual development platform"), #
@@ -507,7 +510,8 @@ SKILLS: list[Skill] = [
   Skill("JSON", ["json", "json5"], ""),
   Skill("Julia", ["julia"], "", disambiguate=dis_julia()),
   Skill("Kotlin", ["kotlin"], ""),
-  Skill("LESS", [literal("LESS")], ""),
+  Skill("LESS", ["LESS"], ""),
+  Skill("LESS", ["less"], disambiguate=dis_context("sass", "scss")),
   Skill("Lisp", ["lisp"], ""),
   Skill("Lua", ["lua"], ""),
   Skill("Nim", ["nim"], ""),

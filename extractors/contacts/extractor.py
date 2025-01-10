@@ -3,8 +3,6 @@ from .email import parse_emails
 from .phone import parse_phones
 from .url import parse_urls
 
-__all__ = ["Contacts", "ContactExtractor"]
-
 @dataclass
 class Contacts:
   emails: list[str] = field(default_factory=list)

@@ -18,14 +18,6 @@ from typing import Any, Callable, Generator, cast, Iterable
   "LEFT_ID", "REL_OP", "RIGHT_ID", "RIGHT_ATTRS"
 )
 
-__all__ = [
-  "normalize", "uniq", "omit_parens",
-  "fix_grammar",
-  "get_nlp", "ver1", "noun", "propn", "verb",
-  "Pattern", "LB", "RB",
-  "orth", "lookslike",
-]
-
 def normalize(text: str, pipechar: str = ".") -> str:
   # Correct separators for grammar
   text = text.replace("：", ": ")
@@ -43,12 +35,15 @@ def normalize(text: str, pipechar: str = ".") -> str:
   text = re.sub(r"(\.js)/(?=\w)", r"\1 / ", text, flags=re.IGNORECASE)
   # Workarounds for C# and C++ joined with separators
   text = re.sub(r"(?<!\w)(c(?:\+\+|#))([,/])(?=\w)", sep_splitter, text, flags=re.IGNORECASE)
-  # Strip the whitespace
-  text = text.strip()
-  # Add the trailing dot
-  text = re.sub(r"(?<=\w)$", " .", text)
+  # Strip decorations
+  text = re.sub(r"(^[-~=\s]+)|([-~=#@\s]+$)", "", text)
   # Collapse whitespace
   text = re.sub(r"\s+", " ", text)
+  # Ensure the trailing dot if necessary
+  last_word = text.split(" ")[-1]
+  if not last_word.endswith((".", "?", "!")) and not "." in last_word:
+    text += "."
+  # print(repr(text))
   return text
 
 def sep_splitter(match: re.Match[str]) -> str:
@@ -136,8 +131,9 @@ GRAMMAR_FIXES: list[tuple[str, str, re.RegexFlag | int]] = [
   (rf"{LB}B\.?S\.?C?\.?{RB}|{LB}SC?\.?B\.?{RB}", r"B.S", re.IGNORECASE), # B.S  = Bachelor of Science
   (rf"{LB}M\.?S\.?C?\.?{RB}|{LB}SC\.?M\.?{RB}", r"M.S", re.IGNORECASE),  # M.S  = Master of Science (not handling "SM" forms for now)
   (rf"{LB}P\.?H\.?D?\.?{RB}", r"Ph.D", re.IGNORECASE),                   # Ph.D = Doctor of Philosophy
-  (rf"{LB}eng.{RB}", r"eng", re.IGNORECASE),
+  (rf"{LB}eng\.{RB}", r"eng", re.IGNORECASE),
   (rf"{LB}ex\s*[-.]\s*(?=\w)", r"ex ", re.IGNORECASE),
+  (rf"{LB}non\s*-\s*(?=\w)", r"non ", re.IGNORECASE),
   (r" @ ", r" at ", 0),
   (r" & ", r" and ", 0),
   (r"(?<=[\w\s])/co-founder", r" / co-founder", re.IGNORECASE),
@@ -227,13 +223,17 @@ def add_jj_exceptions2(nlp: Language, items: list[str]) -> None:
 
 def get_nlp(name: str | Path = "en_core_web_sm") -> Language:
   nlp = spacy.load(name, exclude=["ner"]) # "lemmatizer",
+
+  # Custom components
   nlp.add_pipe("index_tokens_by_sents", after="parser")
 
+  # Prefixes
   prefixes = list(nlp.Defaults.prefixes or [])
   prefixes.append(r"[-=/(](?=[a-zA-Z(])")
   prefix_regex = spacy.util.compile_prefix_regex(prefixes)
   nlp.tokenizer.prefix_search = prefix_regex.search # type: ignore
 
+  # Suffixes
   suffixes = list(nlp.Defaults.suffixes or [])
   suffixes.append(r"(?<=[a-zA-Z)])[-=/.)]")
   suffixes = [
@@ -260,6 +260,7 @@ def get_nlp(name: str | Path = "en_core_web_sm") -> Language:
     return False
   nlp.tokenizer.token_match = token_match # type: ignore
 
+  # Infixes
   infixes = list(nlp.Defaults.infixes or [])
   infixes.append(r"(?<=[a-zA-Z)])[&+()/](?=[a-zA-Z(])")
   infix_finditer = spacy.util.compile_infix_regex(infixes)
@@ -306,10 +307,10 @@ def ver1(word: str) -> Pattern:
     {LOWER: {REGEX: r"^" + word + r"[-\d.]{0,4}$"}}
   ]
 
-def literal(word: str) -> Pattern:
-  # TODO support spaces and other punct
+def literal(phrase: str) -> Pattern:
   return [
-    {ORTH: word}
+    {ORTH: word} for word in re.split(r"(?<=\W)(?=\w)|(?<=\w)(?=\W)", phrase)
+    if word.strip()
   ]
 
 def noun(word: str) -> Pattern:

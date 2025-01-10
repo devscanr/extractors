@@ -1,15 +1,15 @@
 from dataclasses import dataclass
+from pprint import pprint
 import re
-from spacy.pipeline import EntityRuler
+from spacy import Language
+from spacy.matcher import Matcher, PhraseMatcher
 from spacy.tokens import Doc, Token
-from typing import Any, cast, Literal, Sequence
+from typing import cast, Literal, Sequence
 from ..markers import is_future, is_hashtagged, is_metaphorical, is_negated, is_past
 from ..patterns import expand_phrase12
-from ..spacyhelpers import left_lowerwords, right_anc_heads, right_lowerwords
-from ..utils import Pattern, get_nlp
-from .data import DEV_CANCELING_ROLES, FREELANCER_CANCELING_ROLES, LABELED_PHRASES, LEAD_CANCELING_ROLES, ORG_CANCELING_ROLES, STUDENT_CANCELING_ROLES
-
-__all__ = ["Categorized", "CategoryExtractor", "Role"]
+from ..spacyhelpers import ancestors, left_lowerwords, right_ancestors, right_lowerwords, token_level
+from ..utils import Pattern, literal
+from .data import CANCELING_TAGS, TAGGED_PHRASES
 
 IN, LOWER, ORTH, POS = "IN", "LOWER", "ORTH", "POS"
 
@@ -24,35 +24,26 @@ class Categorized:
   is_hireable: bool | None
 
 class CategoryExtractor:
-  def __init__(self, name: str = "en_core_web_sm") -> None:
-    self.nlp = get_nlp(name)
-    self.init_eruler("entity_ruler", LABELED_PHRASES)
+  def __init__(self, nlp: Language) -> None:
+    self.nlp = nlp
+    self.matcher = Matcher(self.nlp.vocab)                      # matcher: single word, more verbose syntax than PM but less verbose than DM
+    self.pmatcher = PhraseMatcher(self.nlp.vocab, attr="LOWER") # phrases: fastest, no flexibility
+    self.init_matchers(TAGGED_PHRASES)
 
-  def init_eruler(self, name: str, labeled_phrases: dict[str, list[str | Pattern]]) -> None:
-    ruler: EntityRuler = cast(Any, self.nlp.add_pipe("entity_ruler", config={
-      "phrase_matcher_attr": "LOWER",
-    }, name=name))
-    for label, phrases in labeled_phrases.items():
+  def init_matchers(self, tagged_phrases: dict[str, list[str | Pattern]]) -> None:
+    for tag, phrases in tagged_phrases.items():
+      # Update matchers with patterns
       for phrase in phrases:
         if isinstance(phrase, str):
-          assert not re.search("[A-Z]", phrase), f"{phrase!r} contains uppercase character(s), use pattern syntax"
-          ruler.add_patterns([{
-            "label": label,
-            "pattern": pattern
-          } for pattern in expand_phrase12(phrase)])
+          if "<<" in phrase:
+            raise Exception("not supported")
+          else:
+            if re.search("[A-Z]", phrase):
+              self.matcher.add(tag, [literal(p) for p in expand_phrase12(phrase)])
+            else:
+              self.pmatcher.add(tag, [self.nlp(p) for p in expand_phrase12(phrase)])
         elif isinstance(phrase, list):
-          ruler.add_patterns([{
-            "label": label,
-            "pattern": phrase
-          }])
-        else:
-          raise Exception("not supported")
-
-  # def init_pmatcher(..):
-  #   self.pmatcher = PhraseMatcher(self.nlp.vocab, attr="LOWER")
-  #   self.pmatcher.add("PAST", [self.nlp(m) for m in PAST_MARKERS])
-  #   self.pmatcher.add("FUTURE", [self.nlp(m) for m in FUTURE_MARKERS | INTENT_MARKERS])
-  #   self.pmatcher.add("METAPHORIC", [self.nlp(m) for m in METAPHORIC_MARKERS])
+          self.matcher.add(tag, [phrase])
 
   def extract_many(self, text_or_docs: Sequence[str | Doc]) -> list[Categorized]:
     docs = self.nlp.pipe(text_or_docs)
@@ -64,25 +55,93 @@ class CategoryExtractor:
     # print("Debug tokens:")
     # pprint([{"token": tok, "pos": tok.pos_, "dep": tok.dep_, "head": tok.head} for tok in doc if not tok.is_punct])
     # print("Debug ents:", [ent.label_ for ent in doc.ents])
+
+    raw_matches: list[tuple[str, list[int]]] = []
+    matches = self.matcher(doc) if len(self.matcher) else []
+    pmatches = self.pmatcher(doc) if len(self.pmatcher) else []
+    for match in matches:
+      # print("match:", match)
+      [match_id, start, end] = match # e.g. "hardware" -> (10100372000430808166, 3, 4)
+      tag = self.nlp.vocab.strings[match_id]
+      raw_matches.append((tag, list(range(start, end))))
+    for pmatch in pmatches:
+      # print("pmatch:", pmatch)
+      [match_id, start, end] = pmatch # e.g. "hardware-designer" -> (10100372000430808166, 3, 6)
+      tag = self.nlp.vocab.strings[match_id]
+      raw_matches.append((tag, list(range(start, end))))
+    # print("raw_matches:", raw_matches)
+
+    # Resolve overriding matches
+    distinct_matches: list[tuple[str, list[int]]] = []
+    for tag, offsets in raw_matches:
+      other_matches: list[tuple[str, list[int]]] = []
+      for tg, ofs in raw_matches:
+        if ofs == offsets and tg != tag:
+          raise Exception(f"anchors {tag!r} and {tg!r} overlap at {offsets!r}")
+        else:
+          other_matches.append((tg, ofs))
+      if not any(
+        True for other_match in other_matches
+        # Wider alternative exists
+        if set(offsets) < set(other_match[1])
+      ):
+        distinct_matches.append((tag, offsets))
+    # print("distinct_matches:", distinct_matches)
+
+    # Convert to sorted tag-token pairs
+    tag_tokens = [
+      (tag, token)
+      for tag, offsets in distinct_matches
+      if (token := doc[min(offsets, key=lambda o: token_level(doc[o]))])
+    ]
+    tag_tokens.sort(key=lambda tag_token: tag_token[1].i)
+    # print("tag_tokens:", tag_tokens)
+
+    # Filter tag-token pairs
+    tag_tokens2: list[tuple[str, Token]] = []
+    for tag, token in tag_tokens:
+      positive_nancs = set(
+        tok for tok in ancestors(token)
+        if tok.pos_ in {"NOUN", "PROPN", "ADJ"} and
+           not any(pred(tok) for pred in [is_negated, is_past, is_future, is_metaphorical])
+      )
+      if not any(
+        True for tg, tok in tag_tokens
+        if tok in positive_nancs and tg in CANCELING_TAGS[tag] and not is_distant(token, tok)
+      ):
+        tag_tokens2.append((tag, token))
+    # print("tag_tokens2:", tag_tokens2)
+
+    # Extract roles
     role: Role | None = None
     is_freelancer, is_lead, is_remote, is_hireable = None, None, None, None
-    for ent in doc.ents:
-      token = doc[ent.start:ent.end].root
-      r: Role | None
-      if role is None and (r := self.check_dev(ent.label_, token)):
-        role = r
-      elif role is None and (r := self.check_student(ent.label_, token)):
-        role = r
-      elif role is None and (r := self.check_org(ent.label_, token)):
-        role = r
+    for tag, token in tag_tokens2:
+      if role is None:
+        if tag == "DEV":
+          role = self.check_dev(token)
+        elif tag == "NONDEV":
+          role = self.check_nondev(token)
+        elif tag == "STUDENT":
+          role = self.check_student(token)
+        elif tag == "ORG":
+          role = self.check_org(token)
       if is_freelancer is None:
-        is_freelancer = self.check_freelancer(ent.label_, token)
+        if tag == "FREELANCER":
+          is_freelancer = self.check_freelancer(token)
       if is_lead is None:
-        is_lead = self.check_lead(ent.label_, token)
+        if tag == "LEAD":
+          is_lead = self.check_lead(token)
       if is_remote is None:
-        is_remote = self.check_remote(ent.label_, token)
+        if tag == "REMOTE":
+          is_remote = self.check_remote(token)
+        elif tag == "OPEN-TO":
+          is_remote = self.check_opento_remote(token)
       if is_hireable is None:
-        is_hireable = self.check_hireable(ent.label_, token)
+        if tag == "HIREABLE":
+          is_hireable = self.check_hireable(token)
+        elif tag == "OPEN-TO":
+          is_hireable = self.check_opento_hireable(token)
+
     return Categorized(
       role = role,
       is_freelancer = is_freelancer,
@@ -91,152 +150,111 @@ class CategoryExtractor:
       is_hireable = is_hireable,
     )
 
-  # def pmatch(self, doc_or_span: Doc | Span) -> set[str]:
-  #   matches = self.pmatcher(doc_or_span)
-  #   matched: set[str] = set()
-  #   for match_id, _start, _end in matches:
-  #     matched.add(self.nlp.vocab.strings[match_id])
-  #   return matched
+  def check_dev(self, token: Token) -> Literal["Student", "Dev", None]:
+    if is_hashtagged(token):
+      return "Dev"
+    elif is_negated(token):
+      return None
+    elif is_past(token):
+      return None
+    elif is_future(token):
+      return "Student"
+    return "Dev"
 
-  def check_dev(self, label: str, token: Token) -> Literal["Student", "Dev", "Nondev", None]:
-    # print("@ check_dev", repr(str(token)))
-    if label in {"DEV", "NONDEV"}:
-      if is_hashtagged(token):
-        # print("is_hashtagged")
-        return "Dev"
-      elif is_negated(token):
-        # print("is_negated")
-        return None
-      elif is_past(token):
-        # print("is_past")
-        return None
-      elif is_future(token):
-        # print("is_future")
-        return "Student"
-      # matches = self.pmatch(token.sent)
-      # if "FUTURE" in matches:
-      #   return "Student"
-      # if "PAST" in matches:
-      #   return None
-      rheads = right_anc_heads(token)
-      if rheads and rheads[-1].lower_ in DEV_CANCELING_ROLES:
-        return None
-      # Special rules for "Head" ---
-      lwords = left_lowerwords(token)
+  def check_nondev(self, token: Token) -> Literal["Student", "Nondev", None]:
+    if is_hashtagged(token):
+      return "Nondev"
+    elif is_negated(token):
+      return None
+    elif is_past(token):
+      return None
+    elif is_future(token):
+      return "Student"
+    if token.lower_ == "head":
       sent = token.sent
       j = cast(int, token._.i)
-      if label == "NONDEV" and token.lower_ == "head":
-        if j < sent.end and sent[j + 1].lower_ in {"@", "at", "of"}:
-          return "Nondev"
-        if any(True for word in lwords if word in HEAD_MARKERS):
-          return "Nondev"
-        return None
-      # ---
-      return "Dev" if label == "DEV" else "Nondev"
-    return None
-
-  def check_student(self, label: str, token: Token) -> Literal["Student", None]:
-    if label == "STUDENT":
-      if is_hashtagged(token):
-        return "Student"
-      elif is_negated(token):
-        return None
-      elif is_past(token):
-        return None
-      elif is_future(token):
-        return None
-      elif is_metaphorical(token):
-        return None
-      rheads = right_anc_heads(token)
-      if rheads and rheads[-1].lower_ in STUDENT_CANCELING_ROLES:
-        return None
-      return "Student"
-    return None
-
-  def check_org(self, label: str, token: Token) -> Literal["Org", None]:
-    if label == "ORG":
-      root = token.sent.root
-      rheads = right_anc_heads(token)
-      if rheads and rheads[-1].lower_ in ORG_CANCELING_ROLES:
-        return None
-      if root and (root == token or root.lower_ in {"is"}):
-        return "Org"
-    return None
-
-  def check_freelancer(self, label: str, token: Token) -> bool | None:
-    if label == "FREELANCER":
-      if is_hashtagged(token):
-        return True
-      elif is_negated(token):
-        return False
-      elif is_past(token):
-        # print("token:", token, "is_past")
-        return False
-      elif is_future(token):
-        return False
-      # matches = self.pmatch(token.sent)
-      # if {"PAST", "FUTURE"} & matches:
-      #   return False
-      rheads = right_anc_heads(token)
-      if rheads and rheads[-1].lower_ in FREELANCER_CANCELING_ROLES:
-        return None
-      return True
-    return None
-
-  def check_lead(self, label: str, token: Token) -> bool | None:
-    if label == "LEAD":
-      if is_hashtagged(token):
-        return True
-      elif is_negated(token):
-        return False
-      elif is_past(token):
-        return False
-      elif is_future(token):
-        return False
-      # matches = self.pmatch(token.sent)
-      # if {"PAST", "FUTURE"} & matches:
-      #   return False
-      rheads = right_anc_heads(token)
-      if rheads and rheads[-1].lower_ in LEAD_CANCELING_ROLES:
-        return None
-      return True
-    return None
-
-  def check_remote(self, label: str, token: Token) -> bool | None:
-    if label == "REMOTE":
-      if is_hashtagged(token):
-        return True
-      elif is_negated(token):
-        return False
-      rheads = right_anc_heads(token)
-      if any(True for tok in rheads if tok.lower_ in REMOTE_JOB_MARKERS):
-        return True
-      rwords = right_lowerwords(token)
-      if not rwords or rwords[0] in {"friendly", "only", "online"}:
-        return True
+      if j < sent.end and sent[j + 1].lower_ in {"@", "at", "of"}:
+        return "Nondev"
+      lwords = left_lowerwords(token)
+      if any(True for word in lwords if word in HEAD_MARKERS):
+        return "Nondev"
       return None
-    elif label == "OPEN-TO":
-      if not any(True for word in right_lowerwords(token) if word in LABELED_PHRASES["REMOTE"]):
-        return None
-      if is_negated(token):
-        return False
+    return "Nondev"
+
+  def check_student(self, token: Token) -> Literal["Student", None]:
+    if is_hashtagged(token):
+      return "Student"
+    elif is_negated(token):
+      return None
+    elif is_past(token):
+      return None
+    elif is_future(token):
+      return None
+    elif is_metaphorical(token):
+      return None
+    return "Student"
+
+  def check_org(self, token: Token) -> Literal["Org", None]:
+    root = token.sent.root
+    if root == token or root.lemma_ in {"be"}:
+      return "Org"
+    return None
+
+  def check_freelancer(self, token: Token) -> bool | None:
+    if is_hashtagged(token):
+      return True
+    elif is_negated(token):
+      return False
+    elif is_past(token):
+      return False
+    elif is_future(token):
+      return False
+    return True
+
+  def check_lead(self, token: Token) -> bool | None:
+    if is_hashtagged(token):
+      return True
+    elif is_negated(token):
+      return False
+    elif is_past(token):
+      return False
+    elif is_future(token):
+      return False
+    return True
+
+  def check_remote(self, token: Token) -> bool | None:
+    if is_hashtagged(token):
+      return True
+    elif is_negated(token):
+      return False
+    rancs = right_ancestors(token)
+    if any(True for tok in rancs if tok.lower_ in REMOTE_JOB_MARKERS):
+      return True
+    rwords = right_lowerwords(token)
+    if not rwords or rwords[0] in {"friendly", "only", "online"}:
       return True
     return None
 
-  def check_hireable(self, label: str, token: Token) -> bool | None:
-    if label == "HIREABLE":
-      if is_hashtagged(token):
-        return True
-      elif is_negated(token):
-        return False
+  def check_opento_remote(self, token: Token) -> bool | None:
+    if not any(True for word in right_lowerwords(token) if word in TAGGED_PHRASES["REMOTE"]):
+      return None
+    if is_negated(token):
+      return False
+    return True
+
+  def check_hireable(self, token: Token) -> bool | None:
+    if is_hashtagged(token):
       return True
-    elif label == "OPEN-TO":
-      if not any(True for word in right_lowerwords(token) if word in PROPOSAL_MARKERS):
-        return None
-      if is_negated(token):
-        return False
-      return True
-    return None
+    elif is_negated(token):
+      return False
+    return True
+
+  def check_opento_hireable(self, token: Token) -> bool | None:
+    if not any(True for word in right_lowerwords(token) if word in PROPOSAL_MARKERS):
+      return None
+    if is_negated(token):
+      return False
+    return True
 
 REMOTE_JOB_MARKERS = {
   "coder",
@@ -285,3 +303,16 @@ PROPOSAL_MARKERS = {
   "role", "roles",
   "work",
 }
+
+def is_distant(token1: Token, token2: Token) -> bool:
+  mini = min(token1.i, token2.i)
+  maxi = max(token1.i, token2.i)
+  distance: int = 0
+  for tok in token1.doc[mini+1:maxi]:
+    if tok.text in {";", "|"}:
+      distance += 3
+    elif tok.text in {"-", ",", "("}:
+      distance += 2
+    else:
+      distance += 1
+  return distance >= 6

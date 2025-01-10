@@ -1,7 +1,4 @@
-from ...utils import literal
 from ..utils import Topic, dis_context
-
-__all__ = ["SKILLS"]
 
 SKILLS: list[Topic] = [
   # PROCESSES / INDUSTRIES
@@ -92,12 +89,13 @@ SKILLS: list[Topic] = [
 
   Topic("Computer-Science", [
     "computer << science", "computer << scientist", "comp=sci",
-    literal("CS"), "mscs",
+    "CS", "mscs",
   ]),
 
   Topic("Data-Science", [
-    "data << science", "data << scientist", "data=sci",
-    literal("DS"), "msds",
+    "data << science",
+    "data << scientist", "data=sci",
+    # "DS", "msds",
   ]),
 
   Topic("Cryptography", ["cryptography"]),
@@ -177,7 +175,7 @@ SKILLS: list[Topic] = [
 
   Topic("Science", [
     "science(s)", "scientist", "scientific",
-    # literal("B.S"), literal("M.S")
+    # "B.S", "M.S"
   ]),
 
   Topic("Security", [
@@ -209,14 +207,14 @@ SKILLS: list[Topic] = [
 
   Topic("Electronics", ["electronic(s)", "electronical"]),
 
-  Topic("Hardware", ["hardware"]), # literal("HW")
+  Topic("Hardware", ["hardware"]), # "HW"
   Topic("Hardware-Design", [
     "hardware << design", "hardware << designer",
   ], resolve=["Hardware", "Engineering"]),
   Topic("Hardware-Engineering", [
     "hardwareengineering", "hardwareengineer",
     "hardwaredevelopment", "hardwaredeveloper", "hardwaredev",
-    literal("HWE"),
+    "HWE",
   ], resolve=["Hardware", "Engineering"]),
 
   Topic("Infrastructure", ["infrastructure"]),
@@ -240,7 +238,7 @@ SKILLS: list[Topic] = [
   Topic("Software-Engineering", [
     "softwareengineering", "softwareengineer",
     "softwaredevelopment", "softwaredeveloper", "softwaredev",
-    literal("SDE"), literal("SWE"), # sometimes SE @_@
+    "SDE", "SWE", # sometimes SE @_@
   ], resolve=["Software", "Engineering"]),
 ]
 
