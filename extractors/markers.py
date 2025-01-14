@@ -106,25 +106,6 @@ def is_future(noun: Token) -> bool:
       return True # wannabe/future -> developer, future -> laravel -> developer
   return False
 
-def is_metaphorical(noun: Token) -> bool:
-  # print("noun.lefts:", noun.lefts)
-  if {tok.lower_ for tok in noun.lefts} & {"always", "constant", "eternal", "everlasting", "forever", "lifelong", "perpetual"}:
-    return True
-  subtree = list(noun.subtree)
-  doubles = [
-    (tup[0].lower_, tup[1].lower_)
-    for tup in zip(subtree, subtree[1:])
-  ]
-  triples = [
-    (tup[0].lower_, tup[1].lower_, tup[2].lower_)
-    for tup in zip(subtree, subtree[1:], subtree[2:])
-  ]
-  if {tup for tup in doubles} & {("life", "long"), ("of", "life")}:
-    return True
-  if {tup for tup in triples} & {("life", "-", "long")}:
-    return True
-  return False
-
 WILL_WORD = "will"
 PLAN_WORDS = {"aspire", "go", "plan", "strive", "want", "wish"}
 FUTURE_WORDS = {"aspiring", "future", "gonnabe", "striving", "upcoming", "wannabe"}

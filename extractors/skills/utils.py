@@ -1,37 +1,15 @@
-from dataclasses import dataclass
 import re
 from spacy.tokens import Token
-from typing import Callable
-from ..patterns import expand_phrases12
+from ..extractor import Disambiguate
+from ..ppatterns import to_ppatterns
 from ..spacyhelpers import left_token, right_token
-from ..utils import Pattern, hash_skillname, lookslike
-
-type Disambiguate = Callable[[Token], bool]
-type Resolve = Callable[[Token], list[str]]
-
-@dataclass
-class Skill:
-  name: str
-  phrases: list[
-    str |   # Custom pattern (exact matches)
-    Pattern # Spacy pattern
-  ]
-  descr: str | None = None
-  disambiguate: Disambiguate | list[Disambiguate] | None = None
-  resolve: Resolve | list[str] | None = None
-
-@dataclass
-class Term(Skill):
-  pass
-
-@dataclass
-class Topic(Skill):
-  descr = "Topic"
+from ..utils import lookslike
 
 def dis_context(*phrases: str) -> Disambiguate:
+  # TODO use matchers to support multi-words combinations
   regmarkers = [
     re.compile(rf"{re.escape(marker)}", re.IGNORECASE)
-    for marker in expand_phrases12(phrases)
+    for marker in to_ppatterns(list(phrases))
   ]
   def disambiguate(token: Token) -> bool:
     ltoken = left_token(token)
@@ -85,17 +63,3 @@ def dis_letter() -> Disambiguate:
         return False # c-foo, v-bar
     return True
   return disambiguate
-
-# def oneof(*dis_fns) -> Disambiguate:
-#   def disambiguate(token: Token) -> bool:
-#     return any(dis_fn(token) for dis_fn in dis_fns)
-#   return disambiguate
-
-def label(skill: Skill) -> str:
-  if skill.disambiguate:
-    return skill.name + ":maybe:" + hash_skillname(skill.name)
-  else:
-    return skill.name
-
-def unlabel(label: str) -> str:
-  return re.sub(r":maybe:.+$", "", label)

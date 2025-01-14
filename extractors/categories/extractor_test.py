@@ -3,6 +3,7 @@ from dataclasses import dataclass
 import pytest
 from spacy import Language
 from ..utils import fix_grammar, normalize
+from .data import TAGS
 from .extractor import Categorized, CategoryExtractor, Role
 
 @dataclass
@@ -16,7 +17,7 @@ class Cats(Categorized):
 class Test_CategoryExtractor:
   @pytest.fixture(scope="class")
   def extract(self, nlp: Language):
-    ex = CategoryExtractor(nlp)
+    ex = CategoryExtractor(nlp, TAGS)
     def extract(text: str) -> Categorized:
       cats = ex.extract(fix_grammar(normalize(text)))
       return Cats(
@@ -62,7 +63,7 @@ class Test_CategoryExtractor:
     assert extract("PHP & Laravel Developer. Open to remote.").is_remote is True
     assert extract("Remote Fullstack Software Engineer").is_remote is True
     assert extract("A list of semi to fully remote-friendly companies in tech").is_remote is True
-    assert extract("The future of tech is Remote.").is_remote is True
+    assert extract("The future of tech is Remote.").is_remote is None
 
   def test_extract_remote4(self, extract) -> None:
     assert extract("Remote Software Engineer @ Resilience").is_remote is True
@@ -137,135 +138,135 @@ class Test_CategoryExtractor:
     assert extract("open for hire").is_hireable is True
     assert extract("not open for hire").is_hireable is False
 
-  # def test_extract_hireable_4() -> None:
-  #   assert extract("hire-able").is_hireable is True
-  #   assert extract("not hire able").is_hireable is False
-  #   assert extract("This tool is to make everyone hireable").is_hireable is True # known FP
-  #   assert extract("Open to hiring").is_hireable is True
-  #   assert extract("Open to new ideas").is_hireable is True
-  #   assert extract("Open to job offers").is_hireable is True
-  #   assert extract("Open to work proposal").is_hireable is True
-  #   assert extract("Open to proposals").is_hireable is True
-  #   assert extract("Open to something").is_hireable is None
-  #
-  # def test_extract_hireable_5() -> None:
-  #   assert extract("Open to opportunities").is_hireable is True
-  #   assert extract("Open to new opportunities").is_hireable is True
-  #   assert extract("Open for interesting opportunities").is_hireable is True
-  #   assert extract("Open to collaborations").is_hireable is True
-  #   assert extract("Open to future challenges").is_hireable is True
-  #   assert extract("Open to future enquiries").is_hireable is True
-  #   assert extract("Open for professional project enquiry").is_hireable is True
-  #   assert extract("Currently open to an opportunity").is_hireable is True
-  #   assert extract("Currently not open to an opportunity").is_hireable is False
-  #
-  # def test_extract_hireable_6() -> None:
-  #   assert extract("ready to be hired").is_hireable is True
-  #   assert extract("not ready to be hired").is_hireable is False
-  #   assert extract("She is hireable").is_hireable is True
-  #   assert extract("She is not hireable").is_hireable is False
-  #   assert extract("Open for relocation").is_hireable is True
-  #   assert extract("Open for something").is_hireable is None
-  #   assert extract("Not open for relocation").is_hireable is False
-  #   assert extract("Open to internship and job").is_hireable is True
-  #
-  # def test_extract_hireable_7() -> None:
-  #   assert extract("#hireme").is_hireable is True
-  #   assert extract("please hire me").is_hireable is True
-  #   assert extract("Interested in hiring me?").is_hireable is True
-  #   assert extract("Whether you hire me or not, I am overly committed").is_hireable is True
-  #
-  # def test_extract_hireable_8() -> None:
-  #   assert extract("Seeking new job opportunities").is_hireable is True
-  #   assert extract("Seeking new work possibilities").is_hireable is True
-  #   assert extract("Seeking well paid job options").is_hireable is True
-  #   assert extract("not seeking a job").is_hireable is False
-  #   assert extract("not seeking an work").is_hireable is False
-  #   assert extract("not seeking anything").is_hireable is None
-  #
-  # def test_extract_hireable_9() -> None:
-  #   assert extract("looking for job opportunities").is_hireable is True
-  #   assert extract("looking for new options").is_hireable is True
-  #   assert extract("looking for a position").is_hireable is True
-  #   assert extract("not looking for opportunities").is_hireable is False
-  #   assert extract("looking for something").is_hireable is None
-  #
-  # def test_extract_hireable_10() -> None:
-  #   assert extract("looking for job opportunities").is_hireable is True
-  #   assert extract("looking for new options").is_hireable is True
-  #   assert extract("looking for a position").is_hireable is True
-  #   assert extract("Looking for a job now.").is_hireable is True
-  #   assert extract("not looking for opportunities").is_hireable is False
-  #   assert extract("looking for something").is_hireable is None
-  #
-  # def test_extract_hireable_11() -> None:
-  #   assert extract("jobseeker").is_hireable is True
-  #   assert extract("job seeker").is_hireable is True
-  #   assert extract("job-seeker").is_hireable is True
-  #   assert extract("jobseeking").is_hireable is True
-  #   assert extract("job seeking").is_hireable is True
-  #   assert extract("job-seeking").is_hireable is True
-  #   assert extract("not jobseeker").is_hireable is False
-  #   assert extract("not a job seeker").is_hireable is False
-  #   assert extract("not a job-seeker").is_hireable is False
-  #   assert extract("not jobseeking").is_hireable is False
-  #   assert extract("not job seeking").is_hireable is False
-  #   assert extract("not job-seeking").is_hireable is False
-  #
-  # def test_extract_hireable_21() -> None:
-  #   assert extract("Open to AI/ML Roles").is_hireable is True
-  #   assert extract("Open to a leadership role").is_hireable is True
-  #   assert extract("JS, React, Angular; open to relocation").is_hireable is True
-  #   assert extract("Open to new challenges💻").is_hireable is True
-  #   assert extract("looking for job options intern etc.").is_hireable is True
-  #   assert extract("Digital Entrepreneur | Code Lover | Open for New Opportunities").is_hireable is True
-  #   assert extract("Open for Hire - Full-Stack Software Developer | building railsinit.org").is_hireable is True
-  #
-  # def test_extract_hireable_22() -> None:
-  #   assert extract("you can hire me if you want").is_hireable is True
-  #   assert extract("Software Developer, seeking new employment possibilities").is_hireable is True
-  #   assert extract("Seeking challenging employment opportunities").is_hireable is True
-  #   assert extract("Looking for new #rstats opportunities").is_hireable is True
-  #   assert extract("Student. Looking for internships.").is_hireable is True
-  #
-  # def test_extract_hireable_23() -> None:
-  #   assert extract("Computer Engineer. Seeking remote contract work.").is_hireable is True
-  #   assert extract("Web developer. Always seeking contract work. Available via Telegram").is_hireable is True
-  #   assert extract("Professional UI/UX Designer, I Am Ready for hire.").is_hireable is True
-  #   assert extract("Mobile Apps & Web Developer | Freelancer | Ready for Hire").is_hireable is True
-  #   assert extract("Don't try to hire me").is_hireable is False
-  #   assert extract("You can not hire me.").is_hireable is False
-  #
-  # def test_extract_hireable_24() -> None:
-  #   assert extract("See this: I AM NOT HIREABLE").is_hireable is False
-  #   assert extract("If you enjoy my open source work...").is_hireable is None
-  #   assert extract("Open to interpretation").is_hireable is None
-  #   assert extract("An open source ecosystem to liberate the work").is_hireable is None
-  #   assert extract("A tool to hire best developers. Myself included ;").is_hireable is None
-  #   assert extract("🚀Open To You! 🚀").is_hireable is None
-  #
-  # def test_extract_hireable_25() -> None:
-  #   assert extract("I am non hireable").is_hireable is False
-  #   assert extract("always seeking for a job").is_hireable is True
-  #   assert extract("Open to Organizations !").is_hireable is None
-  #   assert extract("🈺 open for business! 🈺").is_hireable is None
-  #   assert extract("🏻 Web Developer | JS ❤ ~ Always open to learn").is_hireable is None
-  #   assert extract("Connect the world of science. Make research open to all.").is_hireable is None
-  #   assert extract("Looking for teleportation").is_hireable is None
-  #
-  # def test_extract_hireable_26() -> None:
-  #   assert extract("What are you looking for and what am I looking for?").is_hireable is None
-  #   assert extract("Looking for the next big thing.").is_hireable is None
-  #   assert extract("I'm looking for: Ruby Ninjas,Ember.js Masters, Python Dev, QAs ...if you're one of them, just let me know!").is_hireable is None
-  #   assert extract("I'm a highly motivated Ninja. Always looking for new things to learn.").is_hireable is None
-  #
-  # def test_extract_hireable_27() -> None:
-  #   assert extract("Just for fun. Not hirable.").is_hireable is False
-  #   assert extract("I'm not for hire. Thank you for your cooperation").is_hireable is False
-  #   assert extract("Freelance Programmer | Not for Hire").is_hireable is False
-  #   assert extract("@ zhakky studios not hire able.").is_hireable is False
-  #   assert extract("Looking for a PhD position!").is_hireable is True
-  #   assert extract("Working on VR Game w/kobugindustries (Not an expert) NOT FOR HIRE").is_hireable is False
+  def test_extract_hireable3(self, extract) -> None:
+    assert extract("hire-able").is_hireable is True
+    assert extract("not hire able").is_hireable is False
+    assert extract("This tool is to make everyone hireable").is_hireable is True # known FP
+    assert extract("Open to hiring").is_hireable is True
+    assert extract("Open to new ideas").is_hireable is True
+    assert extract("Open to job offers").is_hireable is True
+    assert extract("Open to work proposal").is_hireable is True
+    assert extract("Open to proposals").is_hireable is True
+    assert extract("Open to something").is_hireable is None
+
+  def test_extract_hireable4(self, extract) -> None:
+    assert extract("Open to opportunities").is_hireable is True
+    assert extract("Open to new opportunities").is_hireable is True
+    assert extract("Open for interesting opportunities").is_hireable is True
+    assert extract("Open to collaborations").is_hireable is True
+    assert extract("Open to future challenges").is_hireable is True
+    assert extract("Open to future enquiries").is_hireable is True
+    assert extract("Open for professional project enquiry").is_hireable is True
+    assert extract("Currently open to an opportunity").is_hireable is True
+    assert extract("Currently not open to an opportunity").is_hireable is False
+
+  def test_extract_hireable5(self, extract) -> None:
+    assert extract("ready to be hired").is_hireable is True
+    assert extract("not ready to be hired").is_hireable is False
+    assert extract("She is hireable").is_hireable is True
+    assert extract("She is not hireable").is_hireable is False
+    assert extract("Open for relocation").is_hireable is True
+    assert extract("Open for something").is_hireable is None
+    assert extract("Not open for relocation").is_hireable is False
+    assert extract("Open to internship and job").is_hireable is True
+
+  def test_extract_hireable6(self, extract) -> None:
+    assert extract("#hireme").is_hireable is True
+    assert extract("please hire me").is_hireable is True
+    assert extract("Interested in hiring me?").is_hireable is True
+    assert extract("Whether you hire me or not, I am overly committed").is_hireable is True
+
+  def test_extract_hireabl7(self, extract) -> None:
+    assert extract("Seeking new job opportunities").is_hireable is True
+    assert extract("Seeking new work possibilities").is_hireable is True
+    assert extract("Seeking well paid job options").is_hireable is True
+    assert extract("not seeking a job").is_hireable is False
+    assert extract("not seeking an work").is_hireable is False
+    assert extract("not seeking anything").is_hireable is None
+
+  def test_extract_hireable8(self, extract) -> None:
+    assert extract("looking for job opportunities").is_hireable is True
+    assert extract("looking for new options").is_hireable is True
+    assert extract("looking for a position").is_hireable is True
+    assert extract("not looking for opportunities").is_hireable is False
+    assert extract("looking for something").is_hireable is None
+
+  def test_extract_hireable9(self, extract) -> None:
+    assert extract("looking for job opportunities").is_hireable is True
+    assert extract("looking for new options").is_hireable is True
+    assert extract("looking for a position").is_hireable is True
+    assert extract("Looking for a job now.").is_hireable is True
+    assert extract("not looking for opportunities").is_hireable is False
+    assert extract("looking for something").is_hireable is None
+
+  def test_extract_hireable10(self, extract) -> None:
+    assert extract("jobseeker").is_hireable is True
+    assert extract("job seeker").is_hireable is True
+    assert extract("job-seeker").is_hireable is True
+    assert extract("not jobseeker").is_hireable is False
+    assert extract("not a job seeker").is_hireable is False
+    assert extract("not a job-seeker").is_hireable is False
+    # assert extract("jobseeking").is_hireable is True
+    # assert extract("job seeking").is_hireable is True
+    # assert extract("job-seeking").is_hireable is True
+    # assert extract("not jobseeking").is_hireable is False
+    # assert extract("not job seeking").is_hireable is False
+    # assert extract("not job-seeking").is_hireable is False
+
+  def test_extract_hireable11(self, extract) -> None:
+    assert extract("Open to AI/ML Roles").is_hireable is True
+    assert extract("Open to a leadership role").is_hireable is True
+    assert extract("JS, React, Angular; open to relocation").is_hireable is True
+    assert extract("Open to new challenges💻").is_hireable is True
+    assert extract("looking for job options intern etc.").is_hireable is True
+    assert extract("Digital Entrepreneur | Code Lover | Open for New Opportunities").is_hireable is True
+    assert extract("Open for Hire - Full-Stack Software Developer | building railsinit.org").is_hireable is True
+
+  def test_extract_hireable12(self, extract) -> None:
+    assert extract("you can hire me if you want").is_hireable is True
+    assert extract("Software Developer, seeking new employment possibilities").is_hireable is True
+    assert extract("Seeking challenging employment opportunities").is_hireable is True
+    assert extract("Looking for new #rstats opportunities").is_hireable is True
+    assert extract("Student. Looking for internships.").is_hireable is True
+
+  def test_extract_hireable13(self, extract) -> None:
+    assert extract("Computer Engineer. Seeking remote contract work.").is_hireable is True
+    assert extract("Web developer. Always seeking contract work. Available via Telegram").is_hireable is True
+    assert extract("Professional UI/UX Designer, I Am Ready for hire.").is_hireable is True
+    assert extract("Mobile Apps & Web Developer | Freelancer | Ready for Hire").is_hireable is True
+    assert extract("Don't try to hire me").is_hireable is False
+    assert extract("You can not hire me.").is_hireable is False
+
+  def test_extract_hireable14(self, extract) -> None:
+    assert extract("See this: I AM NOT HIREABLE").is_hireable is False
+    assert extract("If you enjoy my open source work...").is_hireable is None
+    assert extract("Open to interpretation").is_hireable is None
+    assert extract("An open source ecosystem to liberate the work").is_hireable is None
+    assert extract("A tool to hire best developers. Myself included ;").is_hireable is None
+    assert extract("🚀Open To You! 🚀").is_hireable is None
+
+  def test_extract_hireable15(self, extract) -> None:
+    assert extract("I am non hireable").is_hireable is False
+    assert extract("always seeking for a job").is_hireable is True
+    assert extract("Open to Organizations !").is_hireable is None
+    assert extract("🈺 open for business! 🈺").is_hireable is None
+    assert extract("🏻 Web Developer | JS ❤ ~ Always open to learn").is_hireable is None
+    assert extract("Connect the world of science. Make research open to all.").is_hireable is None
+    assert extract("Looking for teleportation").is_hireable is None
+
+  def test_extract_hireable16(self, extract) -> None:
+    assert extract("What are you looking for and what am I looking for?").is_hireable is None
+    assert extract("Looking for the next big thing.").is_hireable is None
+    assert extract("I'm looking for: Ruby Ninjas,Ember.js Masters, Python Dev, QAs ...if you're one of them, just let me know!").is_hireable is None
+    assert extract("I'm a highly motivated Ninja. Always looking for new things to learn.").is_hireable is None
+
+  def test_extract_hireable17(self, extract) -> None:
+    assert extract("Just for fun. Not hirable.").is_hireable is False
+    assert extract("I'm not for hire. Thank you for your cooperation").is_hireable is False
+    assert extract("Freelance Programmer | Not for Hire").is_hireable is False
+    assert extract("@ zhakky studios not hire able.").is_hireable is False
+    assert extract("Looking for a PhD position!").is_hireable is True
+    assert extract("Working on VR Game w/kobugindustries (Not an expert) NOT FOR HIRE").is_hireable is False
 
   def test_extract_lead1(self, extract) -> None:
     assert extract("#teamlead").is_lead is True
@@ -278,29 +279,30 @@ class Test_CategoryExtractor:
     assert extract("People first leader and indie hacker.").is_lead is True
     assert extract("Leader of Ukrainian Rust Community").is_lead is True
 
-  # def test_extract_is_lead2() -> None:
-  #   assert extract("Leading anti-cheat @ someplace.").is_lead is True
-  #   assert extract("Software Engineer at @microsoft leading the Copilot UX team").is_lead is True
-  #   assert extract("Designer Developer from Ireland, leading design and dev teams in SF.").is_lead is True
-  #   assert extract("Into kubernetes, typescript, golang, microservices, and leading teams.").is_lead is True
-  #   assert extract("Tech stuff at Leadingly LLC").is_lead is None
-  #   assert extract("mechanical engineer with leading skills").is_lead is None
-  #   assert extract("Building leading data science tools and state-of-the-art ML models").is_lead is None
-  #
-  #   # Unclear
-  #   assert extract("Leading a life long learning expedition").is_lead is True
-  #   assert extract("Creating market-leading software products").is_lead is True
-  #   assert extract("Leading talent to expertise").is_lead is True
-  #   assert extract("All roads leading to humanoids").is_lead is True
-  #   assert extract("Captain leading from the front!").is_lead is True
-  #
-  # def test_extract_is_lead3() -> None:
-  #   assert extract("CTO at entro.solutions").is_lead is None
-  #   assert extract("CEO at Microsoft").is_lead is None
-  #   assert extract("VP at Facebook").is_lead is None
-  #   assert extract("SVP at Netflix").is_lead is None
-  #   assert extract("Not a lead").is_lead is False
-  #   assert extract("ex-lead of GitHub QA team").is_lead is False
+  def test_extract_lead2(self, extract) -> None:
+    assert extract("Leading anti-cheat @ someplace.").is_lead is True
+    assert extract("Software Engineer at @microsoft leading the Copilot UX team").is_lead is True
+    assert extract("Designer Developer from Ireland, leading design and dev teams in SF.").is_lead is True
+    assert extract("Into kubernetes, typescript, golang, microservices, and leading teams.").is_lead is True
+    assert extract("Tech stuff at Leadingly LLC").is_lead is None
+    assert extract("mechanical engineer with leading skills").is_lead is None
+    assert extract("Building leading data science tools and state-of-the-art ML models").is_lead is None
+
+  def test_extract_lead3(self, extract) -> None:
+    assert extract("CTO at entro.solutions").is_lead is None
+    assert extract("CEO at Microsoft").is_lead is None
+    assert extract("VP at Facebook").is_lead is None
+    assert extract("SVP at Netflix").is_lead is None
+    assert extract("Not a lead").is_lead is False
+    assert extract("ex-lead of GitHub QA team").is_lead is False
+
+  def test_extract_lead4(self, extract) -> None:
+    assert extract("Creating market-leading software products").is_lead is None
+    assert extract("All roads leading to humanoids").is_lead is None
+    assert extract("Leading a life long learning expedition").is_lead is None
+    # FPs
+    assert extract("Leading talent to expertise").is_lead is True
+    assert extract("Captain leading from the front!").is_lead is True
 
   # ROLE
   def test_extract_role1(self, extract) -> None:
@@ -320,16 +322,19 @@ class Test_CategoryExtractor:
     assert extract("Great Learning is an online learning platform designed to...").role == "Org"
     assert extract("The GitHub repo for Learning Go by Jon Bodner").role is None
 
-  # def test_extract_student_verbs_3() -> None:
-  #   assert extract("Studying Bio-medical engineering at Cairo University").role == "Student"
-  #   assert extract("17, studying CS.").role == "Student"
-  #   assert extract("Studying Software Engineering at Yunnan University China").role == "Student"
-  #   assert extract("Studying cybersecurity").role == "Student"
-  #   # assert extract("frantically studying the world").role is None
-  #   assert extract("Machine Learning Nut.").role is None
-  #   assert extract("Forever learning").role is None
-  #   assert extract("Always studying").role is None
-  #   assert extract("Never stop studying.").role is None
+  def test_extract_role3(self, extract) -> None:
+    assert extract("Studying Bio-medical engineering at Cairo University").role == "Student"
+    assert extract("17, studying CS.").role == "Student"
+    assert extract("Studying Software Engineering at Yunnan University China").role == "Student"
+    assert extract("Studying cybersecurity").role == "Student"
+    assert extract("frantically studying the world").role is None
+    assert extract("Machine Learning Nut.").role is None
+    assert extract("Forever learning").role is None
+    assert extract("Always studying").role is None
+    assert extract("Never stop studying.").role is None
+
+  def test_extract_role4(self, extract) -> None:
+    assert extract("Eternal student").role is None
 
   # MIXED
   def test_extract_mixed1(self, extract) -> None:

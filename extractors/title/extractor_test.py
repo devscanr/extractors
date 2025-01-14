@@ -2,15 +2,16 @@
 import pytest
 from spacy import Language
 from ..utils import fix_grammar, normalize, omit_parens
+from .data import TAGS
 from .extractor import TitleExtractor, fix_more_grammar
 
 class Test_TitleExtractor:
   @pytest.fixture(scope="class")
   def extract(self, nlp: Language):
-    ex = TitleExtractor(nlp)
+    ex = TitleExtractor(nlp, TAGS)
     def extract(text: str) -> str:
       ntext = omit_parens(fix_more_grammar(fix_grammar(normalize(text))))
-      return ex.extract(ntext, fortag="HUMAN")
+      return ex.extract(ntext, tagfilter="Human")
     return extract
 
   def test_extract_smoke(self, extract) -> None:
@@ -229,7 +230,7 @@ class Test_TitleExtractor:
     assert extract("""
       I am Viktor Klang, a finder, researcher, problem solver, improver of things,
       life-long student, developer/programmer, leader, mentor/advisor, public speaker…
-    """) == "Researcher | Student | Developer"
+    """) == "Researcher | Developer | Programmer"
 
   def test_extract_bios16(self, extract) -> None:
     assert extract("""
@@ -299,7 +300,7 @@ class Test_TitleExtractor:
     assert extract("""
       Technology leader at Gartner (Managing Vice President).
       Graduate student at University of Illinois getting my MBA. Forever an engineer.
-    """) == "Technology Leader at Gartner | Graduate Student at University"
+    """) == "Technology Leader at Gartner | Graduate Student at University | Engineer"
     assert extract("""
       Computer science masters graduate with a specialization in Data Science.
     """) == "Computer Science Masters Graduate"

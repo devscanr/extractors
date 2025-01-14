@@ -5,18 +5,12 @@ import re
 import spacy
 from spacy import Language
 from spacy.tokens import Doc
-from typing import Any, Callable, Generator, cast, Iterable
+from typing import Any, Callable, cast, Iterable
+from .xpatterns import DEP, HEAD, IN, IS_PUNCT, IS_SENT_START, LOWER, OP, ORTH, TAG, tag_jj, tag_nn, tag_nnp
 
 # RESOURCES
 # - https://stackoverflow.com/questions/15388831/what-are-all-possible-pos-tags-of-nltk
 # - https://corenlp.run/
-
-(DEP, IN, IS_PUNCT, IS_SENT_START, LOWER, OP, ORTH, POS, REGEX, TAG) = (
-  "DEP", "IN", "IS_PUNCT", "IS_SENT_START", "LOWER", "OP", "ORTH", "POS", "REGEX", "TAG"
-)
-(LEFT_ID, REL_OP, RIGHT_ID, RIGHT_ATTRS) = (
-  "LEFT_ID", "REL_OP", "RIGHT_ID", "RIGHT_ATTRS"
-)
 
 def normalize(text: str, pipechar: str = ".") -> str:
   # Correct separators for grammar
@@ -53,16 +47,24 @@ def sep_splitter(match: re.Match[str]) -> str:
     word + f" {sep} "
   )
 
-def uniq[T](arr: list[T] | Generator[str, Any, Any]) -> list[T]:
+# TODO rename to `uniq2` and add set-based `uniq1`. No `uniq` version to not forget the related quirks.
+def uniq[T](itr: Iterable[T]) -> list[T]:
   """
-  Order-preserving uniq
+  Order-preserving uniq. Does not support nested lists and other non-hashable item types.
   """
-  # Note: does not collapse "+NNN" with "NNN" so far
+  arr = list(itr)
   d = {}
   for x in arr:
     d[x] = 1
   keys = cast(Iterable[T], d.keys()) # Looks like MyPy (or something) is improperly typing this
   return list(keys)
+
+def uniq3[T](itr: Iterable[T]) -> list[T]:
+  """
+  Slower than the above. Supports nested lists and other non-hashable item types.
+  """
+  arr = list(itr)
+  return [x for i, x in enumerate(arr) if arr.index(x) == i]
 
 def omit_parens(input: str) -> str:
   output = ""
@@ -145,9 +147,6 @@ def fix_grammar(text: str) -> str:
     text = re.sub(pattern, replacement, text, count=0, flags=flags)
   return text
 
-nnp = {TAG: "NNP", POS: "PROPN"}
-jj = {TAG: "JJ", POS: "ADJ"}
-
 def add_dev_exceptions(nlp: Language) -> None:
   # Covers most common cases (ideally, we should retrain the model)
   ruler = cast(Any, nlp.get_pipe("attribute_ruler"))
@@ -156,46 +155,59 @@ def add_dev_exceptions(nlp: Language) -> None:
   ruler.add([
     [{ORTH: orth, IS_SENT_START: False}]
     for orth in problematic
-  ], {TAG: "NNP", POS: "PROPN"}, index=0)
+  ], tag_nnp, index=0)
   # "#go, #node, #next"
   ruler.add([
     [{ORTH: "#"}, {LOWER: orth.lower()}]
     for orth in problematic
-  ], {TAG: "NNP", POS: "PROPN"}, index=1)
+  ], tag_nnp, index=1)
   # "; go,"
   ruler.add([
     [{IS_PUNCT: True}, {LOWER: orth.lower()}, {IS_PUNCT: True}]
     for orth in problematic
-  ], {TAG: "NNP", POS: "PROPN"}, index=1)
+  ], tag_nnp, index=1)
   # e.g. "_/go"
   ruler.add([
     [{ORTH: "/"}, {LOWER: orth.lower()}]
     for orth in problematic
-  ], {TAG: "NNP", POS: "PROPN"}, index=1)
+  ], tag_nnp, index=1)
   # e.g. "go/_"
   ruler.add([
     [{LOWER: orth.lower()}, {ORTH: "/"}]
     for orth in problematic
-  ], {TAG: "NNP", POS: "PROPN"}, index=0)
+  ], tag_nnp, index=0)
 
 def add_nnp_exceptions(nlp: Language, items: list[str]) -> None:
+  # NN: Noun, singular or mass
+  # NNP: Proper noun, singular Phrase
+  # NNS: Noun, plural
+  # NNPS: Proper noun, plural
   ruler = cast(Any, nlp.get_pipe("attribute_ruler"))
   for item in items:
     spacecount = item.count(" ")
     if spacecount >= 2:
       raise ValueError("NNP items with >= 2 spaces are not supported yet")
     elif spacecount == 1:
-      w1, w2 = item.split(" ")
-      pattern = [
-        {LOWER: w1.lower()}, {LOWER: "-", OP: "?"}, {LOWER: w2.lower()},
-      ]
-      ruler.add([pattern], nnp, index=0)
-      ruler.add([pattern], nnp, index=1)
+      for caseditem in [item.lower(), item.upper(), item.title()]:
+        w1, w2 = caseditem.split(" ")
+        if caseditem.islower():
+          patts = [[
+            {LOWER: w1.lower()}, {ORTH: "-", OP: "?"}, {LOWER: w2.lower()},
+          ]]
+          ruler.add(patts, tag_nn | {HEAD: 1, DEP: "compound"}, index=0)
+          ruler.add(patts, tag_nn, index=1)
+        else:
+          patts = [[
+            {ORTH: w1.lower()}, {ORTH: "-", OP: "?"}, {ORTH: w2.lower()},
+          ]]
+          ruler.add(patts, tag_nnp | {HEAD: 1, DEP: "compound"}, index=0)
+          ruler.add(patts, tag_nnp, index=1)
     else:
-      pattern = [
-        {LOWER: item.lower()}
-      ]
-      ruler.add([pattern], nnp)
+      for caseditem in [item.lower(), item.upper(), item.title()]:
+        if caseditem.islower():
+          ruler.add([[{LOWER: item.lower()}]], tag_nn)
+        else:
+          ruler.add([[{LOWER: item.lower()}]], tag_nnp)
 
 def add_jj_exceptions(nlp: Language, items: list[str]) -> None:
   ruler = cast(Any, nlp.get_pipe("attribute_ruler"))
@@ -204,10 +216,9 @@ def add_jj_exceptions(nlp: Language, items: list[str]) -> None:
     if spacecount >= 1:
       raise ValueError("JJ items with >= 1 spaces are not supported")
     else:
-      pattern = [
+      ruler.add([[
         {LOWER: item.lower()}, {TAG: {IN: ["NN", "CD"]}}
-      ]
-      ruler.add([pattern], jj)
+      ]], tag_jj)
 
 def add_jj_exceptions2(nlp: Language, items: list[str]) -> None:
   ruler = cast(Any, nlp.get_pipe("attribute_ruler"))
@@ -216,10 +227,21 @@ def add_jj_exceptions2(nlp: Language, items: list[str]) -> None:
     if spacecount >= 1:
       raise ValueError("VBG items with >= 1 spaces are not supported")
     else:
-      pattern = [
+      ruler.add([[
         {TAG: {IN: ["VBG"]}}, {LOWER: item.lower()},
-      ]
-      ruler.add([pattern], jj, index=1)
+      ]], tag_jj, index=1)
+
+def add_new_exceptions(nlp: Language) -> None:
+  pass
+  # ruler = cast(Any, nlp.get_pipe("attribute_ruler"))
+  # ruler.add([[
+  #   {LOWER: "computer"}, {ORTH: "/"}, {LOWER: "data"},
+  #   {LOWER: "science"},
+  # ]], {HEAD: 3, DEP: "nmod"}, index=0)
+  # ruler.add([[
+  #   {LOWER: "data"}, {ORTH: "/"}, {LOWER: "computer"},
+  #   {LOWER: "science"},
+  # ]], {HEAD: 3, DEP: "nmod"}, index=0)
 
 def get_nlp(name: str | Path = "en_core_web_sm") -> Language:
   nlp = spacy.load(name, exclude=["ner"]) # "lemmatizer",
@@ -274,7 +296,10 @@ def get_nlp(name: str | Path = "en_core_web_sm") -> Language:
   # Make the following PROPER NOUNs
   add_dev_exceptions(nlp)
   add_nnp_exceptions(nlp, [
-    "deep learning", "machine learning",
+    "computer science", # fixing POS, TAG, DEP, HEAD
+    "deep learning",
+    "data science",
+    "machine learning",
   ])
   add_jj_exceptions(nlp, [
     # Make the following ADJECTIVEs if before NOUNs
@@ -286,6 +311,7 @@ def get_nlp(name: str | Path = "en_core_web_sm") -> Language:
     # Make the following ADJECTIVEs if after VERBs
     "leading",
   ])
+  add_new_exceptions(nlp)
   return nlp
 
 @Language.factory("index_tokens_by_sents")
@@ -300,56 +326,7 @@ def component(nlp: Language, name: str) -> Callable[[Doc], Doc]:
 def hash_skillname(text: str) -> str:
   return hashlib.md5(text.encode()).hexdigest()[:12]
 
-type Pattern = list[dict[str, Any]]
-
-def ver1(word: str) -> Pattern:
-  return [
-    {LOWER: {REGEX: r"^" + word + r"[-\d.]{0,4}$"}}
-  ]
-
-def literal(phrase: str) -> Pattern:
-  return [
-    {ORTH: word} for word in re.split(r"(?<=\W)(?=\w)|(?<=\w)(?=\W)", phrase)
-    if word.strip()
-  ]
-
-def noun(word: str) -> Pattern:
-  poss = ["NOUN", "PROPN", "ADJ"]
-  if re.search(r"[A-Z]", word):
-    return [
-      {ORTH: word, POS: {IN: poss}}
-    ]
-  else:
-    return [
-      {LOWER: word, POS: {IN: poss}}
-    ]
-
-def propn(word: str) -> Pattern:
-  poss = ["PROPN"]
-  if re.search(r"[A-Z]", word):
-    return [
-      {ORTH: word, POS: {IN: poss}}
-    ]
-  else:
-    return [
-      {LOWER: word, POS: {IN: poss}}
-    ]
-
-def verb(word: str) -> Pattern:
-  poss = ["VERB"]
-  if re.search(r"[A-Z]", word):
-    return [
-      {ORTH: word, POS: {IN: poss}}
-    ]
-  else:
-    return [
-      {LOWER: word, POS: {IN: poss}}
-    ]
-
 # TODO remove `_.used` extension if it's no longer necessary :)
-
-def orth(phrase: str) -> dict[str, str]:
-  return {ORTH: phrase} if re.search(r"[A-Z]", phrase) else {LOWER: phrase}
 
 def lookslike(lower: str, patt: re.Pattern[str]) -> bool:
   for match in re.finditer(patt, lower):
@@ -385,3 +362,18 @@ def lookslike(lower: str, patt: re.Pattern[str]) -> bool:
   # print(is_separated("baramazon"), "-- Should be False")
   # print(is_separated("BARAMAZON"), "-- Should be False")
   # print(is_separated("zzz"), "-- Should be False")
+
+def includes[T](itr: Iterable[T], subitr: Iterable[T]) -> bool:
+  arr, subarr = list(itr), list(subitr)
+  la, ls = len(arr), len(list(subarr))
+  if not la or not ls:
+    return False
+  for i in range(0, la):
+    try:
+      for j in range(0, ls):
+        if arr[i + j] != subarr[j]:
+          raise ValueError()
+      return True
+    except (IndexError, ValueError):
+      pass
+  return False

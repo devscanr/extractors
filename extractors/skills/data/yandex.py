@@ -1,4 +1,5 @@
-from ..utils import Skill, dis_context
+from ..skill import Skill
+from ..utils import dis_context
 
 dis_ctx = dis_context("yandex")
 

@@ -1,4 +1,5 @@
-from ..utils import Skill, dis_context, dis_neighbours
+from ..skill import Skill
+from ..utils import dis_context, dis_neighbours
 
 dis_ctx = dis_context("amazon", "aws")
 

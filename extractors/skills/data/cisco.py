@@ -1,4 +1,4 @@
-from ..utils import Skill
+from ..skill import Skill
 
 SKILLS: list[Skill] = [
   Skill("Cisco", ["(@)cisco", "cysco=systems"], "Company"),

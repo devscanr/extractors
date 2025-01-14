@@ -1,7 +1,8 @@
-from ...utils import noun
-from ..utils import Topic, dis_context, dis_neighbours
+from ...skills.utils import dis_context, dis_neighbours
+from ...xpatterns import noun
+from ..skill import Skill, Topic
 
-SKILLS: list[Topic] = [
+SKILLS: list[Skill] = [
   # ANALYSIS >
   Topic("AB-Testing", ["a/b-test(s)", "a/b-testing", "ab-test(s)", "ab-testing"]),
   Topic("Hypothesis", ["hypothesis", "hypotheses"]),
@@ -24,7 +25,6 @@ SKILLS: list[Topic] = [
   Topic("Agile", ["agile", "kanban", "scrum"]),
   Topic("APIs", ["api(s)"]),
   Topic("Client-Server", ["client", "server(s)"]), # FPs for "clients"
-  Topic("Computing", ["computer(s)", "computing"]),
   Topic("BDD", ["bdd"]),
   Topic("DDD", ["ddd"]),
   Topic("TDD", ["tdd"]),
@@ -63,7 +63,6 @@ SKILLS: list[Topic] = [
   Topic("Authentication", ["authentication", "auth", "sign=in", "sign=out"]), # also SECURITY
   Topic("Authorization", ["authorization"]), # also SECURITY
   Topic("BaaS", ["baas", "mbaas"]),
-  Topic("GraphQL", ["graphql", "graphiql"]),
   Topic("Microservices", ["micro=service(s)"]),
   Topic("Middlewares", ["middleware(s)"]),
   Topic("OAuth", ["oauth", "oauth1", "oauth2"]), # also SECURITY
@@ -87,12 +86,7 @@ SKILLS: list[Topic] = [
   Topic("SSR", ["ssr"]),
   Topic("SSO", ["sso"]), # also SECURITY
 
-  # BLOCKCHAINS
-  Topic("Blockchains", [
-    "blockchain(s)",
-    "on-chain", "off-chain",
-    "litecoin",
-  ]),
+  # BLOCKCHAINS >
   Topic("Crypto", ["crypto"]),
   Topic("dApps", ["decentralized-application(s)", "dapp(s)"]),
   Topic("DeFi", ["decentralized-finance", "de=fi"]),
@@ -100,23 +94,15 @@ SKILLS: list[Topic] = [
   Topic("Smart-Contracts", ["smart=contract(s)"]),
   Topic("Web3", ["web3"]),
 
-  # DATA
-  Topic("Data", ["data"]), # maybe a whitelist will work better here
-  Topic("-Data", [
-    "personal=data", "user=data",
-    "my=data", "your=data", "our=data", "their=data",
-    "data=graph", "data-querying", "data-storage", # vs database?
-  ], resolve=[]), # oversimplified, will update later
+  # DATA >
   Topic("Big-Data", ["big=data"]),
   Topic("Data-Mining", ["data=mining", "data=extraction"]),
   Topic("Data-Visualization", ["data=visualization(s)", "data=visualisation(s)", "data=viz"]),
   Topic("ETL", ["etl(s)", "elt"]),
 
-  # DATABASES
-  Topic("Databases", ["database(s)"]),
+  # DATABASES >
   Topic("Datalakes", ["data=lake(s)"]),
   Topic("ORM", ["orm"]),
-  Topic("SQL", ["sql"]),
   Topic("NoSQL", ["nosql"]),
   Topic("Warehouses", ["warehouse(s)"]),
 
@@ -138,13 +124,7 @@ SKILLS: list[Topic] = [
   Topic("WebGL", ["webgl"]),
   Topic("Web-Components", ["web=component(s)"]),
 
-  # GAMES
-  Topic("Games", [
-    "game(s)", "gamer", "gameplay",
-    "arcanoid", "minecraft", "tetris", "tictactoe",
-    "single=player", "multi-player",
-  ]),
-  Topic("-Games", ["game=theory"], resolve=[]), # oversimplified, will update later
+  # GAMES >
   # Topic("Pixel", ["pixel(s)"]),
   # Topic("-Pixel", ["google=pixel"]),
   # Topic("Voxel", ["voxel(s)"]),
@@ -155,7 +135,6 @@ SKILLS: list[Topic] = [
   # TODO add game-specific non-graphic topics
 
   # HARDWARE >
-  Topic("Assembly", ["assembly"]), # also SYSTEMS
   Topic("CPU", ["cpu", "central-processing-unit"]),  # also SYSTEMS
   Topic("CPU", ["micro=processor(s)"]),
   Topic("CPU", ["processor(s)"], disambiguate=[
@@ -181,8 +160,7 @@ SKILLS: list[Topic] = [
   Topic("CRM", ["crm", "customer=relationship=management"]),
   Topic("ERP", ["erp"]),
 
-  # MACHINE-LEARNING
-  Topic("Machine-Learning", ["machine-learning", "ml"]),
+  # MACHINE-LEARNING >
   Topic("AI", ["ai", "artificial-intelligence"]),
   Topic("Deep-Learning", ["deep=learning", "deep=reinforcement=learning", "dl"]), # not sure about FPs for "dl"
   Topic("Large-Language-Models", [
@@ -193,8 +171,7 @@ SKILLS: list[Topic] = [
   Topic("Neural-Networks", ["(deep=)neural-networks", "nn", "dnn"]), # not sure about FPs
   # Signal Processing, Face Detection
 
-  # MOBILE
-  Topic("Mobile", ["mobile", "mobileapp"]),
+  # MOBILE >
   Topic("Cross-Platform", ["cross=platform"]), # also SYSTEMS
   Topic("Desktop", ["desktop"]),
   Topic("Devices", ["device(s)"]),
@@ -244,7 +221,7 @@ SKILLS: list[Topic] = [
   # blue green deployments
 
   # ROBOTICS >
-  Topic("Computer-Vision", ["computer << vision"]),
+  Topic("Computer-Vision", ["computer=vision"]),
   Topic("RTOS", ["rtos"]),
   Topic("GPOS", ["gpos"]),
   Topic("Sensors", ["sensor(s)"]),
@@ -315,8 +292,7 @@ SKILLS: list[Topic] = [
   Topic("Regression-Testing", ["regression=testing", "regression=test(s)"]),
   Topic("Unit-Testing", ["unit=testing", "unit=test(s)"]),
 
-  # WEB
-  Topic("Web", ["web", "website", "webapp"]),
+  # WEB >
   Topic("CORS", ["cors"]), # also SECURITY
   Topic("WebSockets", ["websocket(s)", "ws"]), # also NETWORKS
 
@@ -325,7 +301,6 @@ SKILLS: list[Topic] = [
     "augmented=reality", "mixed=reality", "virtual=reality",
     "vr/ar", "vr/mr", "ar/vr", "mr/vr", "vr",
   ]),
-  Topic("Graphics", ["graphic(s)"]),
   Topic("Leadership", ["leadership", "leader", "lead", "leading role"]),
   # Topic("Modeling", ["datamodeling"]), - "database=modeling" is now translated to [Databases, Engineering]
   Topic("Scraping", ["scraping", "webscraping"]),
@@ -341,152 +316,15 @@ SKILLS: list[Topic] = [
   # Topic("Entity-Component-System", ["entity-component-system", "ecs"]), -- conflicts with AWS-ECS
 
   # COMBINED ---------------------------------------------------------------------------------------
-  Topic("Business-Analysis", [
-    "businessanalysis", "businessanalytics", "businessanalyst"
-  ], resolve=["Business", "Analysis"]),
-  # TODO business intelligence, BI
-  # TODO nonprofit(s) ?
-
-  Topic("Cloud-Architecture", ["cloudarchitecture", "cloudarchitect"], resolve=["Cloud", "Architecture"]),
-
-  Topic("Data-Analysis", ["dataanalysis", "dataanalytics", "dataanalyst"], resolve=["Data", "Analysis"]),
-  Topic("Data-Design", ["data=design", "data=designer"], resolve=["Data", "Engineering"]),
-  Topic("Data-Engineering", [
-    "dataengineering", "dataengineer",
-    "datadeveloper", "datadev",
-  ], resolve=["Data", "Engineering"]),
-  Topic("Data-Operations", ["dataoperations", "dataops"], resolve=["Data", "Operations"]),
-  Topic("Data-Security", ["datasecurity", "data=sec", "data=protection"], resolve=["Data", "Security"]),
   Topic("Data-Warehouses", ["data=warehouse(s)", "dwh"], resolve=["Data", "Warehouses"]),
-
-   Topic("Database-Administration", [
-    "databaseadministration", "databaseadministrator", "dba"
-  ], resolve=["Databases", "Administration"]),
-  Topic("Database-Design", [
-    "database=design", "database=designer",
-    "db=design", "db=designer",
-  ], resolve=["Databases", "Engineering"]),
-  Topic("Database-Engineering", [
-    "databaseengineering", "databaseengineer", "db=engineering",
-    "database=modeling", "db=modeling",
-  ], resolve=["Databases", "Engineering"]),
-
-  Topic("Embedded-Engineering", [
-    "embeddedengineer", "embeddedprogramming", "embeddeddev",
-  ], resolve=["Embedded", "Engineering"]),
-
-  Topic("Engineering-Management", [
-    "engineering << management", "engineering << manager",
-  ], resolve=["Engineering", "Management"]),
-  Topic("Engineering-Operations", [
-    "devop(s)",
-  ], resolve=["Engineering", "Operations"]),
-  Topic("Engineering-Security-Operations", [
-    "dev/sec-ops", "sec/dev-ops",
-    "dev-sec-ops", "sec-dev-ops",
-    "devsecop(s)", "secdevop(s)", "devop(s)sec",
-  ], resolve=["Engineering", "Security", "Operations"]),
-
   Topic("Fullstack", ["full=stack(er)"], resolve=["Backend", "Frontend"]),
-
-  Topic("Games-Design", [
-    "game(s) << design",
-    # "game(s) << designer",
-  ], resolve=["Games", "Design"]),
-  Topic("Games-Engineering", [
-    "gameengineering", "gameengineer",
-    "gameprogramming", "gameprogrammer",
-    "gamedeveloper", "gamedev",
-  ], resolve=["Games", "Engineering"]),
-  Topic("Games-Testing", [
-    "playtest(s)",
-  ], resolve=["Games", "Testing"]),
-
-  Topic("Graphics-Design", [
-    "graphic(s) << design", "graphic(s) << designer",
-  ], resolve=["Graphics", "Design"]),
-
-  Topic("Machine-Learning-Engineering", ["ml=engineer(ing)"], resolve=["Machine-Learning", "Engineering"]),
-  Topic("Machine-Learning-Operations", ["mlops", "mldevops", "ai=ops"], resolve=["Machine-Learning", "Operations"]),
-
-  Topic("Marketing-Management", [
-    "marketing << management", "marketing << manager",
-  ], resolve=["Marketing", "Management"]),
-
-  Topic("Mobile-Design", [
-    "mobile << design", "mobile << designer", # Mobile-Design is not UI-Design
-  ], resolve=["Mobile", "Engineering"]),
-  Topic("Mobile-Engineering", [
-    "mobile << developer", "mobile << dev",
-    "mobile << engineer",
-    "mobile << programming", "mobile << programmer",
-  ], resolve=["Mobile", "Engineering"]),
-
-  Topic("Network-Operations", ["networkoperations", "networkops", "netops"], resolve=["Networks", "Operations"]),
-  Topic("Network-Security", ["networksecurity", "netsecurity", "net=sec"], resolve=["Networks", "Security"]),
-
-  Topic("Operations-Management", [
-    "operations << management", "operations << manager",
-  ], resolve=["Operations", "Management"]),
-
-  Topic("Security-Operations", [
-    "securityoperations", "secops"
-  ], resolve=["Security", "Operations"]),
-
   Topic("SDET", ["sdet"], resolve=["Software", "Engineering", "Testing"]),
   Topic("SDLC", ["sdlc"], resolve=["Software", "Engineering", "Testing", "Deployment"]),
-
-  Topic("Solution-Architecture", [
-    "solution=architecture", "solution=architect"
-  ], resolve=["Business", "Software", "Architecture"]),
-
-  Topic("SRE", ["SRE"], resolve=["Reliability", "Software", "Engineering"]),
-
-  Topic("System-Administration", [
-    "systemadministration", "systemadministrator", "sysadmin"
-  ], resolve=["Systems", "Administration"]),
-  Topic("System-Architecture", [
-    "systemarchitecture", "systemarchitect"
-  ], resolve=["Systems", "Architecture"]),
-  Topic("System-Engineering", [
-    "systemengineering", "systemengineer",
-    "systemprogramming",
-    "systemdeveloper", "systemdev",
-  ], resolve=["Systems", "Engineering"]),
-  Topic("System-Operations", [
-    "sysops",
-    "system-operations", # TEMP
-  ]), # , resolve=["Systems", "Operations"]
-
-  # UI/UX-Architecture
-  Topic("UI/UX-Design", [
-    "ui << design", "ui << designer",
-    "ux << design", "ux << designer",
-    "uiux << design", "uiux << designer",
-  ], resolve=["UI/UX", "Design"]),
-  Topic("UI/UX-Testing", [
-    "uitesting", "uitester",
-    "uxtesting", "uxtesting",
-  ], resolve=["UI/UX", "Testing"]),
-
-  Topic("Warehouses-Management", [
-    "warehouse << management", "warehouse << manager",
-  ], resolve=["Warehouses", "Management"]),
-
+  Topic("SRE", ["SRE"], resolve=["Reliability", "Engineering"]),
   Topic("Web-APIs", ["webapi(s)"], resolve=["Web", "APIs"]),
-  Topic("Web-Design", [
-    "web << design", "web << designer",
-  ], resolve=["Web", "Design"]),
-  Topic("Web-Engineering", [
-    "webengineering", "webengineer",
-    "webprogramming", "webprogrammer",
-    "webdeveloper", "webdev",
-    "webcoding", "webcoder",
-  ], resolve=["Web", "Engineering"]),
-  Topic("Web-Security", ["websecurity", "web=sec"], resolve=["Web", "Security"]),
 ]
 
-# TODO phpdeveloper, dataarchitect, webarchitect, phpcoder, dbadmin, rubydev
+# TODO phpdeveloper, webarchitect, phpcoder, dbadmin, rubydev
 
 # TODO split into inside (dev) and outside topics
 
@@ -570,4 +408,3 @@ SKILLS: list[Topic] = [
 
 # Counter-cases for "Architecture"
 # licensed architect, architectural designer and web developer/programmer
-# UI Architect

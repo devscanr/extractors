@@ -1,5 +1,6 @@
-from ...utils import ver1, propn
-from ..utils import Skill, dis_context, dis_neighbours
+from ...xpatterns import ver1, propn
+from ..skill import Skill
+from ..utils import dis_context, dis_neighbours
 
 dis_ctx = dis_context("microsoft")
 

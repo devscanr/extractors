@@ -1,5 +1,4 @@
-# from ...utils import propn
-from ..utils import Skill #, contextual, contextual_or_neighbour, neighbour
+from ..skill import Skill
 
 SKILLS: list[Skill] = [
   Skill("Apple", ["(@)apple"], "Company"),
@@ -8,7 +7,7 @@ SKILLS: list[Skill] = [
   # Skill("Sketch", ["sketch"], ""), many FPs, need to disambig.
 
   # MOBILE
-  Skill("Objective-C", ["objective=c", "objective=c++", "objective=cpp"], ""),
+  Skill("Objective-C", ["objective=c(.)", "objective=c++", "objective=cpp"], ""),
   Skill("Swift", ["swift"], ""),
   Skill("AppKit", ["appkit"], "Framework"),
   Skill("SwiftUI", ["swiftui"], "Framework"),

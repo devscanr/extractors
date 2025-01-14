@@ -1,25 +1,24 @@
-from ..utils import Pattern
+from ..extractor import Tag
+from .roletag import RoleTag
 
-type TaggedPhrases = dict[str, list[str | Pattern]]
-
-TAGGED_PHRASES: TaggedPhrases = {
-  "HUMAN": [
-    # ADMININSTRATORS
+TAGS: list[Tag] = [
+  # TODO consider verbs like programming, studying, leading, etc.
+  RoleTag("Human:Administrator", [
     "administrator", "admin",
     "dbadmin", "dba",
     "systemadministrator", "sysadmin",
-
-    # ANALYSTS
+  ]),
+  RoleTag("Human:Analyst", [
     "analyst",
     "businessanalyst",
     "dataanalyst",
-
-    # ARCHITECTS
+  ]),
+  RoleTag("Human:Architect", [
     "architect",
     "dataarchitect",
     "dbarchitect",
-
-    # DEVELOPERS
+  ]),
+  RoleTag("Human:Developer", [
     "developer", "dev",
     "gamedeveloper", "gamedev",
     "godev", "gopher",
@@ -31,113 +30,135 @@ TAGGED_PHRASES: TaggedPhrases = {
     "softwaredeveloper", "softwaredev",
     "systemdeveloper",
     "webdeveloper", "webdev",
-
-    # ENGINEERS
+  ]),
+  RoleTag("Human:Engineer", [
     "engineer", "eng",
     "dataengineer",
     "mlengineer",
     "softwareengineer", "swe", "sde",
     "systemengineer",
     "webengineer",
-
-    # PROGRAMMERS
+  ]),
+  RoleTag("Human:Programmer", [
     "programmer", "coder",
     "gameprogrammer",
     "phpcoder",
     "webprogrammer", "webcoder",
-
-    # OPERATIONS & SECURITY
+  ]),
+  RoleTag("Human:Ops", [
     "operations", "op(s)",
+  ]),
+  RoleTag("Human:DevOps", [
+    "dev=op(s)",
+  ]),
+  RoleTag("Human:DataOps", [
     "ai=op(s)",
     "dataop(s)",
-    "dev=op(s)",
-    "dev/sec-ops", "devopssec", "devsecops", "sec/dev-ops", "secdevops",
     "ml=op(s)",
+  ]),
+  RoleTag("Human:NetOps", [
     "net=op(s)",
-    "security", "sec",
+  ]),
+  RoleTag("Human:DevSecOps", [
+    "dev/sec=op(s)", "sec/dev=op(s)",
+    "devsecop(s)", "secdevop(s)",
+    "devop(s)sec", "secop(s)dev",
+  ]),
+  RoleTag("Human:SecOps", [
     "sec=op(s)",
-    "sysops",
-
-    # TESTERS & QA
+  ]),
+  RoleTag("Human:SysOps", [
+    "sysop(s)",
+  ]),
+  RoleTag("Human:Security", [
+    "security", "sec",
+  ]),
+  RoleTag("Human:Tester/QA", [
     "qa",
     "tester",
     "pentester",
     "qatester",
-
-    # SCIENCE & ACADEMY
+  ]),
+  RoleTag("Human:Education", [
+    "dean",
+    "coach",
+    "educator",
+    "lecturer",
+    "mentor",
+    "professor", "prof",
+    "teacher",
+    "trainer",
+  ]),
+  RoleTag("Human:Science", [
+    "academic",
+    "biologist",
+    "chemist",
+    "informatician",
     "mathematician",
     "ph.d",
     "ph.d candidate",
+    "physicist",
     "researcher",
     "scientist",
     "statistician",
-
-    # OTHER
+  ]),
+  RoleTag("Human:Business", [
+    "businessman",
+    "ceo",
+    "cto",
+    "director",
+    "entrepreneur",
+    "founder", "co=founder",
+    "investor",
+    "head",
+    "manager",
+    "owner",
+    "president", "vice=president",
+    "vp", "svp",
+  ]),
+  RoleTag("-Human:Business", [
+    "head-first",
+  ]),
+  RoleTag("Human:Other", [
+    "animator",
+    "artist",
+    "auditor",
+    "author",
+    "employee",
     "enthusiast",
     "expert",
     "generalist",
     "guru",
     "hacker",
     "investigator",
+    "lawyer",
+    "musician",
     "ninja",
+    "producer",
     "professional",
+    "recruiter",
     "specialist",
     "wizard",
-
-    # FREELANCERS
+  ]),
+  RoleTag("Human:Freelancer", [
     "free=lancer",
     "consultant",
-
-    # LEADS
+  ]),
+  RoleTag("Human:Lead", [
+    # TODO add human roots like lead << developer? How to default to human, then?
     "lead",
     "leader",
     "teamlead", "tl",
     "techlead",
-
-    # NONDEVS > DESIGNERS
+  ]),
+  RoleTag("Human:Designer", [
     "designer",
     "gamedesigner",
     "uidesigner",
     "webdesigner",
-
-    # NONDEVS > OTHER
-    "academic",
-    "animator",
-    "artist",
-    "auditor",
-    "author",
-    "ceo",
-    "chemist",
-    "coach",
-    "co=founder",
-    "cto",
-    "dean",
-    "director",
-    "educator",
-    "entrepreneur", "businessman",
-    "founder",
-    "head",
-    "informatician",
-    "investor",
-    "lawyer",
-    "lecturer",
-    "owner",
-    "physicist",
-    "president",
-    "producer",
-    "professor", "prof",
-    # postdoc ?
-    "manager",
-    "mentor",
-    "musician",
-    "recruiter",
-    "svp",
-    "teacher",
-    "trainer",
-    "vp",
-
-    # STUDENTS
-    "alumni", "alum",
+  ]),
+  RoleTag("Human:Student", [
+    "alumni", "alumnus", "alum",
     "amateur",
     "beginner",
     "bachelor",
@@ -149,23 +170,30 @@ TAGGED_PHRASES: TaggedPhrases = {
     "major",
     "learner",
     "newbie", "noob",
+    "new to",
     "novice",
     "rookie",
     "sophomore",
     "student",
     "teenager",
     "undergrad(uate)",
-
-    # UNSORTED
-    # "employee",
-  ],
-
-  "SKIP": [
+  ]),
+  RoleTag("-Human:Student", [
+    "constant student",
     "every student",
-    "head first",
-  ],
-
-  "ORG": [
+    "eternal student",
+    "everlasting student",
+    "forever student",
+    "life=long student",
+    "perpetual student",
+    "student of life",
+    *[
+      f"{anchor}>>{target}"
+      for anchor in ["learning", "studying"]
+      for target in ["always", "forever", "world"]
+    ],
+  ]),
+  RoleTag("Org", [
     "agency",
     "company",
     "community",
@@ -175,5 +203,7 @@ TAGGED_PHRASES: TaggedPhrases = {
     "professional network",
     "social network",
     "team",
-  ],
-}
+  ]),
+]
+
+# doc? dr? doctor? postdoc?

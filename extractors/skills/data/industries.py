@@ -1,14 +1,41 @@
-from ..utils import Topic, dis_context
+from ...skills.utils import dis_context
+from ..skill import Skill, Topic
 
-SKILLS: list[Topic] = [
-  # PROCESSES / INDUSTRIES
+SKILLS: list[Skill] = [
+  # PROCESSES / INDUSTRIES / DEV SUB-INDUSTRIES
   Topic("Administration", ["administration", "administrator", "admin"]),
+  Topic("Administration.Databases", [
+    "databaseadministration", "databaseadministrator", "dba"
+  ], resolve=["Administration", "Databases"]),
+  Topic("Administration.Systems", [
+    "systemadministration", "systemadministrator", "sysadmin"
+  ], resolve=["Administration", "Systems"]),
 
   Topic("Analysis", ["analysis", "analytics", "analytical", "analyst"]),
+  Topic("Analysis.Business", [
+    "businessanalysis", "businessanalytics", "businessanalyst"
+  ], resolve=["Analysis", "Business"]),
+  Topic("Analysis.Data", [
+    "dataanalysis", "dataanalytics", "dataanalyst"
+  ], resolve=["Analysis", "Data"]),
   # TODO: -"issue analysis"
   # analyses (plural, appears in vacancies)
+  # TODO business intelligence, BI
+  # TODO nonprofit(s) ?
 
   Topic("Architecture", ["architecture", "architect"]),
+  Topic("Architecture.Cloud", ["cloudarchitecture", "cloudarchitect"], resolve=["Architecture", "Cloud"]),
+  Topic("Architecture.Data", ["dataarchitecture", "dataarchitect"], resolve=["Architecture", "Data"]),
+  Topic("Architecture.Games", ["gamearchitecture", "gamearchitect"], resolve=["Architecture", "Games"]),
+  Topic("Architecture.Security", ["securityarchitecture", "securityarchitect"], resolve=["Architecture", "Security"]),
+  Topic("Architecture.Solutions", [
+    "solution=architecture", "solution=architect"
+  ], resolve=["Architecture", "Software", "Business"]),
+  Topic("Architecture.Systems", [
+    "systemarchitecture", "systemarchitect"
+  ], resolve=["Architecture", "Systems"]),
+  # UI Architect
+  Topic("Architecture.Web", ["webarchitecture", "webarchitect"], resolve=["Architecture", "Web"]),
 
   Topic("Art", ["art", "artist"]),
   Topic("-Art", ["of arts"]), # Bachelor of Arts
@@ -23,11 +50,25 @@ SKILLS: list[Topic] = [
   Topic("Startups", ["startup(s)", "startuper"]),
 
   Topic("Design", [
-    "font << design", "font << designer",
-    "level << design", "level << designer",
-    "motion << design", "motion << designer",
-    "visual << design", "visual << designer",
-  ]), # Other design types are captured in topics
+    "font<~design", "font<~designer",
+    "level<~design", "level<~designer",
+    "motion<~design", "motion<~designer",
+    "visual<~design", "visual<~designer",
+  ]),
+  Topic("Design.Games", [
+    "game(s)<~design", "game(s)<~designer",
+  ], resolve=["Design", "Games"]),
+  Topic("Design.Graphics", [
+    "graphic(s)<~design", "graphic(s)<~designer",
+  ], resolve=["Graphics", "Design"]),
+  Topic("Design.UI/UX", [
+    "ui<~design", "ui<~designer",
+    "ux<~design", "ux<~designer",
+    "uiux<~design", "uiux<~designer",
+  ], resolve=["Design", "UI/UX"]),
+  Topic("Web-Design", [
+    "web<~design", "web<~designer",
+  ], resolve=["Design", "Web"]),
 
   Topic("Engineering", [
     "engineering", "engineered", "engineer", "eng",
@@ -41,28 +82,107 @@ SKILLS: list[Topic] = [
     "team development",
     "development team",
   ], resolve=[]),
+  Topic("Engineering.Data", [
+    "data<~design", "data<~designer",
+    "dataengineering", "dataengineer",
+    "datadeveloper", "datadev",
+  ], resolve=["Engineering", "Data"]),
+  Topic("Engineering.Databases", [
+    "database<~architecture", "database<~architect",
+    "database<~design", "database<~designer",
+    "databaseengineering", "databaseengineer", "db=engineering",
+    "database=modeling", "db=modeling",
+    "db=design", "db=designer",
+  ], resolve=["Engineering", "Databases"]),
+  Topic("Engineering.Embedded", [
+    "embeddedengineer", "embeddedprogramming", "embeddeddev",
+  ], resolve=["Engineering", "Embedded"]),
+  Topic("Engineering.Games", [
+    "gameengineering", "gameengineer",
+    "gameprogramming", "gameprogrammer",
+    "gamedeveloper", "gamedev",
+  ], resolve=["Engineering", "Games"]),
+  Topic("Engineering.Hardware", [
+    "hardware<~architecture", "hardware<~architect",
+    "hardware<~design", "hardware<~designer",
+    "hardwareengineering", "hardwareengineer",
+    "hardwaredevelopment", "hardwaredeveloper", "hardwaredev",
+    "HWE",
+  ], resolve=["Engineering", "Hardware"]),
+  Topic("Engineering.Machine-Learning", ["ml=engineer(ing)"], resolve=["Engineering", "Machine-Learning"]),
+  Topic("Engineering.Mobile", ["mobiledev", "mobiledeveloper", "mobileengineer"], resolve=["Engineering", "Mobile"]),
+  Topic("Engineering.Networks", ["network(s)dev", "network(s)developer", "network(s)engineer"], resolve=["Engineering", "Networks"]),
+  Topic("Engineering.Operations", ["devop(s)"], resolve=["Engineering", "Operations"]),
+  Topic("Engineering.Security.Operations", [
+    "dev/sec-ops", "sec/dev-ops",
+    "dev-sec-ops", "sec-dev-ops",
+    "devsecop(s)", "secdevop(s)", "devop(s)sec",
+  ], resolve=["Engineering", "Security", "Operations"]),
+  Topic("Engineering.Software", [
+    "software<~architecture", "software<~architect",
+    "softwareengineering", "softwareengineer",
+    "softwaredevelopment", "softwaredeveloper", "softwaredev",
+    "SDE", "SWE", # sometimes SE @_@
+    "software<~design", "software<~designer",
+  ], resolve=["Engineering", "Software"]),
+  Topic("Engineering.Systems", [
+    "systemengineering", "systemengineer",
+    "systemprogramming",
+    "systemdeveloper", "systemdev",
+  ], resolve=["Engineering", "Systems"]),
+  Topic("Engineering.Web", [
+    "webengineering", "webengineer",
+    "webprogramming", "webprogrammer",
+    "webdeveloper", "webdev",
+    "webcoding", "webcoder",
+  ], resolve=["Engineering", "Web"]),
+  # TODO backenddev frontenddev fullstackdev
 
   Topic("Management", [
-    "people << management", "people << manager",
-    "process << management", "process << manager",
-    "product << management", "product << manager",
-    "project << management", "project << manager",
-    "release << management", "release << manager",
-    "sales << management", "sales << manager",
-    "team << management", "team << manager",
+    "people<~management", "people<~manager",
+    "process<~management", "process<~manager",
+    "product<~management", "product<~manager",
+    "project<~management", "project<~manager",
+    "release<~management", "release<~manager",
+    "sales<~management", "sales<~manager",
+    "team<~management", "team<~manager",
   ]),
   Topic("-Management", [
     # These rules are not necessary, mostly a reminder
     "content=management", "session=management",
   ]),
-  # Other design types are captured in topics
+  Topic("Management.Engineering", [
+    "engineering<~management", "engineering<~manager",
+  ], resolve=["Management", "Engineering"]),
+  Topic("Management.Marketing", [
+    "marketing<~management", "marketing<~manager",
+  ], resolve=["Management", "Marketing"]),
+  Topic("Management.Operations", [
+    "operations<~management", "operations<~manager",
+  ], resolve=["Management", "Operations"]),
+  Topic("Management.Warehouses", [
+    "warehouse<~management", "warehouse<~manager",
+  ], resolve=["Management", "Warehouses"]),
 
   Topic("Marketing", [
     "marketing", "marketer",
     "seo", "smo", "advertising", "advertisement",
   ]),
 
+  Topic("Mobile", ["mobile", "mobileapp"]),
+  Topic("Mobile-Engineering", [
+    "mobile<~developer", "mobile<~dev",
+    "mobile<~engineer",
+    "mobile<~programming", "mobile<~programmer",
+    "mobile<~design", "mobile<~designer", # Mobile-Design is not UI-Design
+  ], resolve=["Mobile", "Engineering"]),
+
   Topic("Operations", ["operations", "ops"]),
+  Topic("Operations.Data", ["dataoperations", "dataop(s)"], resolve=["Operations", "Data"]),
+  Topic("Operations.Machine-Learning", ["mlop(s)", "mldevop(s)", "ai=op(s)"], resolve=["Operations", "Machine-Learning"]),
+  Topic("Operations.Networks", ["network(s)operations", "networkop(s)", "netop(s)"], resolve=["Operations", "Networks"]),
+  Topic("Operations.Security", ["securityoperations", "secop(s)"], resolve=["Operations", "Security"]),
+  Topic("Operations.Systems", ["system(s)operations", "sysop(s)"], resolve=["Operations", "Systems"]),
 
   Topic("Research", ["research", "reseacher"]),
 
@@ -75,6 +195,13 @@ SKILLS: list[Topic] = [
     "suite", "suites", "unit", "write", "writing"
   )),
   Topic("-Testing", ["battle-tested", "tested to"], resolve=[]),
+  Topic("Games-Testing", [
+    "playtest(s)",
+  ], resolve=["Games", "Testing"]),
+  Topic("UI/UX-Testing", [
+    "uitesting", "uitester",
+    "uxtesting", "uxtesting",
+  ], resolve=["UI/UX", "Testing"]),
 
   # SCIENCES / STUDIES / MATHS
   Topic("Anthropology", ["anthropology", "anthropologist"]),
@@ -88,14 +215,13 @@ SKILLS: list[Topic] = [
   Topic("Chemistry", ["chemistry", "chemist"]),
 
   Topic("Computer-Science", [
-    "computer << science", "computer << scientist", "comp=sci",
-    "CS", "mscs",
+    "computer(s)<~science", "computer<~scientist",
+    "comp=sci", "CS", "mscs",
   ]),
 
   Topic("Data-Science", [
-    "data << science",
-    "data << scientist", "data=sci",
-    # "DS", "msds",
+    "data<~science", "data<~scientist",
+    "data=sci", # "DS", "msds",
   ]),
 
   Topic("Cryptography", ["cryptography"]),
@@ -184,6 +310,9 @@ SKILLS: list[Topic] = [
     "threat",
   ]),
   # Topic("Security", ["sec"], disambiguate=neighbour(2)),
+  Topic("Security.Data", ["datasecurity", "data=sec", "data=protection"], resolve=["Security", "Data"]),
+  Topic("Security.Networks", ["networksecurity", "netsecurity", "net=sec"], resolve=["Security", "Networks"]),
+  Topic("Security.Web", ["websecurity", "web=sec"], resolve=["Security", "Web"]),
 
   Topic("Sport", [
     "sport",
@@ -202,24 +331,54 @@ SKILLS: list[Topic] = [
 
   Topic("Travel", ["travel(s)"]),
 
-  # BROAD ENGINEERING TOPICS
-  Topic("Electrical-Engineering", ["electrical=engineering", "electrical", "electric(s)"]),
+  # BROAD TOPICS
+  Topic("Blockchains", [
+    "blockchain(s)",
+    "on-chain", "off-chain",
+    "litecoin",
+  ]),
+
+  Topic("Computer", ["computer(s)", "computing"]),
+  # Note: to be able to name this "Computer" and still be captured by "Computer-Science"
+  # we have to split dpattern rules like:
+  # == probably applies only to <~ and more complex patterns ==
+  # Computer-Science {LOWER: computerscience}
+  # Computer-Science {LOWER: computer}<-{LOWER: science}
+  # Computer-Science:1 {LOWER: computer}<-{NOUN} {CONJ} {science} omit offsets [1, 2]
+  # Computer-Science:2 -- other complex rule -- omit some offsets
+  # Then, perhaps in a separate step after match, drop those "omit offsets"
+  # If we do this, we might not need exclusive/inclusive differentiation at all
+
+  Topic("Data", ["data"]), # maybe a whitelist will work better here
+  Topic("-Data", [
+    "personal=data", "user=data",
+    "my=data", "your=data", "our=data", "their=data",
+    "data=graph", "data-querying", "data-storage", # vs database?
+  ], resolve=[]), # oversimplified, will update later
+
+  Topic("Databases", ["database(s)"]),
+
+  Topic("Electrics", ["electrical", "electric(s)"]),
 
   Topic("Electronics", ["electronic(s)", "electronical"]),
 
+  Topic("Games", [
+    "game(s)", "gamer", "gameplay",
+    "arcanoid", "minecraft", "tetris", "tictactoe",
+    "single=player", "multi-player",
+  ]),
+  Topic("-Games", ["game=theory"], resolve=[]), # oversimplified, will update later
+
+  Topic("Graphics", ["graphic(s)"]),
+
   Topic("Hardware", ["hardware"]), # "HW"
-  Topic("Hardware-Design", [
-    "hardware << design", "hardware << designer",
-  ], resolve=["Hardware", "Engineering"]),
-  Topic("Hardware-Engineering", [
-    "hardwareengineering", "hardwareengineer",
-    "hardwaredevelopment", "hardwaredeveloper", "hardwaredev",
-    "HWE",
-  ], resolve=["Hardware", "Engineering"]),
 
   Topic("Infrastructure", ["infrastructure"]),
 
+  Topic("Machine-Learning", ["machine-learning", "ml"]),
+
   Topic("Networks", ["networking", "network(s)"]),
+
   Topic("Internet", ["internet", "www"]),
 
   Topic("Robotics", ["robotic(s)", "robocon", "rpa"]),
@@ -229,17 +388,8 @@ SKILLS: list[Topic] = [
     "programming", "programmer",
     "coding", "coder",
   ]),
-  Topic("Software-Achitecture", [
-    "softwarearchitecture", "softwarearchitect",
-  ], resolve=["Software", "Engineering"]),
-  Topic("Software-Design", [
-    "software << design", "software << designer",
-  ], resolve=["Software", "Engineering"]),
-  Topic("Software-Engineering", [
-    "softwareengineering", "softwareengineer",
-    "softwaredevelopment", "softwaredeveloper", "softwaredev",
-    "SDE", "SWE", # sometimes SE @_@
-  ], resolve=["Software", "Engineering"]),
+
+  Topic("Web", ["web", "website", "webapp"]),
 ]
 
 # Academy (doc, post-doc, etc)

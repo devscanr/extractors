@@ -1,5 +1,5 @@
-from ...utils import ver1
-from ..utils import Skill
+from ...xpatterns import ver1
+from ..skill import Skill
 
 SKILLS: list[Skill] = [
   Skill("Adobe", ["(@)adobe"], "Company"),

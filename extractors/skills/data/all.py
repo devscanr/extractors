@@ -1,6 +1,7 @@
 from spacy.tokens import Token
-from ...utils import IN, LOWER, OP, propn, ver1
-from ..utils import Disambiguate, Skill, dis_context, dis_letter, dis_neighbours
+from ...xpatterns import IN, LOWER, OP, propn, ver1
+from ..skill import Skill
+from ..utils import Disambiguate, dis_context, dis_letter, dis_neighbours
 from .adobe import SKILLS as ADOBE_SKILLS
 from .amazon import SKILLS as AMAZON_SKILLS
 from .apache import SKILLS as APACHE_SKILLS
@@ -22,12 +23,6 @@ def dis_julia() -> Disambiguate:
         return False
     return True
   return disambiguate
-
-# SKILLS: list[Skill] = [
-#   Skill("JAX-Kex", [
-#     "JAX=Kex",
-#   ]),
-# ]
 
 SKILLS: list[Skill] = [
   *ADOBE_SKILLS,
@@ -479,8 +474,9 @@ SKILLS: list[Skill] = [
   # MAIN LANGUAGES
   Skill("Ada", ["ada"], ""),
   Skill("Apex", ["apex"], ""),
+  Skill("Assembly", ["assembly", "asm"]), # not technically a language
   Skill("C", ["c-lang"], ""),
-  Skill("C", ["c"], disambiguate=dis_letter()),
+  Skill("C", ["c(.)"], disambiguate=dis_letter()), # disambiguate from "c." like in "c. 1, c. 2" (chapter)
   Skill("C++", ["c++", "cpp", "c=plus=plus"], ""),
   Skill("C#", ["c#", "csharp"], ""),
   Skill("Cairo", ["cairo"], ""),
@@ -499,8 +495,9 @@ SKILLS: list[Skill] = [
   Skill("Erlang", ["erlang"], ""),
   Skill("Fortran", ["fortran"], ""),
   Skill("F#", ["f#", "f=lang", "fsharp"], ""),
-  Skill("GQL", ["gql"], ""), # TODO Cypher
   Skill("Gleam", ["gleam"], ""),
+  Skill("GQL", ["gql"], ""), # TODO Cypher
+  Skill("GraphQL", ["graphql", "graphiql"]),
   Skill("Go", ["golang", "gopher", propn("go")], ""),
   Skill("Groovy", ["groovy"], ""),
   Skill("Haskell", ["haskell"], ""),
@@ -536,6 +533,7 @@ SKILLS: list[Skill] = [
   Skill("Solidity", ["solidity"], ""),
   Skill("TypeScript", ["type=script", "ts"], ""),
   Skill("Shell", ["shell", "bash", "zsh"], ""),
+  Skill("SQL", ["sql"]),
   Skill("SVG", ["svg"], ""),
   Skill("XML", ["xml"], ""),
   Skill("YAML", ["yaml"], ""),
@@ -565,8 +563,6 @@ SKILLS: list[Skill] = [
 # export const rawSkillTable: Dict<SkillRow> = {
 #   "Chef": {pattern: "chef", category: "platform", role: "Engineer"},
 #   // should we add new char like "css𝐕" or should we consume numbers after EACH term?
-#   // Most skills have versions BUT topics don't @_@
-#   // So it can be a per-table configuration
 #   "Native Android": {pattern: "native=android", category: "platform", role: "Engineer"},
 #   "Native iOS": {pattern: "native-ios", category: "platform", role: "Engineer"},
 #   "Octave": {pattern: "octave", category: "lang"},
@@ -643,7 +639,6 @@ SKILLS: list[Skill] = [
 #   dependency injection middleware, concept, pattern, anti-patter, idiom, best practice
 #   deploy, build, compiler
 #   roadmap, computer science
-#   coding skills, application ideas
 #
 #   TODO
 #   CQRS

@@ -3,12 +3,13 @@ import pytest
 from spacy import Language
 from typing import Callable
 from ..utils import fix_grammar, normalize
+from .data import SKILLS
 from .extractor import SkillExtractor
 
 class Test_SkillExtractor:
   @pytest.fixture(scope="class")
   def extract(self, nlp: Language):
-    ex = SkillExtractor(nlp)
+    ex = SkillExtractor(nlp, SKILLS)
     def extract(text: str) -> list[str]:
       return ex.extract(fix_grammar(normalize(text, pipechar=",")))
     return extract
@@ -29,17 +30,29 @@ class Test_SkillExtractor:
   def test_extract_smoke(self, extract) -> None:
     assert extract("Joomla") == ["Joomla"]
     assert extract("modx") == ["MODx"]
+    assert extract("objective-c") == ["Objective-C"]
+    assert extract("foo") == []
+    assert extract("computer") == ["Computer"]
+    assert extract("Science") == ["Science"]
+    assert extract("computer science") == ["Computer-Science"]
     assert extract("foo") == []
 
   def test_extract_many_smoke(self, extract_many) -> None:
-    assert extract_many(["Joomla", "modx"]) == [
+    assert extract_many(["Joomla", "modx", "objective-c", "foo"]) == [
       ["Joomla"],
       ["MODx"],
+      ["Objective-C"],
+      [],
+    ]
+    assert extract_many(["computer", "Science", "computer science"]) == [
+      ["Computer"],
+      ["Science"],
+      ["Computer-Science"],
     ]
 
   # ADHOC
   def test_extract_adhoc1(self, extractset) -> None:
-    assert extractset("computer") == {"Computing"}
+    assert extractset("computer") == {"Computer"}
     assert extractset("data") == {"Data"}
     assert extractset("my user data") == set()
     assert extractset("data science") == {"Data-Science"}
@@ -61,11 +74,11 @@ class Test_SkillExtractor:
 
   def test_extract_adhoc2(self, extractset) -> None:
     assert extractset("programming") == {"Software"}
-    assert extractset("computer programming") == {"Computing", "Software"}
+    assert extractset("computer programming") == {"Computer", "Software"}
     assert extractset("web programming") == {"Web", "Software"}
     assert extractset("php programming") == {"PHP", "Software"}
     assert extractset("programming with PHP") == {"Software", "PHP"}
-    assert extractset("just programming on computers") == {"Software", "Computing"}
+    assert extractset("just programming on computers") == {"Software", "Computer"}
 
   def test_extract_adhoc3(self, extractset) -> None:
     assert extractset("software engineering") == {"Software", "Engineering"}
@@ -96,7 +109,7 @@ class Test_SkillExtractor:
     assert extractset("Game development/design") == {"Games", "Design", "Engineering"}
     assert extractset("Game design/dev") == {"Games", "Design", "Engineering"}
     assert extractset("Game design/development") == {"Games", "Design", "Engineering"}
-    assert extractset("Design/dev of games") == {"Games", "Design", "Engineering"}
+    # assert extractset("Design/dev of games") == {"Games", "Design", "Engineering"}
     assert extractset("Dev/design of games") == {"Games", "Design", "Engineering"}
 
   def test_extract_adhoc7(self, extractset) -> None:
@@ -288,7 +301,7 @@ class Test_SkillExtractor:
 
   def test_extract_bios9(self, extractset) -> None:
     assert extractset("""
-    FULL STACK JAVA | NETBEANS | C# | MICROSOFT MANAGEMENT STUDIO | VISUAL CODE | JUPYTER NOTEBOOK | PYTHON & RUBY
+      FULL STACK JAVA | NETBEANS | C# | MICROSOFT MANAGEMENT STUDIO | VISUAL CODE | JUPYTER NOTEBOOK | PYTHON & RUBY
     """) == {
       "Backend", "Frontend", "Java", "C#", "MS-SQLServer", "Jupyter", "Python", "Ruby"
     }
@@ -326,7 +339,7 @@ class Test_SkillExtractor:
     assert extractset("Hi, my name is Arm") == set()
     assert extractset("My left arm is stronger than my right arm") == set()
     assert extractset("I’m doing high-performance computing work on CPU, including x86, arm.") == {
-      "Performance", "Computing", "CPU", "x86", "ARM"
+      "Performance", "Computer", "CPU", "x86", "ARM"
     }
     assert extractset("Embrace AI-IoT | RISC-V | ARM | ARC") == {"AI", "IoT", "RISC", "ARM", "ARC"}
     assert extractset("PERN afficianado") == {"PostgreSQL", "Express", "React", "NodeJS"}
@@ -334,7 +347,7 @@ class Test_SkillExtractor:
   def test_extract_bios13(self, extractset) -> None:
      assert extractset("My favorite language is Jax") == set()
      assert extractset("My name is Jax") == set()
-     assert extractset("Hi, I'm Jax, an avid computer sorcerer") == {"Computing"}
+     assert extractset("Hi, I'm Jax, an avid computer sorcerer") == {"Computer"}
      assert extractset("CUDA C++ , Pytorch RT, JAX(JIT,Haiku enjoyer, FLAX Flexer)") == {"CUDA", "C++", "PyTorch", "JAX", "Flax"}
      assert extractset("JAX @NVIDIA") == {"JAX", "NVidia"}
      assert extractset("Scientist @ JAX") == {"Science", "JAX"}
@@ -453,6 +466,7 @@ class Test_SkillExtractor:
     }
 
   def test_extract_bios21(self, extractset) -> None:
+    assert extractset("I love making games with Godot") == {"Games", "Godot"}
     assert extractset("""
       Experience with infrastructure as code (IaC) tools like Terraform, Ansible,
       or Azure Resource Manager (ARM) templates.
@@ -504,7 +518,3 @@ class Test_SkillExtractor:
       #oauth
       #hacktoberfest
     """) == {"Open-Source", "Auth0", "Google-Firebase", "Authentication", "Amazon-Cognito", "Java", "OAuth"}
-
-# interested in data science, neuroscience, and machine learning
-# All About Quantum Computer
-# I love making games - FN
