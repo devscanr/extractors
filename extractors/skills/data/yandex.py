@@ -1,14 +1,14 @@
-from ..skill import Skill
+from ..skill import Skill, Company, Tech
 from ..utils import dis_context
 
 dis_ctx = dis_context("yandex")
 
 SKILLS: list[Skill] = [
-  Skill("Yandex", ["yandex"], "Company"),
+  Company("Yandex", ["(@)yandex"], "Company"),
 
-  Skill("ClickHouse", ["clickhouse"], ""),
+  Tech("ClickHouse", ["clickhouse"]),
 
   # CLOUD
   # Skill("?", ["yt"], ""), # many FPs
-  Skill("YDB", ["ydb"], "Distributed SQL database with high availability, scalability, and strong consistency"), # https://ydb.tech/
+  Tech("YDB", ["ydb"], "Distributed SQL database with high availability, scalability, and strong consistency"), # https://ydb.tech/
 ]

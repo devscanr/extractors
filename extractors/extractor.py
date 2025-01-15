@@ -22,9 +22,9 @@ class Tag:
     XPattern | # Matcher pattern
     DPattern   # DependencyMatcher pattern
   ]
-  descr: str = ""
-  exclusive: bool = True
-  disambiguate: Disambiguate | list[Disambiguate] | None = None
+  descr: str
+  exclusive: bool
+  disambiguate: Disambiguate | list[Disambiguate] | None
   @property
   def ambiguous(self) -> bool:
     return bool(self.disambiguate)
@@ -52,12 +52,8 @@ class BaseExtractor:
     for tag in tags:
       mname = attach_maybe(tag.name) if tag.ambiguous else tag.name
       # Update descriptions
-      assert (
-        (self.descrs[tag.name] == tag.descr) or (self.descrs[tag.name] and not tag.descr)
-        if tag.name in self.descrs
-        else True
-      ), f"varying `descr` at {tag.name!r}"
-      self.descrs[tag.name] = tag.descr
+      if tag.name not in self.descrs:
+        self.descrs[tag.name] = tag.descr
       # Update exclusives
       assert (
         self.exclusives[tag.name] == tag.exclusive

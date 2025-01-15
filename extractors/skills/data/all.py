@@ -1,28 +1,21 @@
-from spacy.tokens import Token
 from ...xpatterns import IN, LOWER, OP, propn, ver1
-from ..skill import Skill
-from ..utils import Disambiguate, dis_context, dis_letter, dis_neighbours
+from ..skill import Skill, Tech
+from ..utils import dis_context, dis_neighbours
 from .adobe import SKILLS as ADOBE_SKILLS
 from .amazon import SKILLS as AMAZON_SKILLS
 from .apache import SKILLS as APACHE_SKILLS
 from .apple import SKILLS as APPLE_SKILLS
 from .cisco import SKILLS as CISCO_SKILLS
-from .companies import SKILLS as COMPANIES_SKILLS
 from .google import SKILLS as GOOGLE_SKILLS
 from .hashicorp import SKILLS as HASHICORP_SKILLS
 from .microsoft import SKILLS as MICROSOFT_SKILLS
+from .yandex import SKILLS as YANDEX_SKILLS
+# ...
+from .certificates import SKILLS as CERTIFICATES_SKILLS
+from .companies import SKILLS as COMPANIES_SKILLS
 from .industries import SKILLS as INDUSTRIES_SKILLS
 from .topics import SKILLS as TOPICS_SKILLS
-from .yandex import SKILLS as YANDEX_SKILLS
-
-def dis_julia() -> Disambiguate:
-  # dis_seq = dis_sequence()
-  def disambiguate(token: Token) -> bool:
-    for tok in token.sent:
-      if tok.lemma_ in {"be", "name"}:
-        return False
-    return True
-  return disambiguate
+from .languages import SKILLS as LANGUAGE_SKILLS
 
 SKILLS: list[Skill] = [
   *ADOBE_SKILLS,
@@ -30,161 +23,164 @@ SKILLS: list[Skill] = [
   *APACHE_SKILLS,
   *APPLE_SKILLS,
   *CISCO_SKILLS,
-  *COMPANIES_SKILLS,
   *GOOGLE_SKILLS,
   *HASHICORP_SKILLS,
   *MICROSOFT_SKILLS,
   *YANDEX_SKILLS,
+  # ...
+  *CERTIFICATES_SKILLS,
+  *COMPANIES_SKILLS,
   *INDUSTRIES_SKILLS,
   *TOPICS_SKILLS,
+  *LANGUAGE_SKILLS,
 
   # ANALYSIS
-  Skill("Tableau", ["tableau"], ""),
+  Tech("Tableau", ["tableau"]),
 
   # CLOUD
-  Skill("Cloudflare", ["cloudflare"], ""),
-  Skill("Heroku", ["heroku"], ""),
-  Skill("Netlify", ["netlify"], ""),
+  Tech("Cloudflare", ["cloudflare"]),
+  Tech("Heroku", ["heroku"]),
+  Tech("Netlify", ["netlify"]),
 
   # TOOLS (should mostly be discouraged in UI)
-  Skill("Confluence", ["confluence"], ""), # FP, exclude "confluence of" pattern
-  Skill("GitHub", ["github"], ""),
-  Skill("GitLab", ["gitlab"], ""),
-  Skill("Jira", ["jira"], ""),
-  Skill("Postman", ["postman"], ""),
-  Skill("Swagger", ["swagger"], ""),
+  Tech("Confluence", ["confluence"]), # FP, exclude "confluence of" pattern
+  Tech("GitHub", ["github"]),
+  Tech("GitLab", ["gitlab"]),
+  Tech("Jira", ["jira"]),
+  Tech("Postman", ["postman"]),
+  Tech("Swagger", ["swagger"]),
 
   # MOBILE & CROSS-PLATFORM
   # notification, ui, gui, interface, native, web
   # Bluetooth, TCP, USB
-  Skill("Android", ["android"], ""),
-  Skill("CMake", ["cmake"], ""),
-  Skill("Cocoa", ["cocoa"], ""),
-  Skill("Cordova", ["cordova", "phonegap"], ""),
-  Skill("Dagger2", ["dagger=2"], "Programmable CI/CD engine that runs pipelines in containers"),
-  Skill("GTK", ["gtk", "gtk+"], ""),
-  Skill("Ionic", ["ionic"], ""),
-  Skill("Capacitor", ["capacitor"], ""),
-  Skill("Jetpack-Compose", ["jetpack=compose", "jetpack=navigation", "android=compose"], ""), # just Jetpack is ambiguous
+  Tech("Android", ["android"]),
+  Tech("CMake", ["cmake"]),
+  Tech("Cocoa", ["cocoa"]),
+  Tech("Cordova", ["cordova", "phonegap"]),
+  Tech("Dagger2", ["dagger=2"], "Programmable CI/CD engine that runs pipelines in containers"),
+  Tech("GTK", ["gtk", "gtk+"]),
+  Tech("Ionic", ["ionic"]),
+  Tech("Capacitor", ["capacitor"]),
+  Tech("Jetpack-Compose", ["jetpack=compose", "jetpack=navigation", "android=compose"]), # just Jetpack is ambiguous
 
-  Skill("Lottie", ["lottie"], ""),
-  Skill("Onsen UI", ["onsen", "onsen=ui"], ""),
-  Skill("Native-Script", ["native=script"], ""),
-  Skill("Novu", ["novu"], ""), # open-source notification platform, framework, CMS https://github.com/novuhq/novu
-  Skill("QML", ["qml"], ""), # Qt modeling language
-  Skill("Qt", ["pyqt", "pyside", "qtruby", "qtjambi", "php=qt", ver1("qt")], ""),
-  Skill("React-Native", ["react=native"], ""),
-  Skill("Retrofit", ["retrofit"], ""),
-  Skill("SDL", ["sdl"], ""),
-  Skill("SFML", ["sfml"], ""),
-  Skill("Xcode", ["xcode"], ""),
+  Tech("Lottie", ["lottie"]),
+  Tech("Onsen UI", ["onsen", "onsen=ui"]),
+  Tech("Native-Script", ["native=script"]),
+  Tech("Novu", ["novu"]), # open-source notification platform, framework, CMS https://github.com/novuhq/novu
+  Tech("QML", ["qml"]), # Qt modeling language
+  Tech("Qt", ["pyqt", "pyside", "qtruby", "qtjambi", "php=qt", ver1("qt")]),
+  Tech("React-Native", ["react=native"]),
+  Tech("Retrofit", ["retrofit"]),
+  Tech("SDL", ["sdl"]),
+  Tech("SFML", ["sfml"]),
+  Tech("Xcode", ["xcode"]),
   # Titanium -- disambiguate
-  Skill("VoIP", ["voip"], ""), # voice over IP
-  Skill("Vue-Native", ["vue=native"], ""),
-  Skill("WebRTC", ["webrtc"], ""), # web real-time communication
+  Tech("VoIP", ["voip"]), # voice over IP
+  Tech("Vue-Native", ["vue=native"]),
+  Tech("WebRTC", ["webrtc"]), # web real-time communication
 
   # DATABASE, DWH
-  Skill("CouchBase", ["couchbase"], ""),
-  Skill("CouchDB", ["couch=db"], ""),
-  Skill("DynamoDB", ["dynamo=db"], ""),
-  Skill("Elasticsearch", ["elastic=search"], ""),
-  Skill("Greenplum", ["greenplum"], ""),
-  Skill("MariaDB", ["maria=db"], ""),
-  Skill("Memcached", ["memcache(d)"], ""),
-  Skill("MongoDB", ["mongo=db", ver1("mongo")], ""),
-  Skill("MySQL", ["my-sql", "my sql", ver1("mysql"), "(my=)sql=manager"], ""),
-  Skill("Neo4j", ["neo4j", "neo4j=db"], ""),
-  Skill("Opensearch", ["opensearch"], "Community-driven Elasticsearch fork"),
-  Skill("Oracle", ["oracle=db", "oracle", "pl(/)sql"], ""), # Oracle Database or Oracle RDBMS TODO split DB and COMPANY
-  Skill("PouchDB", ["pouch=db"], ""),
-  Skill("Presto", ["presto"], ""),
-  Skill("PostgreSQL", [
+  Tech("CouchBase", ["couchbase"]),
+  Tech("CouchDB", ["couch=db"]),
+  Tech("DynamoDB", ["dynamo=db"]),
+  Tech("Elasticsearch", ["elastic=search"]),
+  Tech("Greenplum", ["greenplum"]),
+  Tech("MariaDB", ["maria=db"]),
+  Tech("Memcached", ["memcache(d)"]),
+  Tech("MongoDB", ["mongo=db", ver1("mongo")]),
+  Tech("MySQL", ["my-sql", "my sql", ver1("mysql"), "(my=)sql=manager"]),
+  Tech("Neo4j", ["neo4j", "neo4j=db"]),
+  Tech("Opensearch", ["opensearch"], "Community-driven Elasticsearch fork"),
+  Tech("Oracle", ["oracle=db", "oracle", "pl(/)sql"]), # Oracle Database or Oracle RDBMS TODO split DB and COMPANY
+  Tech("PouchDB", ["pouch=db"]),
+  Tech("Presto", ["presto"]),
+  Tech("PostgreSQL", [
     "postgre=sql", "postgres=sql", ver1("postgres"),
     "pgadmin",
     "psql", "pgsql"
-  ], ""),
-  Skill("Redis", ["redis"], ""),
-  Skill("ScyllaDB", ["scylladb"], ""),
-  Skill("Supabase", ["supabase"], ""),
-  Skill("SQLite", [ver1("sqlite")], ""),
-  Skill("Trino", ["trino"], ""), # also ANALYTICS (https://trino.io/ Fast distributed SQL query engine for big data analytics)
+  ]),
+  Tech("Redis", ["redis"]),
+  Tech("ScyllaDB", ["scylladb"]),
+  Tech("Supabase", ["supabase"]),
+  Tech("SQLite", [ver1("sqlite")]),
+  Tech("Trino", ["trino"]), # also ANALYTICS (https://trino.io/ Fast distributed SQL query engine for big data analytics)
   # orms
-  Skill("Django-ORM", ["django=orm"], ""),
-  Skill("Drizzle", ["drizzle=orm", "drizzle"], ""),
-  Skill("Hibernate", ["hibernate"], ""),
-  Skill("Prisma", ["prisma=orm", "prisma"], ""), # Popular word, some FPs
-  Skill("Sequelize", ["sequelize"], ""),
-  Skill("SQLAlchemy", ["sql=alchemy"], ""),
-  Skill("TypeORM", ["type=orm"], ""),
+  Tech("Django-ORM", ["django=orm"]),
+  Tech("Drizzle", ["drizzle=orm", "drizzle"]),
+  Tech("Hibernate", ["hibernate"]),
+  Tech("Prisma", ["prisma=orm", "prisma"]), # Popular word, some FPs
+  Tech("Sequelize", ["sequelize"]),
+  Tech("SQLAlchemy", ["sql=alchemy"]),
+  Tech("TypeORM", ["type=orm"]),
 
   # DATA SCIENCE
-  Skill("Anaconda", ["anaconda", "miniconda", "conda"], ""),
-  Skill("Beautiful-Soup", ["beautiful=soup"], ""),
-  Skill("IPython", ["ipython"], ""), # interactive shell
-  Skill("Jupyter", ["jupyter=lab", "jupyter-notebook(s)", "jupyter"], ""),
-  Skill("Matplotlib", ["matplotlib"], ""),
-  Skill("NLTK", ["nltk"], ""),
-  Skill("Numba", [[{LOWER: "numba"}, {OP: "!", LOWER: {IN: ["1", "one", "wan"]}}]], ""),
-  Skill("NumPy", ["numpy"], ""),
-  Skill("Pandas", ["pandas"], ""),
-  Skill("PyTorch", ["pytorch"], ""),
-  Skill("Keras", ["keras"], ""),
-  Skill("RAPIDS", [propn("rapids")], ""), # also GAMEDEV (`https://rapids.ai/`)
-  Skill("Scikit-Learn", ["scikit=learn", "sklearn"], ""),
-  Skill("SciPy", ["scipy"], ""),
-  Skill("Seaborn", ["seaborn"], ""),
-  Skill("ShowFlake", ["snowflake"], ""), # ~ MS Databricks, ~ AWS Redshift
-  Skill("Spacy", ["spacy"], ""),
-  Skill("Stan", ["stan"], "", disambiguate=[
+  Tech("Anaconda", ["anaconda", "miniconda", "conda"]),
+  Tech("Beautiful-Soup", ["beautiful=soup"]),
+  Tech("IPython", ["ipython"]), # interactive shell
+  Tech("Jupyter", ["jupyter=lab", "jupyter-notebook(s)", "jupyter"]),
+  Tech("Matplotlib", ["matplotlib"]),
+  Tech("NLTK", ["nltk"]),
+  Tech("Numba", [[{LOWER: "numba"}, {OP: "!", LOWER: {IN: ["1", "one", "wan"]}}]]),
+  Tech("NumPy", ["numpy"]),
+  Tech("Pandas", ["pandas"]),
+  Tech("PyTorch", ["pytorch"]),
+  Tech("Keras", ["keras"]),
+  Tech("RAPIDS", [propn("rapids")]), # also GAMEDEV (`https://rapids.ai/`)
+  Tech("Scikit-Learn", ["scikit=learn", "sklearn"]),
+  Tech("SciPy", ["scipy"]),
+  Tech("Seaborn", ["seaborn"]),
+  Tech("ShowFlake", ["snowflake"]), # ~ MS Databricks, ~ AWS Redshift
+  Tech("Spacy", ["spacy"]),
+  Tech("Stan", ["stan"], disambiguate=[
     dis_neighbours(),
     dis_context("r", "python")
   ]),
-  Skill("Stata", ["stata"], ""),
-  Skill("TensorRT", ["tensorrt"], ""), # NVidia
+  Tech("Stata", ["stata"]),
+  Tech("TensorRT", ["tensorrt"]), # NVidia
 
   # GAME
-  Skill("BabylonJS", ["babylon.=js"], "Game and rendering engine packed into a JavaScript framework"),
-  Skill("CUDA", ["cuda"], ""), # also ROBOTICS, EMBEDDED (GPU computing, NVIDIA)
-  Skill("Godot", ["godot=engine", "godot", "gd=script"], ""),
-  Skill("Phaser", ["phaser.=js", "phaser"], ""),
-  Skill("PixiJS", ["pixi.=js", "pixi"], ""),
-  Skill("PlayStation", ["playstation", "ps4", "ps5"], ""),
-  Skill("PyGame", ["pygame"], ""),
-  Skill("Roblox", ["roblox"], ""),
-  Skill("Solar2D", ["solar2d"], ""),
-  Skill("Unreal-Engine", ["unreal=engine", "unreal=script", "unreal", "ue-4", "ue-5", "ue4", "ue5"], ""),
-  Skill("ThreeJS", ["three.=js"], ""),
+  Tech("BabylonJS", ["babylon.=js"], "Game and rendering engine packed into a JavaScript framework"),
+  Tech("CUDA", ["cuda"]), # also ROBOTICS, EMBEDDED (GPU computing, NVIDIA)
+  Tech("Godot", ["godot=engine", "godot", "gd=script"]),
+  Tech("Phaser", ["phaser.=js", "phaser"]),
+  Tech("PixiJS", ["pixi.=js", "pixi"]),
+  Tech("PlayStation", ["playstation", "ps4", "ps5"]),
+  Tech("PyGame", ["pygame"]),
+  Tech("Roblox", ["roblox"]),
+  Tech("Solar2D", ["solar2d"]),
+  Tech("Unreal-Engine", ["unreal=engine", "unreal=script", "unreal", "ue-4", "ue-5", "ue4", "ue5"]),
+  Tech("ThreeJS", ["three.=js"]),
 
-  Skill("OpenGL", ["opengl"], ""),
+  Tech("OpenGL", ["opengl"]),
 
   # WEB BACKEND
-  Skill("Auth0", ["auth0"], ""), # also SECURITY
-  Skill("Bun", ["bun"], ""),
-  Skill("CakePHP", ["cake=php"], ""),
-  Skill("CherryPy", ["cherry=py"], ""),
-  Skill("CodeIgniter", ["code=igniter"], ""),
-  Skill("Deno", ["deno"], ""),
-  Skill("Django", ["django", "drf"], ""), # django-rest-framework
-  Skill("Express", ["express.=js", "express"], ""),
-  Skill("FastAPI", ["fast=api"], ""),
-  Skill("Fastify", ["fastify"], ""),
-  Skill("Flask", ["flask"], ""),
-  Skill("Jakarta-EE", ["jakarta(=ee)", "java-ee", "j2ee", "java-platform"], ""),
-  Skill("JVM", ["jvm"], "Java Virtual Machine enables a computer to run Java (Kotlin, etc.) programs"),
-  Skill("Hasura", ["hasura"], ""),
-  Skill("Koa", ["koa"], ""),
-  Skill("Laravel", ["laravel"], ""),
-  Skill("NestJS", ["nest.=js", propn("nest")], ""),
-  Skill("Nginx", ["nginx"], ""),
-  Skill("Phoenix", ["phoenix"], ""),
-  Skill("Ruby-on-Rails", ["ruby-on-rails", "rails", "ror"], ""),
-  Skill("SailsJS", ["sails.=js"], ""),
-  Skill("Spring", [
+  Tech("Auth0", ["auth0"]), # also SECURITY
+  Tech("Bun", ["bun"]),
+  Tech("CakePHP", ["cake=php"]),
+  Tech("CherryPy", ["cherry=py"]),
+  Tech("CodeIgniter", ["code=igniter"]),
+  Tech("Deno", ["deno"]),
+  Tech("Django", ["django", "drf"]), # django-rest-framework
+  Tech("Express", ["express.=js", "express"]),
+  Tech("FastAPI", ["fast=api"]),
+  Tech("Fastify", ["fastify"]),
+  Tech("Flask", ["flask"]),
+  Tech("Jakarta-EE", ["jakarta(=ee)", "java-ee", "j2ee", "java-platform"]),
+  Tech("JVM", ["jvm"], "Java Virtual Machine enables a computer to run Java (Kotlin, etc.) programs"),
+  Tech("Hasura", ["hasura"]),
+  Tech("Koa", ["koa"]),
+  Tech("Laravel", ["laravel"]),
+  Tech("NestJS", ["nest.=js", propn("nest")]),
+  Tech("Nginx", ["nginx"]),
+  Tech("Phoenix", ["phoenix"]),
+  Tech("Ruby-on-Rails", ["ruby-on-rails", "rails", "ror"]),
+  Tech("SailsJS", ["sails.=js"]),
+  Tech("Spring", [
     ver1("spring"), "spring-framework", "spring-boot", "spring-cloud",
     "spring-mvc", "spring-security", "spring-webflux"
-  ], ""),
-  Skill("Symfony", [ver1("symfony")], ""),
-  Skill("Yii", [ver1("yii")], ""),
+  ]),
+  Tech("Symfony", [ver1("symfony")]),
+  Tech("Yii", [ver1("yii")]),
 
 # #   Key Components of J2EE:
 # #
@@ -195,364 +191,264 @@ SKILLS: list[Skill] = [
 # # Java Naming and Directory Interface (JNDI): An API that provides naming and directory functionality to applications, allowing them to look up resources like databases and EJBs.
 # # Java Transaction API (JTA): A specification that allows for the management of transactions across multiple resources.
 
-  Skill("Micronaut", ["micronaut"], ""),
-  Skill("RabbitMQ", ["rabbit=mq", "rmq"], ""),
-  Skill("Vert-X", ["vert.=x"], ""),
+  Tech("Micronaut", ["micronaut"]),
+  Tech("RabbitMQ", ["rabbit=mq", "rmq"]),
+  Tech("Vert-X", ["vert.=x"]),
 
   # WEB FRONTEND
-  Skill("Angular", ["angular.=js", "angular"], "Web framework for SPA, mobile, PWA development with focus on modularity"),
-  Skill("Astro", ["astro.=js", "astro"], "Web framework for content-driven websites, server-first"),
-  Skill("Bootstrap", ["bootstrap"], ""),
-  Skill("Chakra-UI", ["chakra=ui", "chakra"], ""),
-  Skill("ChartJS", ["chart.=js"], ""),
-  Skill("D3JS", ["d3.=js", "d3"], ""),
-  Skill("EmberJS", ["ember.=js", "ember"], ""),
-  Skill("Figma", ["figma"], ""),
-  Skill("Framer", ["framer"], ""),
-  Skill("jQuery", ["jquery"], ""),
-  Skill("Lit", [propn("lit")], ""),
-  Skill("Material-UI", ["material=ui", "mui", propn("material")], ""),
-  Skill("Materialize", ["materialize"], ""),
-  Skill("NgRx", ["ngrx"], "Reactive state management for Angular apps inspired by Redux"),
-  Skill("Pinia", ["pinia"], ""),
-  Skill("React", ["react.=js", "react"], ""),
-  Skill("Redux", ["redux.=js", "redux"], ""),
-  Skill("Remix", ["remix.=js", "remix"], ""),
-  Skill("RiotJS", ["riot.=js"], ""),
-  Skill("SolidJS", ["solid.=js", propn("solid")], ""),
-  Skill("Svelte", ["svelte.=js", "svelte"], ""),
-  Skill("Tailwind-CSS", ["tailwind.=css", "tailwind"], ""),
-  Skill("VueJS", ["vue.=js", ver1("vue")], ""),
-  Skill("VueX", ["vuex"], "State management pattern + library for VueJS applications"),
+  Tech("Angular", ["angular.=js", "angular"], "Web framework for SPA, mobile, PWA development with focus on modularity"),
+  Tech("Astro", ["astro.=js", "astro"], "Web framework for content-driven websites, server-first"),
+  Tech("Bootstrap", ["bootstrap"]),
+  Tech("Chakra-UI", ["chakra=ui", "chakra"]),
+  Tech("ChartJS", ["chart.=js"]),
+  Tech("D3JS", ["d3.=js", "d3"]),
+  Tech("EmberJS", ["ember.=js", "ember"]),
+  Tech("Figma", ["figma"]),
+  Tech("Framer", ["framer"]),
+  Tech("jQuery", ["jquery"]),
+  Tech("Lit", [propn("lit")]),
+  Tech("Material-UI", ["material=ui", "mui", propn("material")]),
+  Tech("Materialize", ["materialize"]),
+  Tech("NgRx", ["ngrx"], "Reactive state management for Angular apps inspired by Redux"),
+  Tech("Pinia", ["pinia"]),
+  Tech("React", ["react.=js", "react"]),
+  Tech("Redux", ["redux.=js", "redux"]),
+  Tech("Remix", ["remix.=js", "remix"]),
+  Tech("RiotJS", ["riot.=js"]),
+  Tech("SolidJS", ["solid.=js", propn("solid")]),
+  Tech("Svelte", ["svelte.=js", "svelte"]),
+  Tech("Tailwind-CSS", ["tailwind.=css", "tailwind"]),
+  Tech("VueJS", ["vue.=js", ver1("vue")]),
+  Tech("VueX", ["vuex"], "State management pattern + library for VueJS applications"),
 
   # WEB FULLSTACK
-  Skill("Gulp", ["gulp"], ""),
-  Skill("Vaadin", ["vaadin"], ""),
-  Skill("Vite", ["vite"], ""),
-  Skill("Webpack", ["webpack"], ""),
+  Tech("Gulp", ["gulp"]),
+  Tech("Vaadin", ["vaadin"]),
+  Tech("Vite", ["vite"]),
+  Tech("Webpack", ["webpack"]),
 
-  Skill("JAM-Stack", ["jam=stack"], resolve=["JavaScript", "API", "Markup"]),
-  Skill("MEAN-Stack", ["mean=stack", propn("mean")], resolve=["MongoDB", "Express", "Angular", "NodeJS"]),
-  Skill("MERN-Stack", ["mern=stack", "mern"], resolve=["MongoDB", "Express", "React", "NodeJS"]),
-  Skill("MEVN-Stack", ["mevn=stack", "mevn"], resolve=["MongoDB", "Express", "VueJS", "NodeJS"]),
-  Skill("PERN-Stack", ["pern=stack", "pern"], resolve=["PostgreSQL", "Express", "React", "NodeJS"]),
-  Skill("LAMP-Stack", ["lamp=stack", propn("LAMP")], resolve=["Linux", "MySQL", "PHP"]), # Apache
+  Tech("JAM-Stack", ["jam=stack"], resolve=["JavaScript", "API", "Markup"]),
+  Tech("MEAN-Stack", ["mean=stack", propn("mean")], resolve=["MongoDB", "Express", "Angular", "NodeJS"]),
+  Tech("MERN-Stack", ["mern=stack", "mern"], resolve=["MongoDB", "Express", "React", "NodeJS"]),
+  Tech("MEVN-Stack", ["mevn=stack", "mevn"], resolve=["MongoDB", "Express", "VueJS", "NodeJS"]),
+  Tech("PERN-Stack", ["pern=stack", "pern"], resolve=["PostgreSQL", "Express", "React", "NodeJS"]),
+  Tech("LAMP-Stack", ["lamp=stack", propn("LAMP")], resolve=["Linux", "MySQL", "PHP"]), # Apache
 
-  Skill("Chrome", ["chrome"], ""),
-  Skill("Firefox", ["firefox"], ""),
-  Skill("Safari", ["safari"], ""),
-  Skill("WebKit", ["webkit"], ""), # browser engine
+  Tech("Chrome", ["chrome"]),
+  Tech("Firefox", ["firefox"]),
+  Tech("Safari", ["safari"]),
+  Tech("WebKit", ["webkit"]), # browser engine
 
-  Skill("Apollo", ["apollo.=js", "apollo=client", "apollo=server", "apollo"], "GraphQL-centric fullstack tools for web and mobile"),
-  Skill("HTMX", ["htmx"], ""),
-  Skill("Meteor", ["meteor", "meteor.=js"], ""),
-  Skill("Ktor", ["ktor"], ""), # fullstack framework in Kotlin
-  Skill("NextJS", ["next.=js"], ""), # , propn("next")
-  Skill("NextJS", ["next"], disambiguate=[
+  Tech("Apollo", ["apollo.=js", "apollo=client", "apollo=server", "apollo"], "GraphQL-centric fullstack tools for web and mobile"),
+  Tech("HTMX", ["htmx"]),
+  Tech("Meteor", ["meteor", "meteor.=js"]),
+  Tech("Ktor", ["ktor"]), # fullstack framework in Kotlin
+  Tech("NextJS", ["next.=js"]), # , propn("next")
+  Tech("NextJS", ["next"], disambiguate=[
     dis_neighbours(),
     dis_context("framework", "nuxt", "react")
   ]),
-  Skill("NuxtJS", ["nuxt.=js", propn("nuxt")], ""),
-  Skill("NodeJS", ["node.=js", propn("node")], ""),
-  Skill("SvelteKit", ["svelte=kit"], ""),
+  Tech("NuxtJS", ["nuxt.=js", propn("nuxt")]),
+  Tech("NodeJS", ["node.=js", propn("node")]),
+  Tech("SvelteKit", ["svelte=kit"]),
 
   # LOW-CODE
-  Skill("1C", ["1c"], ""), # ??
-  Skill("Bitrix", [
+  Tech("1C", ["1c"]), # ??
+  Tech("Bitrix", [
     "bitrix",
     "1c=bitrix", "bitrix=1c", "1с-битрикс", "битрикс-1с",
     "bitrix=24", "битрикс=24",
-  ], ""), # so rare it makes sense to merge them...
-  Skill("Airtable", ["airtable"], ""),
-  Skill("Drupal", ["drupal"], ""),
-  Skill("Gatsby", ["gatsby"], ""),
-  Skill("Hygraph", ["hygraph", "graph=cms"], ""),
-  Skill("Jekyll", ["jekyll"], ""),
-  Skill("Joomla", ["joomla"], ""),
-  Skill("MODx", ["modx"], ""),
-  Skill("Shopify", ["shopify"], ""),
-  Skill("Strapi", ["strapi"], ""),
-  Skill("WebFlow", ["webflow"], ""),
-  Skill("Wix", ["wix"], ""),
-  Skill("WooCommerce", ["woo=commerce"], ""),
-  Skill("WordPress", ["wordpress"], ""),
+  ]), # so rare it makes sense to merge them...
+  Tech("Airtable", ["airtable"]),
+  Tech("Drupal", ["drupal"]),
+  Tech("Gatsby", ["gatsby"]),
+  Tech("Hygraph", ["hygraph", "graph=cms"]),
+  Tech("Jekyll", ["jekyll"]),
+  Tech("Joomla", ["joomla"]),
+  Tech("MODx", ["modx"]),
+  Tech("Shopify", ["shopify"]),
+  Tech("Strapi", ["strapi"]),
+  Tech("WebFlow", ["webflow"]),
+  Tech("Wix", ["wix"]),
+  Tech("WooCommerce", ["woo=commerce"]),
+  Tech("WordPress", ["wordpress"]),
 
   # OPERATIONS
-  Skill("Celery", ["celery"], ""),
-  Skill("ELK-Stack", ["elk=stack", "elk"], resolve=["Elasticsearch", "Logstash", "Kibana"]), # , "Beats"
-  Skill("Ansible", ["ansible"], "Automation engine for configuration management, application deployment, and task automation"),
-  # Skill("Dagger", ["dagger"], "Programmable CI/CD engine that runs pipelines in containers"),
-  Skill("CircleCI", ["circleci"], ""),
-  Skill("CKA", ["cka"], ""), # certificate
-  Skill("CKAD", ["ckad"], ""), # certificate
-  Skill("CompTIA-ITOps", ["cios"], ""), # certificate
-  Skill("MCSA", ["mcsa"], ""), # certificate
-  Skill("Docker", ["docker", "dockerfile"], ""),
-  Skill("Docker-Compose", ["docker=compose"], ""),
-  Skill("Docker-Swarm", ["docker=swarm"], ""),
-  Skill("Dokku", ["dokku"], ""), # also Cloud
-  Skill("GitHub-Actions", ["github=actions"], ""),
-  Skill("GitLab-CI", ["gitlab=ci"], ""),
-  Skill("Grafana", ["grafana"], "Monitoring"),
-  Skill("Helm", ["helm"], ""),
-  Skill("Jaeger", ["jaeger"], "Distributed tracing platform, CNCF"),
-  Skill("Jenkins", ["jenkins"], ""),
-  Skill("Kibana", ["kibana"], ""),
-  Skill("Kubernetes", ["kubernetes", "k8s", "k3s"], ""),
-  Skill("Logstash", ["logstash"], ""),
-  Skill("OpenShift", ["openshift"], "Cloud platform, a set of tools and services for application lifecycle"),
-  Skill("Prometheus", ["prometheus"], ""),
-  Skill("Pulumi", ["pulumi"], ""),
-  Skill("Puppet", ["puppet"], ""),
-  Skill("Quarkus", ["quarkus"], ""),
-  Skill("Spinnaker", ["spinnaker"], ""),
-  Skill("Splunk", ["splunk"], ""), # also SECURITY
-  Skill("RHCE", ["rhce"], ""),   # certificate
-  Skill("RHCSA", ["rhcsa"], ""), # certificate
-  Skill("TeamCity", ["teamcity"], ""),
-  Skill("Vagrant", ["vagrant"], ""),
+  Tech("Celery", ["celery"]),
+  Tech("ELK-Stack", ["elk=stack", "elk"], resolve=["Elasticsearch", "Logstash", "Kibana"]), # , "Beats"
+  Tech("Ansible", ["ansible"], "Automation engine for configuration management, application deployment, and task automation"),
+  # Tech("Dagger", ["dagger"], "Programmable CI/CD engine that runs pipelines in containers"),
+  Tech("CircleCI", ["circleci"]),
+  Tech("Docker", ["docker", "dockerfile"]),
+  Tech("Docker-Compose", ["docker=compose"]),
+  Tech("Docker-Swarm", ["docker=swarm"]),
+  Tech("Dokku", ["dokku"]), # also Cloud
+  Tech("GitHub-Actions", ["github=actions"]),
+  Tech("GitLab-CI", ["gitlab=ci"]),
+  Tech("Grafana", ["grafana"], "Monitoring"),
+  Tech("Helm", ["helm"]),
+  Tech("Jaeger", ["jaeger"], "Distributed tracing platform, CNCF"),
+  Tech("Jenkins", ["jenkins"]),
+  Tech("Kibana", ["kibana"]),
+  Tech("Kubernetes", ["kubernetes", "k8s", "k3s"]),
+  Tech("Logstash", ["logstash"]),
+  Tech("OpenShift", ["openshift"], "Cloud platform, a set of tools and services for application lifecycle"),
+  Tech("Prometheus", ["prometheus"]),
+  Tech("Pulumi", ["pulumi"]),
+  Tech("Puppet", ["puppet"]),
+  Tech("Quarkus", ["quarkus"]),
+  Tech("Spinnaker", ["spinnaker"]),
+  Tech("Splunk", ["splunk"]), # also SECURITY
+  Tech("TeamCity", ["teamcity"]),
+  Tech("Vagrant", ["vagrant"]),
   # Good to have Knowledge of modern monitoring solutions (e.g. Nagios, Zabbix, Prometheus, Splunk).
   # Familiarity with monitoring tools such as SolarWinds, Nagios, or similar.
 
   # QA-n-AUTOMATION (tech & platforms)
-  Skill("Appium", ["appium"], ""),
-  Skill("Codeception", ["codeception"], ""),
-  Skill("Cucumber", ["cucumber"], ""),
-  Skill("Cypress", ["cypress", "cypress.=js"], ""),
-  Skill("Jasmine", ["jasmine"], "", disambiguate=[
+  Tech("Appium", ["appium"]),
+  Tech("Codeception", ["codeception"]),
+  Tech("Cucumber", ["cucumber"]),
+  Tech("Cypress", ["cypress", "cypress.=js"]),
+  Tech("Jasmine", ["jasmine"], disambiguate=[
     dis_neighbours(),
     dis_context("Jest", "Karma", "QA")
   ]),
-  Skill("Jest", ["jest"], ""),
-  Skill("JUnit", ["junit"], ""),
-  Skill("Karma", ["karma"], "", disambiguate=[
+  Tech("Jest", ["jest"]),
+  Tech("JUnit", ["junit"]),
+  Tech("Karma", ["karma"], disambiguate=[
     dis_neighbours(),
     dis_context("Jasmine", "Jest", "QA")
   ]),
-  Skill("PHPUnit", ["php=unit"], ""),
-  Skill("Playwright", ["playwright"], ""),
-  Skill("Protractor", ["protractor"], ""),
-  Skill("PyTest", ["pytest"], ""),
-  Skill("Selenium", ["selenium"], ""),
-  Skill("Sentry", ["sentry"], "Monitoring"),
-  Skill("TestCafe", ["testcafe"], ""),
-  Skill("TestNg", ["testng"], ""),
-  Skill("WebdriverIO", ["webdriverio"], ""),
+  Tech("PHPUnit", ["php=unit"]),
+  Tech("Playwright", ["playwright"]),
+  Tech("Protractor", ["protractor"]),
+  Tech("PyTest", ["pytest"]),
+  Tech("Selenium", ["selenium"]),
+  Tech("Sentry", ["sentry"], "Monitoring"),
+  Tech("TestCafe", ["testcafe"]),
+  Tech("TestNg", ["testng"]),
+  Tech("WebdriverIO", ["webdriverio"]),
 
   # BLOCKCHAIN
-  Skill("Arweave", ["arweave"], "A permanent and decentralized web inside an open ledger"),
-  Skill("Bitcoin", ["bitcoin"], ""),
-  Skill("Ethereum", ["ethereum"], ""),
-  Skill("EthersJS", ["eithers.=js"], ""),
-  Skill("EVM", ["evm"], "Ethereum Virtual Machine"),
-  Skill("Solana", ["solana"], ""),
-  Skill("Web3JS", ["web3.=js"], ""),
-  # Skill("SVM", ["svm"], ""), TODO disambiguate Support-Vector-Machine vs Solana-Virtual-Machine
+  Tech("Arweave", ["arweave"], "A permanent and decentralized web inside an open ledger"),
+  Tech("Bitcoin", ["bitcoin"]),
+  Tech("Ethereum", ["ethereum"]),
+  Tech("EthersJS", ["eithers.=js"]),
+  Tech("EVM", ["evm"], "Ethereum Virtual Machine"),
+  Tech("Solana", ["solana"]),
+  Tech("Web3JS", ["web3.=js"]),
+  # Tech("SVM", ["svm"]), TODO disambiguate Support-Vector-Machine vs Solana-Virtual-Machine
 
   # MEDIA
-  Skill("FFmpeg", ["ffmpeg"], "Cross-platform solution to record, convert and stream audio and video"),
+  Tech("FFmpeg", ["ffmpeg"], "Cross-platform solution to record, convert and stream audio and video"),
 
   # NETWORKS
-  Skill("CompTIA-Network+", ["network+", "comptia n(etwork)+"], ""), # certificate
-  Skill("F5-Networks", ["f5-networks", "f5"], ""), # Company
-  Skill("LoRa", [propn("LoRa")], ""), # transmission tech
-  Skill("MTCNA", ["mtcna"], ""),    # certificate
-  Skill("MQTT", ["mqtt"], ""),      # IoT messaging standard, also CLOUD
-  Skill("Netconf", ["netconf"], "Protocol"),
-  Skill("Nmap", ["nmap"], ""),             # also SECURITY
-  Skill("Netcat", ["netcat", "ncat"], ""), # also SECURITY
-  Skill("Proxyman", ["proxyman"], ""),   # also SECURITY
-  Skill("Wireshark", ["wireshark"], ""),   # also SECURITY
-  Skill("YANG", ["YANG"], "Data modeling language"),
-  Skill("Zigbee", ["zigbee"], ""), # protocol spec. also EMBEDDED
+  Tech("F5-Networks", ["f5-networks", "f5"]), # Company
+  Tech("LoRa", [propn("LoRa")]), # transmission tech
+  Tech("MQTT", ["mqtt"]),      # IoT messaging standard, also CLOUD
+  Tech("Netconf", ["netconf"], "Protocol"),
+  Tech("Nmap", ["nmap"]),             # also SECURITY
+  Tech("Netcat", ["netcat", "ncat"]), # also SECURITY
+  Tech("Proxyman", ["proxyman"]),   # also SECURITY
+  Tech("Wireshark", ["wireshark"]),   # also SECURITY
+  Tech("YANG", ["YANG"], "Data modeling language"),
+  Tech("Zigbee", ["zigbee"]), # protocol spec. also EMBEDDED
 
   # SECURITY
-  Skill("Burp-Suite", ["burp=suite"], "Proprietary vulnerability scanning, penetration testing, and webapp security platform"),
-  Skill("CEH", ["ceh"], ""),     # certificate
-  Skill("CISA", ["cisa"], ""),   # certificate
-  Skill("CISM", ["cism"], ""),   # certificate
-  Skill("CISSP", ["ciss", "cissp"], "Certified Information Systems Security Professional"), # certificate
-  Skill("CSSLP", ["csslp"], "Certified Secure Software Lifecycle Professional"), # certificate
-  Skill("CASE", ["CASE"], "Certified Application Security Engineer"), # certificate
-  Skill("CompTIA-PenTest+", ["pentest+", "comptia-p(entest)+"], ""), # certificate
-  Skill("CompTIA-Security+", ["security+", "comptia-s(ecurity)+"], ""), # certificate
-  Skill("GIAC-CIH", ["gcih"], ""),     # certificate
-  Skill("GIAC-SEC", ["gsec"], ""),     # certificate
-  Skill("GIAC-REM", ["grem"], ""),     # certificate
-  Skill("GIAC-WAPT", ["gwapt"], ""),   # certificate
-  Skill("OSCP/OSCE", ["oscp", "osce"], ""), # certificate
-  Skill("Cobalt-Strike", ["cobalt=strike"], ""),
-  Skill("JWT", ["jwt"], ""),
-  Skill("Metasploit", ["metasploit"], ""),
-  Skill("Nessus", ["nessus"], ""),
-  Skill("SAML", ["saml"], ""),
-  Skill("Snort", [propn("snort")], ""),
-  Skill("SSCP", ["sscp"], ""), # certificate
+  Tech("Burp-Suite", ["burp=suite"], "Proprietary vulnerability scanning, penetration testing, and webapp security platform"),
+  Tech("Cobalt-Strike", ["cobalt=strike"]),
+  Tech("JWT", ["jwt"]),
+  Tech("Metasploit", ["metasploit"]),
+  Tech("Nessus", ["nessus"]),
+  Tech("SAML", ["saml"]),
+  Tech("Snort", [propn("snort")]),
   # CANVAS, Empire, Core Impact -- attack frameworks
-  # Relevant certifications (kept only new: CISSP-ISSAP, CCSP, SC-100, CRTSA, GDSA, TOGAF) are highly desirable.
-
-  # SANS (GPEN, GXPN, GWAPT) -- wtf: SANS vs GIAC
 
   # ROBOTICS
-  # Skill("ABB", ["abb"], ""),           # robot brand
-  Skill("Fanuc", ["fanuc"], ""),       # robot brand
-  Skill("iCub", ["icub"], ""),         # robot brand
-  Skill("HyQ", ["hyq"], ""),           # robot brand
-  Skill("KUKA", ["kuka"], ""),         # robot brand
-  Skill("OpenCV", ["opencv"], ""),     # open source Computer Vision library
-  # Skill("Omron", ["omron"], ""),       # electronics corporation
-  Skill("FreeRTOS", ["freertos"], ""), # OS, also EMBEDDED-n-SYSTEM
-  Skill("ROS", ["ros"], ""),           # OS, also EMBEDDED-n-SYSTEM
-  # Skill("SLAM", ["slam", "vslam"], ""), # simultaneous localization and mapping
-  # Skill("Yaskawa", ["yaskawa"], ""), # electric and robotics corporation
+  # Tech("ABB", ["abb"]),           # robot brand
+  Tech("Fanuc", ["fanuc"]),       # robot brand
+  Tech("iCub", ["icub"]),         # robot brand
+  Tech("HyQ", ["hyq"]),           # robot brand
+  Tech("KUKA", ["kuka"]),         # robot brand
+  Tech("OpenCV", ["opencv"]),     # open source Computer Vision library
+  # Tech("Omron", ["omron"]),       # electronics corporation
+  Tech("FreeRTOS", ["freertos"]), # OS, also EMBEDDED-n-SYSTEM
+  Tech("ROS", ["ros"]),           # OS, also EMBEDDED-n-SYSTEM
+  # Tech("SLAM", ["slam", "vslam"]), # simultaneous localization and mapping
+  # Tech("Yaskawa", ["yaskawa"]), # electric and robotics corporation
 
-  Skill("Simulink", ["simulink"], ""), # some lang.
+  Tech("Simulink", ["simulink"]), # some lang.
 
   # SYSTEM
-  Skill("FreeBSD", ["freebsd"], ""), # also CROSS-PLATFORM
-  Skill("Linux", [
+  Tech("FreeBSD", ["freebsd"]), # also CROSS-PLATFORM
+  Tech("Linux", [
     "linux", "debian", "ubuntu",
-  ], ""), # also CROSS-PLATFORM
-  Skill("MacOS", ["macos", "osx"], ""), # also CROSS-PLATFORM
-  Skill("Unix", ["unix", "*nix"], ""),   # also CROSS-PLATFORM
-  Skill("Windows", ["windows", "win32", "win64"], ""), # also CROSS-PLATFORM
+  ]), # also CROSS-PLATFORM
+  Tech("MacOS", ["macos", "osx"]), # also CROSS-PLATFORM
+  Tech("Unix", ["unix", "*nix"]),   # also CROSS-PLATFORM
+  Tech("Windows", ["windows", "win32", "win64"]), # also CROSS-PLATFORM
 
-  Skill("Clang", ["clang"], ""),
-  Skill("MicroPython", ["micropython"], ""), # compiler
-  Skill("GCC", ["gcc"], ""), # compiler
-  Skill("LLVM", ["llvm"], ""),
+  Tech("Clang", ["clang"]),
+  Tech("MicroPython", ["micropython"]), # compiler
+  Tech("GCC", ["gcc"]), # compiler
+  Tech("LLVM", ["llvm"]),
 
   # HARDWARE & EMBEDDED
-  # Skill("HPC", ["hpc"], "High performance computing"),
-  Skill("Arduino", ["arduino"], "Controller brand"),
-  Skill("ASIC", ["asic"], ""), # ASICs are custom-designed circuits for specific applications, offering high performance and efficiency
-  Skill("ARC", [propn("ARC")], "CPU family"),
-  Skill("ARC", ["arc"], disambiguate=[
+  # Tech("HPC", ["hpc"], "High performance computing"),
+  Tech("Arduino", ["arduino"], "Controller brand"),
+  Tech("ASIC", ["asic"]), # ASICs are custom-designed circuits for specific applications, offering high performance and efficiency
+  Tech("ARC", [propn("ARC")], "CPU family"),
+  Tech("ARC", ["arc"], disambiguate=[
     dis_neighbours(),
     dis_context("cpu", "arm", "processor(s)")
   ]),
-  Skill("AutoCAD", ["autocad"], ""),
-  Skill("AVR", ["avr"], "Controller family"),
-  Skill("Elbrus-2000", ["elbrus=2000", "e2k"], "CPU"),
-  Skill("Embox", ["embox"], ""), # Embox is a configurable RTOS designed for resource constrained and embedded systems
-  Skill("ESP32", ["esp=32"], ""), # controller family
-  Skill("ESP8266", ["esp=8266"], ""), # controller family
-  Skill("FPGA", ["fpga"], ""), # FPGAs are reprogrammable devices that provide flexibility and rapid prototyping capabilities
-  Skill("i.MX6", ["i.mx=6"], ""), # platform
-  Skill("LabVIEW", ["labview"], ""),
-  Skill("KiCad", ["kicad=eda", "kicad"], ""),
-  Skill("MicroBlaze", ["microblaze"], ""), # soft core
-  Skill("MIPS", ["mips"], ""), # CPU architecture
-  Skill("MSP430", ["msp=430"], ""), # controller family
-  Skill("PowerPC", ["powerpc"], ""), # CPU architecture
-  Skill("Raspberry-Pi", ["raspberry", "rasp=pi", "raspberry=pi(s)", "rpi"], ""), # platform
-  Skill("RISC", ["risc", "risc-v"], ""), # CPU architecture
-  Skill("SPARC", ["sparc"], ""), # platform
-  Skill("Altium-Designer", ["altium=designer"], ""), # tool
-  Skill("Altium-365", ["altium=365"], ""), # tool
-  Skill("Autodesk-Fusion", ["autodesk-fusion", "fusion=360"], ""), # tool
-  Skill("Autodesk-Eagle", ["autodesk-eagle"], ""), # tool
-  Skill("Autodesk-Eagle", ["eagle"], disambiguate=[
+  Tech("AutoCAD", ["autocad"]),
+  Tech("AVR", ["avr"], "Controller family"),
+  Tech("Elbrus-2000", ["elbrus=2000", "e2k"], "CPU"),
+  Tech("Embox", ["embox"]), # Embox is a configurable RTOS designed for resource constrained and embedded systems
+  Tech("ESP32", ["esp=32"]), # controller family
+  Tech("ESP8266", ["esp=8266"]), # controller family
+  Tech("FPGA", ["fpga"]), # FPGAs are reprogrammable devices that provide flexibility and rapid prototyping capabilities
+  Tech("i.MX6", ["i.mx=6"]), # platform
+  Tech("LabVIEW", ["labview"]),
+  Tech("KiCad", ["kicad=eda", "kicad"]),
+  Tech("MicroBlaze", ["microblaze"]), # soft core
+  Tech("MIPS", ["mips"]), # CPU architecture
+  Tech("MSP430", ["msp=430"]), # controller family
+  Tech("PowerPC", ["powerpc"]), # CPU architecture
+  Tech("Raspberry-Pi", ["raspberry", "rasp=pi", "raspberry=pi(s)", "rpi"]), # platform
+  Tech("RISC", ["risc", "risc-v"]), # CPU architecture
+  Tech("SPARC", ["sparc"]), # platform
+  Tech("Altium-Designer", ["altium=designer"]), # tool
+  Tech("Altium-365", ["altium=365"]), # tool
+  Tech("Autodesk-Fusion", ["autodesk-fusion", "fusion=360"]), # tool
+  Tech("Autodesk-Eagle", ["autodesk-eagle"]), # tool
+  Tech("Autodesk-Eagle", ["eagle"], disambiguate=[
     dis_neighbours(),
     dis_context("Autodesk", "AutoCAD")
   ]),
-  Skill("Touchdesigner", ["touchdesigner"], "Visual development platform"), #
-  Skill("Solidworks", ["solidworks-pcb", "solidworks"], "CB design tool"),
-  Skill("STM32", ["stm=32"], ""), # platform
-  Skill("Verilog", ["verilog", "sysverilog", "systemverilog"], "Specialized PL"),
-  Skill("VHDL", ["vhdl"], "Specialized PL"),
-  Skill("VLIW", ["vliw"], "CPU architecture"),
-  Skill("x32", ["x32"], "CPU architecture"),
-  Skill("x64", ["x64"], "CPU architecture"),
-  Skill("x86", ["x86", "x86-32", "x86-64", "i286", "i386"], "Intel CPU architecture"),
-  Skill("Yosys", ["yosys"], ""), # https://github.com/YosysHQ/yosys
-  Skill("Z80", ["z=80"], "CPU brand"),
+  Tech("Touchdesigner", ["touchdesigner"], "Visual development platform"), #
+  Tech("Solidworks", ["solidworks-pcb", "solidworks"], "CB design tool"),
+  Tech("STM32", ["stm=32"]), # platform
+  Tech("Verilog", ["verilog", "sysverilog", "systemverilog"], "Specialized PL"),
+  Tech("VHDL", ["vhdl"], "Specialized PL"),
+  Tech("VLIW", ["vliw"], "CPU architecture"),
+  Tech("x32", ["x32"], "CPU architecture"),
+  Tech("x64", ["x64"], "CPU architecture"),
+  Tech("x86", ["x86", "x86-32", "x86-64", "i286", "i386"], "Intel CPU architecture"),
+  Tech("Yosys", ["yosys"]), # https://github.com/YosysHQ/yosys
+  Tech("Z80", ["z=80"], "CPU brand"),
 
   # DESKTOP
-  Skill("ElectronJS", ["electron=js"], ""), # tons of FPs for just "electron"
-
-  # MAIN LANGUAGES
-  Skill("Ada", ["ada"], ""),
-  Skill("Apex", ["apex"], ""),
-  Skill("Assembly", ["assembly", "asm"]), # not technically a language
-  Skill("C", ["c-lang"], ""),
-  Skill("C", ["c(.)"], disambiguate=dis_letter()), # disambiguate from "c." like in "c. 1, c. 2" (chapter)
-  Skill("C++", ["c++", "cpp", "c=plus=plus"], ""),
-  Skill("C#", ["c#", "csharp"], ""),
-  Skill("Cairo", ["cairo"], ""),
-  Skill("Clojure", ["clojure", "clojurian"], ""),
-  Skill("ClojureScript", ["clojure=script"], ""),
-  Skill("Cobol", ["cobol"], ""),
-  Skill("Crystal", ["crystal-lang", "crystal"], ""),
-  Skill("CSS", [ver1("css")], ""),
-  Skill("CSV", ["csv"], ""),
-  Skill("D", ["d=lang"], ""),
-  Skill("D", ["d"], disambiguate=dis_letter()),
-  Skill("Dart", ["dart"], ""),
-  Skill("Delphi", ["delphi"], ""),
-  Skill("Elixir", ["elixir"], ""),
-  Skill("Elm", ["elm"], ""),
-  Skill("Erlang", ["erlang"], ""),
-  Skill("Fortran", ["fortran"], ""),
-  Skill("F#", ["f#", "f=lang", "fsharp"], ""),
-  Skill("Gleam", ["gleam"], ""),
-  Skill("GQL", ["gql"], ""), # TODO Cypher
-  Skill("GraphQL", ["graphql", "graphiql"]),
-  Skill("Go", ["golang", "gopher", propn("go")], ""),
-  Skill("Groovy", ["groovy"], ""),
-  Skill("Haskell", ["haskell"], ""),
-  Skill("HTML", [ver1("html")], ""),
-  Skill("Java", [ver1("java"), "java-se"], ""),
-  Skill("JavaScript", ["java=script", "js"], ""),
-  Skill("JSON", ["json", "json5"], ""),
-  Skill("Julia", ["julia"], "", disambiguate=dis_julia()),
-  Skill("Kotlin", ["kotlin"], ""),
-  Skill("LESS", ["LESS"], ""),
-  Skill("LESS", ["less"], disambiguate=dis_context("sass", "scss")),
-  Skill("Lisp", ["lisp"], ""),
-  Skill("Lua", ["lua"], ""),
-  Skill("Nim", ["nim"], ""),
-  Skill("Makefile", ["makefile"], ""),
-  Skill("Markdown", ["markdown", "md"], ""),
-  Skill("Matlab", ["matlab"], ""),
-  Skill("Mojo", ["mojo"], ""),
-  Skill("Ocaml", ["ocaml"], ""),
-  Skill("Odin", ["odin"], ""),
-  Skill("-Odin", ["odin-project"], resolve=[]),
-  Skill("Perl", [ver1("perl")], ""),
-  Skill("PHP", [ver1("php"), "phper"], ""),
-  Skill("PowerShell", ["power=shell"], ""),
-  Skill("Prolog", ["prolog"], ""),
-  Skill("Python", [ver1("python"), "py", "pythonist(a)"], ""),
-  Skill("R", ["r=lang"], "Programming language for statistical computing and data visualization"),
-  Skill("R", ["r"], disambiguate=dis_letter()),
-  Skill("Ruby", ["ruby=lang", "ruby", "rubyist", "rubist"], ""),
-  Skill("Rust", ["rust", "rustacean"], ""),
-  Skill("SASS", ["sass", "scss"], ""),
-  Skill("Scala", ["scala"], ""),
-  Skill("Solidity", ["solidity"], ""),
-  Skill("TypeScript", ["type=script", "ts"], ""),
-  Skill("Shell", ["shell", "bash", "zsh"], ""),
-  Skill("SQL", ["sql"]),
-  Skill("SVG", ["svg"], ""),
-  Skill("XML", ["xml"], ""),
-  Skill("YAML", ["yaml"], ""),
-  Skill("V", ["vlang"], ""),
-  Skill("V", ["v"], disambiguate=dis_letter()),
-  Skill("Vala", ["vala"], ""),
-  Skill("Vyper", ["vyper"], ""),
-  Skill("Visual-Basic", ["visual=basic", "vb(a)", "vb.net"], ""),
-  Skill("WebAssembly", ["wasm", "web=assembly"], ""),
-  Skill("Zig", ["zig"], ""),
+  Tech("ElectronJS", ["electron=js"]), # tons of FPs for just "electron"
 
   # UNSORTED
-  Skill("Blender", ["blender"], ""),
-  Skill("CompTIA-A+", ["comptia a+"], ""), # certificate for tech. support and IT ops
-  Skill("RxJS", ["rxjs"], ""),
-  Skill("Git", ["git"], ""),
-  Skill("SVN", ["svn"], ""),
-  Skill("gRPC", ["grpc"], "Skill"),
-  Skill("tRPC", ["trpc"], "Skill"),
+  Tech("Blender", ["blender"]),
+  Tech("RxJS", ["rxjs"]),
+  Tech("Git", ["git"]),
+  Tech("SVN", ["svn"]),
+  Tech("gRPC", ["grpc"], "Skill"),
+  Tech("tRPC", ["trpc"], "Skill"),
 ]
 
 # // SECURITY TOOLS

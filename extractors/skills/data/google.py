@@ -1,34 +1,34 @@
-from ..skill import Skill
+from ..skill import Company, Skill, Tech
 from ..utils import dis_context, dis_neighbours
 
 dis_ctx = dis_context("google")
 
 SKILLS: list[Skill] = [
-  Skill("Google", ["(@)google"], "Company"),
+  Company("Google", ["(@)google"], "Company"),
 
-  Skill("Flax", ["flax"], "NN for Jax"),
-  Skill("JAX", ["JAX"], "TensorFlow alternative"),
-  Skill("JAX", ["jax"], disambiguate=[
+  Tech("Flax", ["flax"], "NN for Jax"),
+  Tech("JAX", ["JAX"], "TensorFlow alternative"),
+  Tech("JAX", ["jax"], disambiguate=[
     dis_neighbours(),
     dis_context("google", "flax", "tensorflow"),
   ]),
-  Skill("TensorFlow", ["tensorflow"], ""),
+  Tech("TensorFlow", ["tensorflow"]),
 
-  Skill("Flutter", ["flutter"], ""),
+  Tech("Flutter", ["flutter"]),
 
   # CLOUD
-  Skill("Google-BigQuery", ["google-bigquery", "bigquery"], ""), # EE data warehouse
-  Skill("Google-Cloud", ["google=cloud", "gcp"], ""),
-  Skill("Google-Cloud", ["gc"], disambiguate=[
+  Tech("Google-BigQuery", ["google-bigquery", "bigquery"]), # EE data warehouse
+  Tech("Google-Cloud", ["google=cloud", "gcp"]),
+  Tech("Google-Cloud", ["gc"], disambiguate=[
     dis_neighbours(),
     dis_context("aws", "azure"),
   ]),
-  Skill("Google-Firebase", ["google=firebase", "firebase"], ""),
-  Skill("Google-CloudStorage", ["google-cloud=storage", "gcs"], ""),
-  Skill("Google-Pub/Sub", ["google-pub/sub"], ""),
-  Skill("Google-Sheets", ["google=sheets"], ""),
-  Skill("Google-BigTable", ["google-bigtable"], ""), # fast flexible noSQL
-  Skill("Google-Kubernetes", ["google-kubernetes-engine", "google=ke", "google=ks", "gke", "gks"], ""), # ~ Amazon-EKS
+  Tech("Google-Firebase", ["google=firebase", "firebase"]),
+  Tech("Google-CloudStorage", ["google-cloud=storage", "gcs"]),
+  Tech("Google-Pub/Sub", ["google-pub/sub"]),
+  Tech("Google-Sheets", ["google=sheets"]),
+  Tech("Google-BigTable", ["google-bigtable"]), # fast flexible noSQL
+  Tech("Google-Kubernetes", ["google-kubernetes-engine", "google=ke", "google=ks", "gke", "gks"]), # ~ Amazon-EKS
 
   # Drive
   # GC Functions

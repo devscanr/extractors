@@ -1,27 +1,26 @@
-from ..skill import Skill
+from ..skill import Company, Skill, Tech
 
 SKILLS: list[Skill] = [
-  Skill("Apple", ["(@)apple"], "Company"),
+  Company("Apple", ["(@)apple"]),
 
   # DESIGN
-  # Skill("Sketch", ["sketch"], ""), many FPs, need to disambig.
+  # Tech("Sketch", ["sketch"], ""), many FPs, need to disambig.
 
   # MOBILE
-  Skill("Objective-C", ["objective=c(.)", "objective=c++", "objective=cpp"], ""),
-  Skill("Swift", ["swift"], ""),
-  Skill("AppKit", ["appkit"], "Framework"),
-  Skill("SwiftUI", ["swiftui"], "Framework"),
-  Skill("UIKit", ["uikit"], "Framework"),
+  Tech("Swift", ["swift"]),
+  Tech("AppKit", ["appkit"], "Framework"),
+  Tech("SwiftUI", ["swiftui"], "Framework"),
+  Tech("UIKit", ["uikit"], "Framework"),
 
   # OS
-  Skill("iOS", ["ios"], ""),
-  Skill("iPadOS", ["ipados"], ""),
-  Skill("tvOS", ["tvos"], ""),
-  Skill("watchOS", ["watchos"], ""),
+  Tech("iOS", ["ios"]),
+  Tech("iPadOS", ["ipados"]),
+  Tech("tvOS", ["tvos"]),
+  Tech("watchOS", ["watchos"]),
 
   # DEVICES
-  Skill("iMac", ["imac"], ""),
-  Skill("iPad", ["ipad"], ""),
-  Skill("iPhone", ["iphone"], ""),
-  Skill("iWatch", ["iwatch"], ""),
+  Tech("iMac", ["imac"]),
+  Tech("iPad", ["ipad"]),
+  Tech("iPhone", ["iphone"]),
+  Tech("iWatch", ["iwatch"]),
 ]

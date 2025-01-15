@@ -119,7 +119,7 @@ SKILLS: list[Skill] = [
   Topic("Flexbox", ["flex=box"]),
   Topic("MPA", ["mpa"]),
   Topic("SPA", ["spa"]),
-  Topic("-SPA", ["med spa", "medical spa"], resolve=[]),
+  Topic("-SPA", ["med spa", "medical spa"]),
   Topic("Markup", ["markup"]),
   Topic("WebGL", ["webgl"]),
   Topic("Web-Components", ["web=component(s)"]),
@@ -215,7 +215,6 @@ SKILLS: list[Skill] = [
   Topic("Integrations", ["integration(s)"]),
   Topic("Orchestration", ["orchestration"]),
   Topic("Provisioning", ["provisioning"]),
-  # certificates: AWS Certified Solutions Architect Professional, AWS Certified DevOps Engineer Professional
   Topic("Virtualization", ["virtualization", "virtual=machine(s)", "vm(s)"]),
   Topic("VPCs", ["vpc(s)"]),
   # blue green deployments

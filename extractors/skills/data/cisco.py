@@ -1,13 +1,9 @@
-from ..skill import Skill
+from ..skill import Company, Skill, Tech
 
 SKILLS: list[Skill] = [
-  Skill("Cisco", ["(@)cisco", "cysco=systems"], "Company"),
+  Company("Cisco", ["(@)cisco", "cysco=systems"]),
 
   # NETWORKS
-  Skill("Cisco-ACI", ["cisco=aci"], "Software-defined networking (SDN) solution for data centers"),
-  Skill("Cisco-Nexus", ["cisco=nexus"], "Modular and fixed port network switches for data centers"),
-
-  # CERTIFICATES
-  Skill("Cisco-CNA", ["ccna"], "Certificate"), #
-  Skill("Cisco-CNP", ["ccnp"], "Certificate"), # TODO "CCNP or equivalent required; CCIE or other advanced certs are preferred."
+  Tech("Cisco-ACI", ["cisco=aci"], "Software-defined networking (SDN) solution for data centers"),
+  Tech("Cisco-Nexus", ["cisco=nexus"], "Modular and fixed port network switches for data centers"),
 ]

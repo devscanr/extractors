@@ -12,6 +12,7 @@ def RoleTag(
   disambiguate: Disambiguate | list[Disambiguate] | None = None
 ) -> Tag:
   return Tag(
-    name, phrases, descr="",
-    disambiguate=disambiguate
+    name, phrases, "",
+    exclusive = True,
+    disambiguate = disambiguate
   )

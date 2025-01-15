@@ -81,7 +81,7 @@ SKILLS: list[Skill] = [
     "personal development",
     "team development",
     "development team",
-  ], resolve=[]),
+  ]),
   Topic("Engineering.Data", [
     "data<~design", "data<~designer",
     "dataengineering", "dataengineer",
@@ -194,7 +194,7 @@ SKILLS: list[Skill] = [
     "management", "manual",
     "suite", "suites", "unit", "write", "writing"
   )),
-  Topic("-Testing", ["battle-tested", "tested to"], resolve=[]),
+  Topic("-Testing", ["battle-tested", "tested to"]),
   Topic("Games-Testing", [
     "playtest(s)",
   ], resolve=["Games", "Testing"]),
@@ -265,7 +265,7 @@ SKILLS: list[Skill] = [
     "edtech", "educator", "e=learning",
     "dean", "prof(essor)", "teacher"
   ]),
-  Topic("-Education", ["my-education"], resolve=[]),
+  Topic("-Education", ["my-education"]),
 
   Topic("Finance", [
     "banking", "bankless",
@@ -367,7 +367,7 @@ SKILLS: list[Skill] = [
     "arcanoid", "minecraft", "tetris", "tictactoe",
     "single=player", "multi-player",
   ]),
-  Topic("-Games", ["game=theory"], resolve=[]), # oversimplified, will update later
+  Topic("-Games", ["game=theory"]), # oversimplified, will update later
 
   Topic("Graphics", ["graphic(s)"]),
 

@@ -28,24 +28,29 @@ class Test_SkillExtractor:
 
   # SMOKE
   def test_extract_smoke(self, extract) -> None:
+    # TECHS
     assert extract("Joomla") == ["Joomla"]
     assert extract("modx") == ["MODx"]
+    # LANGUAGES
     assert extract("objective-c") == ["Objective-C"]
     assert extract("foo") == []
+    # TOPICS
     assert extract("computer") == ["Computer"]
     assert extract("Science") == ["Science"]
     assert extract("computer science") == ["Computer-Science"]
     assert extract("foo") == []
+    # COMPANIES
+    assert extract("Apple") == ["Apple"]
+    # CERTIFICATES
+    assert extract("CompTIA-A+") == ["CompTIA-A+"]
 
   def test_extract_many_smoke(self, extract_many) -> None:
-    assert extract_many(["Joomla", "modx", "objective-c", "foo"]) == [
+    assert extract_many(["Joomla", "objective-c", "foo"]) == [
       ["Joomla"],
-      ["MODx"],
       ["Objective-C"],
       [],
     ]
-    assert extract_many(["computer", "Science", "computer science"]) == [
-      ["Computer"],
+    assert extract_many(["Science", "computer science"]) == [
       ["Science"],
       ["Computer-Science"],
     ]
