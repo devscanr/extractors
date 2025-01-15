@@ -395,8 +395,7 @@ class Test_CategoryExtractor:
     assert extract("I am a passionate student who loves to learn and explore").role == "Student"
     assert extract("undergraduate student of Tongji university").role == "Student"
     assert extract("Undergraduate at UC Berkeley, double major in CS and Math.").role == "Student"
-    assert extract("Formerly Stanford CS PhD Student.").role == "Dev"
-    # ^ "Formerly" cancels "Student" and PhD remains, the result looks correct in this case
+    assert extract("Formerly Stanford CS PhD Student.").role is None
 
   def test_extract_role8(self, extract) -> None:
     assert extract("A 2nd year studxnt of the Higher IT School.").role is None
@@ -496,6 +495,12 @@ class Test_CategoryExtractor:
     assert extract("Opened to remote job offers") == Cats(is_remote=True, is_hireable=True)
     assert extract("Currently open to remote / relocated job offers.") == Cats(is_remote=True, is_hireable=True)
     assert extract("Deep learning ftw") == Cats()
+
+  def test_extract_adhoc4(self, extract) -> None:
+    assert extract("Former Dev Student") == Cats()
+    assert extract("Ex Engineer Student") == Cats()
+    assert extract("Former Eng VP") == Cats()
+    assert extract("Ex Dev President") == Cats()
 
   # BIOs
   def test_extract_bios1(self, extract) -> None:

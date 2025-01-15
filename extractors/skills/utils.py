@@ -19,7 +19,7 @@ def dis_context(*phrases: str) -> Disambiguate:
     for tok in token.sent:
       if tok != token:
         lower = tok.lower_
-        if any(True for regmarker in regmarkers if lookslike(lower, regmarker)):
+        if any(lookslike(lower, regmarker) for regmarker in regmarkers):
           return True
     return False
   return disambiguate

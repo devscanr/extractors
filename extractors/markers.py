@@ -96,9 +96,9 @@ def is_future(noun: Token) -> bool:
   #   pprint({"token": tok.lower_, "pos": tok.pos_, "dep": tok.dep_, "lemma": tok.lemma_, "head": tok.head})
   for tok in noun.sent:
     if tok == noun.head and tok.lower_ in {"be", "become"}:
-      if any(True for t in noun.sent if t.head == tok and t.lemma_ == WILL_WORD):
+      if any(t.head == tok and t.lemma_ == WILL_WORD for t in noun.sent):
         return True # will be/become <- developer
-      if any(True for t in noun.sent if t == tok.head and t.lemma_ in PLAN_WORDS):
+      if any(t == tok.head and t.lemma_ in PLAN_WORDS for t in noun.sent):
         return True # going/plan/want/wishing to be/become <- developer
     if tok == noun.head and tok.lower_ in {"wannabe"}:
       return True # developer -> wannabe

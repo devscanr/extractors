@@ -20,7 +20,7 @@ class TitleExtractor(BaseExtractor):
     tmatches, tunmatches = self.find_tmatches(doc)
     ignore_tokens = [tok for _, tokens, _ in tunmatches for tok in tokens]
 
-    # Filter tmatches additionally
+    # Filter tmatches additionally (TODO apply the same role canceling we do in `CategoryExtractor`)
     tmatches2 = [
       (name, tokens, maintoken)
       for name, tokens, maintoken in tmatches
@@ -73,7 +73,7 @@ def find_noun_span(token: Token, acc_spans: list[list[Token]]) -> Span:
       continue
     if tok == token:
       toks.append(tok) # [Developer]
-    if not any(True for span in acc_spans if tok in span):
+    if not any(tok in span for span in acc_spans):
       if tok.head == token and tok.i < token.i:
         toks.append(tok) # [Senior] Developer, [Senior] PHP Developer
       elif tok.head.head == token and tok.i < token.i:

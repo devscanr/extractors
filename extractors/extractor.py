@@ -136,8 +136,8 @@ class BaseExtractor:
         elif not (mname == k and offsets == ofs):
           other_matches.append((k, ofs))
       if not any(
-        True for other_match in other_matches
-        if self.should_ignore((mname, offsets), other_match)
+        self.should_ignore((mname, offsets), other_match)
+        for other_match in other_matches
       ):
         omatches.append((mname, offsets))
     # print("omatches:", omatches)

@@ -24,25 +24,17 @@ class CategoryExtractor(BaseExtractor):
 
     tmatches, _ = self.find_tmatches(doc)
 
-    # Filter tag-token pairs
+    # Cancel certain roles by mathed ancestor roles
     tmatches2: list[TMatch] = []
     for name, tokens, maintoken in tmatches:
       cancelingset = next((CANCELING_TAGS[uname] for uname in unfold_names(name) if uname in CANCELING_TAGS), set())
-      ancs = set(
-        tok for tok in ancestors(maintoken)
-        if (
-          tok.pos_ in {"NOUN", "PROPN"} and not any(pred(tok) for pred in [is_negated, is_past, is_future])
-          or
-          tok.pos_ in {"ADJ", "VERB"}
-        )
-      )
-      for nm, _, maintok in tmatches:
-        if maintok in ancs and not is_distant(maintoken, maintok):
-          if set(unfold_names(nm)) & cancelingset:
-            break
-      else:
+      ancs = set(ancestors(maintoken))
+      if not any(
+        maintok in ancs and set(unfold_names(nm)) & cancelingset and not is_distant(maintoken, maintok)
+        for nm, _, maintok in tmatches
+      ):
         tmatches2.append((name, tokens, maintoken))
-    print("tmatches2:", tmatches2)
+    # print("tmatches2:", tmatches2)
 
     # Extract roles
     role: Role | None = None
@@ -103,7 +95,7 @@ class CategoryExtractor(BaseExtractor):
       if j < sent.end and sent[j + 1].lower_ in {"@", "at", "of"}:
         return "Nondev"
       lwords = left_lowerwords(token)
-      if any(True for word in lwords if word in HEAD_MARKERS):
+      if any(word in HEAD_MARKERS for word in lwords):
         return "Nondev"
       return None
     return "Nondev"
