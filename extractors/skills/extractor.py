@@ -13,11 +13,15 @@ def create_resolve(ss: list[str]) -> Resolve:
 class SkillExtractor(BaseExtractor):
   def __init__(self, nlp: Language, skills: Sequence[Skill]):
     super().__init__(nlp, skills)
+    self.groups: dict[str, str] = {}
     self.resolvers: dict[str, Resolve] = {}
     self.init_matchers2(skills)
 
   def init_matchers2(self, skills: Sequence[Skill]) -> None:
     for skill in skills:
+      # Update groups
+      if skill.name not in self.groups:
+        self.groups[skill.name] = skill.group
       # Update resolve fns
       if skill.resolve is not None:
         assert skill.name not in self.resolvers, f"duplicate `resolve` at {skill.name!r}"

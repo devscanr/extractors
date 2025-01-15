@@ -10,8 +10,8 @@ type Resolve = Callable[[Token], list[str]]
 
 @dataclass
 class Skill(Tag):
-  group: Group = field(kw_only=True)
   exclusive: bool = field(default=True, kw_only=True)
+  group: Group = field(kw_only=True)
   resolve: Resolve | list[str] | None = field(default=None, kw_only=True)
 
 def Tech(
@@ -22,16 +22,16 @@ def Tech(
     DPattern   # DependencyMatcher pattern
   ],
   descr: str = "Tech",
+  exclusive: bool = True,
   disambiguate: Disambiguate | list[Disambiguate] | None = None,
   resolve: Resolve | list[str] | None = None,
-  exclusive: bool = True
 ) -> Skill:
   return Skill(
     name, phrases, descr,
     exclusive = exclusive,
     disambiguate = disambiguate,
-    resolve = resolve,
-    group = "Tech"
+    group = "Tech",
+    resolve = resolve
   )
 
 def Topic(
@@ -42,16 +42,16 @@ def Topic(
     DPattern   # DependencyMatcher pattern
   ],
   descr: str = "Topic",
+  exclusive: bool = True,
   disambiguate: Disambiguate | list[Disambiguate] | None = None,
-  resolve: Resolve | list[str] | None = None,
-  exclusive: bool = True
+  resolve: Resolve | list[str] | None = None
 ) -> Skill:
   return Skill(
     name, phrases, descr,
     exclusive = exclusive,
     disambiguate = disambiguate,
-    resolve = resolve,
-    group = "Topic"
+    group = "Topic",
+    resolve = resolve
   )
 
 def Language(
