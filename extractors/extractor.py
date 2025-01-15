@@ -3,7 +3,7 @@ import re
 from spacy import Language
 from spacy.matcher import DependencyMatcher, Matcher, PhraseMatcher
 from spacy.tokens import Doc, Token
-from typing import Callable, Sequence
+from typing import Any, Callable, Sequence, cast
 from .ppatterns import to_ppatterns
 from .spacyhelpers import token_level
 from .utils import hash_skillname, uniq3
@@ -84,7 +84,8 @@ class BaseExtractor:
             if re.search("[A-Z]", phrase):
               self.xmatcher.add(mname, [literal(p) for p in to_ppatterns([phrase])])
             else:
-              self.pmatcher.add(mname, [self.nlp(p) for p in to_ppatterns([phrase])]) # TODO perf
+              pipe = cast(Any, self.nlp.tokenizer).pipe # `tokenizer.pipe` is untyped in Spacy @_@
+              self.pmatcher.add(mname, list(pipe(to_ppatterns([phrase]))))
         elif isinstance(phrase, list) and len(phrase):
           if "RIGHT_ID" in phrase[0]:
             self.dmatcher.add(mname, [phrase])

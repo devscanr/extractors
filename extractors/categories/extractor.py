@@ -11,7 +11,10 @@ class CategoryExtractor(BaseExtractor):
   exclusive_tags = False
 
   def extract_many(self, text_or_docs: Sequence[str | Doc]) -> list[Categorized]:
-    docs = self.nlp.pipe(text_or_docs)
+    if not text_or_docs:
+      return []
+    docs = self.nlp.pipe(text_or_docs) if isinstance(text_or_docs[0], str) else text_or_docs
+    # LATER: `n_process` for multiprocessing
     return [self.extract(doc) for doc in docs]
 
   def extract(self, text_or_doc: str | Doc) -> Categorized:
