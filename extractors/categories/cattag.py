@@ -10,9 +10,9 @@ def CatTag(
     DPattern   # DependencyMatcher pattern
   ],
   disambiguate: Disambiguate | list[Disambiguate] | None = None,
-  exclusive: bool = False,
+  exclusive: bool = True
 ) -> Tag:
   return Tag(
-    name, phrases, exclusive=False,
-    descr="", disambiguate=disambiguate
+    name, phrases, "",
+    exclusive=exclusive, disambiguate=disambiguate
   )

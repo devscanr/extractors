@@ -1,6 +1,6 @@
 from spacy.tokens import Doc, Token
 from typing import cast, Literal, Sequence
-from ..extractor import BaseExtractor, TMatch, detach_maybe
+from ..extractor import BaseExtractor, TMatch
 from ..markers import is_future, is_hashtagged, is_negated, is_past
 from ..spacyhelpers import ancestors, left_lowerwords
 from .categorized import Categorized, Role
@@ -23,55 +23,52 @@ class CategoryExtractor(BaseExtractor):
     # ])
 
     tmatches, _ = self.find_tmatches(doc)
-    tmatches = self.filter_main(tmatches)
 
     # Filter tag-token pairs
     tmatches2: list[TMatch] = []
-    for mname, [token] in tmatches:
-      name = detach_maybe(mname)
+    for name, tokens, maintoken in tmatches:
+      cancelingset = next((CANCELING_TAGS[uname] for uname in unfold_names(name) if uname in CANCELING_TAGS), set())
       ancs = set(
-        tok for tok in ancestors(token)
+        tok for tok in ancestors(maintoken)
         if (
           tok.pos_ in {"NOUN", "PROPN"} and not any(pred(tok) for pred in [is_negated, is_past, is_future])
           or
           tok.pos_ in {"ADJ", "VERB"}
         )
       )
-      if not any(
-        True for nam, [tok] in tmatches
-        if tok in ancs and (
-          name not in CANCELING_TAGS or
-          nam in CANCELING_TAGS[name]
-        ) and not is_distant(token, tok)
-      ):
-        tmatches2.append((name, [token]))
-    # print("tmatches2:", tmatches2)
+      for nm, _, maintok in tmatches:
+        if maintok in ancs and not is_distant(maintoken, maintok):
+          if set(unfold_names(nm)) & cancelingset:
+            break
+      else:
+        tmatches2.append((name, tokens, maintoken))
+    print("tmatches2:", tmatches2)
 
     # Extract roles
     role: Role | None = None
     is_freelancer, is_lead, is_remote, is_hireable = None, None, None, None
-    for name, [token] in tmatches2:
+    for name, _, maintoken in tmatches2:
       if role is None:
         if name == "Dev" or name.startswith("Dev:"):
-          role = self.check_dev(token)
+          role = self.check_dev(maintoken)
         elif name == "Nondev" or name.startswith("Nondev:"):
-          role = self.check_nondev(token)
+          role = self.check_nondev(maintoken)
         elif name == "Student":
-          role = self.check_student(token)
+          role = self.check_student(maintoken)
         elif name == "Org":
-          role = self.check_organization(token)
+          role = self.check_organization(maintoken)
       if is_freelancer is None:
         if name == "Freelancer":
-          is_freelancer = self.check_freelancer(token)
+          is_freelancer = self.check_freelancer(maintoken)
       if is_lead is None:
         if name == "Lead":
-          is_lead = self.check_lead(token)
+          is_lead = self.check_lead(maintoken)
       if is_remote is None:
         if name == "Remote":
-          is_remote = self.check_remote(token)
+          is_remote = self.check_remote(maintoken)
       if is_hireable is None:
         if name == "Hireable":
-          is_hireable = self.check_hireable(token)
+          is_hireable = self.check_hireable(maintoken)
     return Categorized(
       role = role,
       is_freelancer = is_freelancer,
@@ -228,3 +225,15 @@ def is_distant(token1: Token, token2: Token) -> bool:
     else:
       distance += 1
   return distance >= 6
+
+def getprefix(name: str) -> str:
+  return name.split(":")[0]
+
+def unfold_names(name: str) -> list[str]:
+  # "Nondev:Business:Other" -> ["Nondev:Business:Other", "Nondev:Business", "Nondev"]
+  result: list[str] = []
+  parts = name.split(":")
+  while parts:
+    result.append(":".join(parts))
+    parts.pop()
+  return result

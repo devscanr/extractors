@@ -9,9 +9,9 @@ def RoleTag(
     XPattern | # Matcher pattern
     DPattern   # DependencyMatcher pattern
   ],
-  disambiguate: Disambiguate | list[Disambiguate] | None = None,
+  disambiguate: Disambiguate | list[Disambiguate] | None = None
 ) -> Tag:
   return Tag(
-    name, phrases, exclusive=False,
-    descr="", disambiguate=disambiguate
+    name, phrases, descr="",
+    disambiguate=disambiguate
   )

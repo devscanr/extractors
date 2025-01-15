@@ -173,7 +173,7 @@ TAGS: list[Tag] = [
     "professional",
     "specialist",
   ]),
-  CatTag("NonDev:Education", [
+  CatTag("Nondev:Education", [
     "dean",
     "coach",
     "educator",
@@ -263,6 +263,7 @@ TAGS: list[Tag] = [
     "company",
     "community",
     "firm",
+    "group",
     "organization", "org",
     "platform",
     "professional network",
@@ -274,8 +275,9 @@ TAGS: list[Tag] = [
   CatTag("Remote", [
     [{LOWER: "remote"} | dep_root],
     [{LOWER: "remotely"} | dep_root],
-    "remote=only",
     "remote=friendly",
+    "remote=only",
+    "open=for=remote",
     "open=to=remote",
     "remote/online",
     *[
@@ -338,14 +340,15 @@ TAGS: list[Tag] = [
 # to cancel "Student" role. Not applied yet, not sure...
 
 CANCELING_TAGS = {
-  "Dev": {"Devanization", "Nondev", "Org", "Student"},
-  "Nondev": {"Devanization", "Nondev", "Org", "Student"},
+  "Dev": {"Dev", "Nondev", "Org", "Student"},
+  "Nondev": {"Dev", "Nondev", "Org", "Student"},
+  "Nondev:Business": {"Nondev", "Org", "Student"},
   "Student": {"Org", "Student"},
   "Org": {"Dev", "Nondev", "Org", "Student"},
   "Lead": {"Org", "Student"},
   "Freelancer": {"Freelancer", "Org"},
   "Hireable": {"Org"},
   "Remote": {"Org"},
-}
+} # TODO why don't we use the same approach in title extraction?!
 
 # TODO "doctor", "postdoc", etc.

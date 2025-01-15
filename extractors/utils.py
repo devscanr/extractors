@@ -270,13 +270,16 @@ def get_nlp(name: str | Path = "en_core_web_sm") -> Language:
   # Tokenizer exceptions (sometimes are applied after prefix/suffix, sometimes before – wtf)
   def token_match(token: str) -> bool | None:
     lower = token.lower()
+    # Preserve special cases
     if lower in {"c+", "c++", "c#", ".net", "ph.d"}:
       return True
-    if lower.startswith("co-"):
+    # Preserve tokens like "@foo-bar"
+    if lower[0] == "@" and lower[-1].isalnum():
       return True
-    # For cases like "@foo-bar" to keep it together
-    if lower.startswith(("@",)) and not lower.endswith((",", ".")):
+    # Preserve "co-" prefix (Spacy default models do not understand it adequately)
+    if lower.startswith("co-") and lower[-1].isalnum():
       return True
+    # Preserve ".js"-like suffixes
     if lower.endswith((".js", ".py", ".net")) and (lower.count(".") == 1) and ("/" not in lower):
       return True
     return False

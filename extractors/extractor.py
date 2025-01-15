@@ -10,8 +10,8 @@ from .utils import hash_skillname, uniq3
 from .dpatterns import DPattern, separate_dphantoms, to_dpatterns2
 from .xpatterns import XPattern, literal
 
-type OMatch = tuple[str, list[int]]   # Matched tag with corresponding offsets
-type TMatch = tuple[str, list[Token]] # Matched tag with corresponding tokens
+type OMatch = tuple[str, list[int]]          # Matched tag with corresponding offsets
+type TMatch = tuple[str, list[Token], Token] # Matched tag with corresponding tokens and the determined main token
 type Disambiguate = Callable[[Token], bool]
 
 @dataclass
@@ -153,36 +153,25 @@ class BaseExtractor:
       name = detach_maybe(mname)
       if name == mname:
         if name.startswith("-"):
-          tunmatches.append((name, tokens))
+          tunmatches.append((name, tokens, maintoken))
         else:
-          tmatches.append((name, tokens))
+          tmatches.append((name, tokens, maintoken))
       else:
         if name.startswith("-"):
           raise Exception("disambiguation for negations is not supported yet")
         assert mname in self.disambiguates # TEMP
         if any(disambiguate(maintoken) for disambiguate in self.disambiguates[mname]):
-          tmatches.append((name, tokens))
-    def keyfn(tmatch: TMatch) -> int:
-      mname, tokens = tmatch
-      maintoken = min(tokens, key=lambda t: token_level(t))
-      return maintoken.i
-    tmatches.sort(key=keyfn)
-    tunmatches.sort(key=keyfn)
+          tmatches.append((name, tokens, maintoken))
+    tmatches.sort(key=lambda m: m[2].i)
+    tunmatches.sort(key=lambda m: m[2].i)
     # print("tmatches:", tmatches)
     # print("tunmatches:", tunmatches)
     return tmatches, tunmatches
 
-  def filter_main(self, tmatches: list[TMatch]) -> list[TMatch]:
-    return [
-      (name, [min(tokens, key=lambda t: token_level(t))])
-      for name, tokens
-      in tmatches
-    ]
-
   def should_ignore(self, match: OMatch, other_match: OMatch) -> bool:
     # print("@ should_ignore")
     mname, offsets = match
-    # print("mname:", mname)
+    # print("mname:", mname, "offsets:", offsets)
     other_mname, other_offsets = other_match
     name, other_name = detach_maybe(mname), detach_maybe(other_mname)
     exclusive, other_exclusive = self.exclusives[name], self.exclusives[other_name]

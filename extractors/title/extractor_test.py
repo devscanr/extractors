@@ -311,7 +311,6 @@ class Test_TitleExtractor:
       On a mission to help every student to reach their potential with technologies
     """) == ""
 
-# On a mission to help every student to reach their potential with technologies - FP, discard dep:nsubj?
 # TOGAF 9 Certified Enterprise Architect, Pragmatist, Economic Student, Biker,
 # senior software engineer at @pagarme | Computer Science undergraduate at Pontifical Catholic University of Paraná
 # "CS PhD student at Stony Brook University, new to Distributed System."

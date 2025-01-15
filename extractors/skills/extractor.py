@@ -1,5 +1,3 @@
-from pprint import pprint
-
 from spacy import Language
 from spacy.tokens import Doc, Token
 from typing import Callable, Sequence
@@ -36,13 +34,12 @@ class SkillExtractor(BaseExtractor):
     #   "token": tok, "pos": tok.pos_, "dep": tok.dep_, "head": tok.head} for tok in doc
     # ]) # if not tok.is_punct
     tmatches, _ = self.find_tmatches(doc)
-    tmatches = self.filter_main(tmatches)
     # Resolve skills
     skills: list[str] = []
-    for skill, [token] in tmatches:
-      if skill in self.resolvers:
-        skills += self.resolvers[skill](token)
+    for name, _, maintoken in tmatches:
+      if name in self.resolvers:
+        skills += self.resolvers[name](maintoken)
       else:
-        skills.append(skill)
+        skills.append(name)
     # Uniquelize skills
     return uniq(skills)

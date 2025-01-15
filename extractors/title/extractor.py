@@ -3,9 +3,8 @@ import re
 from spacy.tokens import Doc, Span, Token
 from typing import Literal, Sequence
 from ..categories.extractor import is_hashtagged
-from ..extractor import BaseExtractor, TMatch
+from ..extractor import BaseExtractor
 from ..markers import is_future, is_negated, is_past
-from ..spacyhelpers import token_level
 from ..utils import LB, RB
 
 class TitleExtractor(BaseExtractor):
@@ -19,25 +18,24 @@ class TitleExtractor(BaseExtractor):
     # pprint([{"token": tok, "pos": tok.pos_, "dep": tok.dep_, "head": tok.head} for tok in doc if not tok.is_punct])
 
     tmatches, tunmatches = self.find_tmatches(doc)
-    ignore_tokens = [tok for _, tokens in tunmatches for tok in tokens]
+    ignore_tokens = [tok for _, tokens, _ in tunmatches for tok in tokens]
 
     # Filter tmatches additionally
-    tmatches2: list[TMatch] = []
-    for tag, tokens in tmatches:
-      token = min(tokens, key=lambda t: token_level(t)) # not sure about this part...
-      if tag == tagfilter or tag.startswith(tagfilter + ":"):
-        if token.head.text.startswith("@"):
-          tmatches2.append((tag, [token]))
-        elif token.dep_ not in {"amod", "compound", "dobj", "pobj"}:
-          tmatches2.append((tag, [token]))
-        elif token.dep_ == "pobj" and token.head.lower_ == "as": # TODO maybe analize a verb instead
-          tmatches2.append((tag, [token]))
-    # print("tmatches2:", tmatches2)
+    tmatches2 = [
+      (name, tokens, maintoken)
+      for name, tokens, maintoken in tmatches
+      if (name == tagfilter or name.startswith(tagfilter + ":")) and (
+        maintoken.head.text.startswith("@") or
+        maintoken.dep_ not in {"amod", "compound", "dobj", "pobj"} or
+        maintoken.dep_ == "pobj" and maintoken.head.lower_ == "as"
+        # ^ TODO maybe analize a verb instead
+      )
+    ]
 
     # Extract spans
     spans: list[Span] = []
-    for _, [token] in tmatches2:
-      span = find_noun_span(token, [list(span) for span in spans] + [ignore_tokens])
+    for _, _, maintoken in tmatches2:
+      span = find_noun_span(maintoken, [list(span) for span in spans] + [ignore_tokens])
       if is_hashtagged(span.root):
         spans.append(span)
       elif not any(pred(span.root) for pred in [is_negated, is_past, is_future]):

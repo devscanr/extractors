@@ -304,6 +304,38 @@ class Test_CategoryExtractor:
     assert extract("Leading talent to expertise").is_lead is True
     assert extract("Captain leading from the front!").is_lead is True
 
+  def test_extract_lead5(self, extract) -> None:
+    assert extract("TL, JavaScript Developer").is_lead is True
+    assert extract("CTO, TL") .is_lead is True
+    assert extract("Typographer, Tech Lead").is_lead is True
+    assert extract("Senior Site Reliability Engineer, TL").is_lead is True
+    assert extract("TL;DR : DJ turned software engineer").is_lead is None
+    assert extract("Founder and SVP Creative at Frac.tl").is_lead is None
+
+  # FREELANCER
+  def test_extract_freelancer1(self, extract) -> None:
+    assert extract("freelance").is_freelancer is True
+    assert extract("free lance").is_freelancer is True
+    assert extract("free-lance").is_freelancer is True
+    assert extract("freelancer").is_freelancer is True
+    assert extract("free lancer").is_freelancer is True
+    assert extract("free-lancer").is_freelancer is True
+    assert extract("I am freelancer").is_freelancer is True
+    assert extract("I am a free-lancer").is_freelancer is True
+    assert extract("#java #freelancer").is_freelancer is True
+
+  def test_extract_freelancer2(self, extract) -> None:
+    assert extract("Junior Dev @ free lance").is_freelancer is True
+    assert extract("open to freelance work").is_freelancer is True
+    assert extract("seeking remote freelance jobs").is_freelancer is True
+    assert extract("ready to freelance opportunities").is_freelancer is True
+    assert extract("considering projects as a freelancer").is_freelancer is True
+
+  def test_extract_freelancer3(self, extract) -> None:
+    assert extract("Weblancer").is_freelancer is None
+    assert extract("freelancim").is_freelancer is None
+    assert extract("freelancing").is_freelancer is True
+
   # ROLE
   def test_extract_role1(self, extract) -> None:
     assert extract("I'm learning Python at the moment").role == "Student"
@@ -335,9 +367,138 @@ class Test_CategoryExtractor:
 
   def test_extract_role4(self, extract) -> None:
     assert extract("Eternal student").role is None
+    assert extract("Future student").role is None
+    assert extract("Aspiring Analyst").role == "Student"
+    assert extract("Future engineer").role == "Student"
+    assert extract("Front-end Developer 👩‍💻 \nPlatzi Student 💚 \nSoftware Engineer").role == "Dev"
+    assert extract("Frontend dev by day, backend student by night").role == "Dev"
 
-  # MIXED
-  def test_extract_mixed1(self, extract) -> None:
+  def test_extract_role5(self, extract) -> None:
+    assert extract("Formerly a student at Something").role is None
+    assert extract("A former student at Something").role is None
+    assert extract("Programming newbie").role == "Student"
+    assert extract("Just a noob").role == "Student"
+    assert extract("Just a beginner").role == "Student"
+    assert extract("Mobile novice").role == "Student"
+    assert extract("Blockchain noob").role == "Student"
+
+  def test_extract_role6(self, extract) -> None:
+    assert extract("Computer Engineer & MSc Student").role == "Dev"
+    assert extract("Bachelor student of Comp Sci @ Concordia University").role == "Student"
+    assert extract("Bachelor of Comp Sci student @ Concordia University").role == "Student"
+    assert extract("Private Pilot | Bachelor of Science").role == "Student"
+    assert extract("MSCS Student").role == "Student"
+
+  def test_extract_role7(self, extract) -> None:
+    assert extract("Computer science masters graduate with a specialization in Data Science.").role == "Student"
+    assert extract("Data science undergraduate, proficient in Computer Science.").role == "Student"
+    assert extract("I am a passionate student who loves to learn and explore").role == "Student"
+    assert extract("undergraduate student of Tongji university").role == "Student"
+    assert extract("Undergraduate at UC Berkeley, double major in CS and Math.").role == "Student"
+    assert extract("Formerly Stanford CS PhD Student.").role == "Dev"
+    # ^ "Formerly" cancels "Student" and PhD remains, the result looks correct in this case
+
+  def test_extract_role8(self, extract) -> None:
+    assert extract("A 2nd year studxnt of the Higher IT School.").role is None
+    assert extract("Currently looking for an ML internship").role == "Student"
+    assert extract("I want to be a data analyst").role == "Student"
+    assert extract("I want to become a computer scientist").role == "Student"
+    assert extract("Computer Science Major at NAU").role == "Student"
+    assert extract("Computer science major at Stockton university").role == "Student"
+
+  def test_extract_role9(self, extract) -> None:
+    assert extract("Technical Artist. Founder of @Golden-Ram-Studio").role == "Nondev"
+    assert extract("Manager, developer, and designer walk into bar").role == "Nondev"
+    assert extract("A student of life, working as a QA at a Bay Area").role == "Dev"
+    assert extract("Life-long student").role is None
+    assert extract("Perpetual student").role is None
+
+  def test_extract_role10(self, extract) -> None:
+    assert extract("UI/UX designer -  Front Stack - iOS/SwiftUI developer").role == "Nondev"
+    assert extract("iOS/SwiftUI developer and UI/UX designer").role == "Dev"
+    assert extract("Business Analyst | MBA Student").role == "Dev"
+    assert extract("Constant student").role is None
+    assert extract("I was a student").role is None
+
+  def test_extract_role11(self, extract) -> None:
+    assert extract("Marketing/Data Analyst").role == "Dev"
+    assert extract("Yet another software dev").role == "Dev"
+    assert extract("community").role == "Org"
+    assert extract("community contributor").role is None
+    assert extract("Software development done right").role is None
+
+  def test_extract_role12(self, extract) -> None:
+    assert extract("Intern at Microsoft").role == "Student"
+    assert extract("Internship at Netflix").role == "Student"
+    assert extract("Solidity developer with 10+ years experience. CTO at entro.solutions").role == "Dev"
+    assert extract("company founder at 18yo, programmer, game developer, VR enthusiast").role == "Nondev"
+    assert extract("Fullstack web design agency").role == "Org"
+
+  def test_extract_role13(self, extract) -> None:
+    assert extract("✒️ Co-founder of CollBoard.com").role == "Nondev"
+    assert extract("Founder").role == "Nondev"
+    assert extract("Cofounder").role == "Nondev"
+    assert extract("Co founder").role == "Nondev"
+    assert extract("Co-founder").role == "Nondev"
+    assert extract("Engineer").role == "Dev"
+    assert extract("Developer").role == "Dev"
+
+  def test_extract_role14(self, extract) -> None:
+    assert extract("Dev").role == "Dev"
+    assert extract("Programmer").role == "Dev"
+    assert extract("Coder").role == "Dev"
+    assert extract("Mentor").role == "Nondev"
+    assert extract("Teacher").role == "Nondev"
+    assert extract("Lecturer").role == "Nondev"
+    assert extract("Mathematician").role == "Dev"
+
+  def test_extract_role15(self, extract) -> None:
+    assert extract("Agency").role == "Org"
+    assert extract("Company").role == "Org"
+    assert extract("Group").role == "Org"
+    assert extract("Organization").role == "Org"
+
+  def test_extract_role16(self, extract) -> None:
+    assert extract("Head of Design @github.").role == "Nondev"
+    assert extract("Growth Head").role == "Nondev"
+    assert extract("permanent head damage").role is None
+    assert extract("Author of Head First Ruby").role is None
+    assert extract("head in ☁️").role is None
+
+  def test_extract_set17(self, extract) -> None:
+    assert extract("Bachelor").role == "Student"
+    assert extract("Bachelor student").role == "Student"
+    assert extract("Bachelor student engineer").role == "Student"
+    assert extract("Bachelor engineer student").role == "Student"
+    assert extract("Bachelor engineering student").role == "Student"
+    assert extract("BS engineering student").role == "Student"
+    assert extract("B.S engineering student").role == "Student"
+    assert extract("B.Sc engineering student").role == "Student"
+    assert extract("Master-of-Science engineering student").role == "Student"
+    assert extract("MS engineering student").role == "Student"
+    assert extract("M.S engineering student").role == "Student"
+    assert extract("M.Sc engineering student").role == "Student"
+
+  def test_extract_adhoc1(self, extract) -> None:
+    assert extract("Software Engineering student") == Cats("Student")
+    assert extract("Eng student") == Cats("Student")
+    assert extract("Software Engineer student") == Cats("Student")
+    assert extract("Project management is not for everyone") == Cats()
+
+  def test_extract_adhoc2(self, extract) -> None:
+    assert extract("Engineering leadership at Square") == Cats(is_lead=True)
+    assert extract("open to freelance remote work") == Cats(is_remote=True, is_hireable=True, is_freelancer=True)
+    assert extract("ex-Facebook BFDL. Now tech-lead at @AWS") == Cats(is_lead=True)
+    assert extract("ex-Yandex padavan. Now teamlead at @Google") == Cats(is_lead = True)
+    assert extract("Formerly a manager at Foo. Now a student at Bar") == Cats("Student")
+
+  def test_extract_adhoc3(self, extract) -> None:
+    assert extract("Opened to remote job offers") == Cats(is_remote=True, is_hireable=True)
+    assert extract("Currently open to remote / relocated job offers.") == Cats(is_remote=True, is_hireable=True)
+    assert extract("Deep learning ftw") == Cats()
+
+  # BIOs
+  def test_extract_bios1(self, extract) -> None:
     assert extract("""
       Full stack software engineer. Freelance. Some time ago: CTO & co-founder at Nightset
     """) == Cats("Dev", is_freelancer=True)
@@ -348,7 +509,7 @@ class Test_CategoryExtractor:
       Game developer, programmer, bit of an artist; C++, Unreal
     """) == Cats("Dev")
 
-  def test_extract_mixed2(self, extract) -> None:
+  def test_extract_bios2(self, extract) -> None:
     assert extract("Environmental student, Unreal Engine developer") == Cats("Student")
     assert extract("""
       Software engineer working on games, and tools. Currently leading UI on Clip It @ Neura Studios.
@@ -357,59 +518,14 @@ class Test_CategoryExtractor:
       Founder and CEO of @rangle , the leading lean/agile JavaScript consulting firm.
     """) == Cats("Nondev")
 
-  def test_extract_mixed(self, extract) -> None:
-    assert extract("Game Producer & Lead Development | Network & Systems Admin") == Cats("Nondev", is_lead=True)
-    assert extract("Technical Artist. Founder of @Golden-Ram-Studio").role == "Nondev"
-    assert extract("Manager, developer, and designer walk into bar").role == "Nondev"
-
-  def test_extract_mixed5(self, extract) -> None:
-    assert extract("UI/UX designer -  Front Stack - iOS/SwiftUI developer").role == "Nondev"
-    assert extract("iOS/SwiftUI developer and UI/UX designer").role == "Dev"
-    assert extract("Business Analyst | MBA Student").role == "Dev"
-
-  def test_extract_mixed6(self, extract) -> None:
-    assert extract("Software Engineering student") == Cats("Student")
-    assert extract("Eng student") == Cats("Student")
-    assert extract("Software Engineer student") == Cats("Student")
-    assert extract("Project management is not for everyone") == Cats()
-
-  def test_extract_mixed7(self, extract) -> None:
-    assert extract("Computer science masters graduate with a specialization in Data Science.").role == "Student"
-    assert extract("Data science undergraduate, proficient in Computer Science.").role == "Student"
-    assert extract("Engineering leadership at Square") == Cats(is_lead=True)
-    assert extract("open to remote work") == Cats(is_remote=True, is_hireable=True)
-    assert extract("Opened to remote job offers") == Cats(is_remote=True, is_hireable=True)
-    assert extract("Currently open to remote / relocated job offers.") == Cats(is_remote=True, is_hireable=True)
-    assert extract("open to freelance work") == Cats(is_freelancer=True, is_hireable=True)
-
-  def test_extract_mixed8(self, extract) -> None:
+  def test_extract_bios3(self, extract) -> None:
     assert extract("Machine learning engineer") == Cats("Dev")
     assert extract("Just learning here...") == Cats("Student")
     assert extract("Studying devops for fun and profit.") == Cats("Student")
-    assert extract("Deep learning ftw") == Cats()
     assert extract("Peter is a remote jobseeker") == Cats(is_remote=True, is_hireable=True)
     assert extract("Freelance Programmer | Not for Hire") == Cats("Dev", is_freelancer=True, is_hireable=False)
 
-  def test_extract_mixed9(self, extract) -> None:
-    assert extract("Marketing/Data Analyst").role == "Dev"
-    assert extract("Yet another software dev").role == "Dev"
-    assert extract("""
-      daily.dev is a professional network for developers to learn, collaborate, and grow together.
-    """) == Cats("Org")
-    assert extract("community").role == "Org"
-    assert extract("community contributor").role is None
-    assert extract("""
-      participated in incubating many projects about zero trust and Web3 organization
-    """).role is None
-    assert extract("Software development done right").role is None
-
-  def test_extract_mixed10(self, extract) -> None:
-    assert extract("Aspiring Analyst").role == "Student"
-    assert extract("Future engineer").role == "Student"
-    assert extract("Front-end Developer 👩‍💻 \nPlatzi Student 💚 \nSoftware Engineer").role == "Dev"
-    assert extract("Frontend dev by day, backend student by night").role == "Dev"
-
-  def test_extract_mixed11(self, extract) -> None:
+  def test_extract_bios4(self, extract) -> None:
     assert extract("""
       Freelance open source developer. Hire me!
     """) == Cats("Dev", is_freelancer=True, is_hireable=True)
@@ -421,238 +537,176 @@ class Test_CategoryExtractor:
     """) == Cats("Dev", is_freelancer=True, is_hireable=True)
     assert extract("Remote tech hiring, everywhere.") == Cats()
 
-  def test_extract_mixed12(self, extract) -> None:
-    assert extract("A student of life, working as a QA at a Bay Area").role == "Dev"
-    assert extract("Life-long student").role is None
-    assert extract("Perpetual student").role is None
-    assert extract("Constant student").role is None
-    assert extract("I was a student").role is None
-
-  def test_extract_mixed13(self, extract) -> None:
+  def test_extract_bios5(self, extract) -> None:
     assert extract("""
       Frontend + DevOp! web3 / DeFi, TypeScript, React/Next/Nest, ex. freelancer
     """) == Cats("Dev", is_freelancer=False)
     assert extract("Ex-engineer, freelancer") == Cats(is_freelancer=True)
     assert extract("Ex freelancer at Bay, forever student") == Cats(is_freelancer=False)
 
-  def test_extract_mixed14(self, extract) -> None:
-    assert extract("ex-Facebook BFDL. Now tech-lead at @AWS") == Cats(is_lead=True)
-    assert extract("ex-Yandex padavan. Now teamlead at @Google") == Cats(is_lead = True)
-    assert extract("Formerly a manager at Foo. Now a student at Bar") == Cats("Student")
+  def test_extract_bios6(self, extract) -> None:
     assert extract("Yandex.Fintech | ITMO SWE '25") == Cats("Dev")
-
-  def test_extract_mixed15(self, extract) -> None:
     assert extract("Retired backend engineer") == Cats()
     assert extract("I am a data scientist with a passion for learning") == Cats("Dev")
     assert extract("Computer science newbie") == Cats("Student")
     assert extract("CMC MSU bachelor's degree, FCS HSE master student, ex-Data Scientist at Tinkoff bank") == Cats("Student")
 
-  def test_extract_mixed16(self, extract) -> None:
-    assert extract("I want to be a data analyst").role == "Student"
-    assert extract("I want to become a computer scientist").role == "Student"
-    assert extract("Computer Science Major at NAU").role == "Student"
-    assert extract("Computer science major at Stockton university").role == "Student"
+  def test_extract_bios7(self, extract) -> None:
+    assert extract("Working as a Technical Recruiter!") == Cats("Nondev")
+    assert extract("New software developer.") == Cats("Dev")
+    assert extract("I'm studying data analytics and here are my first projects") == Cats("Student")
+    assert extract("Hello. I'am Vadim Tikhonov. I study code, data analysis and data science.") == Cats("Student")
+    assert extract("I am new to ML & DL") == Cats("Student")
+    assert extract("Romero is seeking new opportunities;") == Cats(is_hireable=True)
 
-  def test_extract_set17(self, extract) -> None:
-    assert extract("Just a beginner").role == "Student"
-    assert extract("Mobile novice").role == "Student"
-    assert extract("Blockchain noob").role == "Student"
-    assert extract("A 2nd year studxnt of the Higher IT School.").role is None
-    assert extract("Currently looking for an ML internship").role == "Student"
+  def test_extract_bios8(self, extract) -> None:
+    assert extract("Aspiring Python Data Analyst") == Cats("Student")
+    assert extract("CS Undergrad at New Jersey Institute of Technology") == Cats("Student")
+    assert extract("Game developer from New Orlean") == Cats("Dev")
+    assert extract("Financial University under the government of Russia") == Cats()
+    assert extract("Gopher. Former TL of Go CDK and author of Wire.") == Cats("Dev", is_lead=False)
 
-  def test_extract_set18(self, extract) -> None:
-    assert extract("Working as a Technical Recruiter!").role == "Nondev"
-    assert extract("New software developer.").role == "Dev"
-    assert extract("I'm studying data analytics and here are my first projects").role == "Student"
-    assert extract("Hello. I'am Vadim Tikhonov. I study code, data analysis and data science.").role == "Student"
-    assert extract("I am new to ML & DL").role == "Student"
-    assert extract("Seeking new opportunities;").role is None
-
-  def test_extract_set19(self, extract) -> None:
-    assert extract("Aspiring Python Data Analyst").role == "Student"
-    assert extract("CS Undergrad at New Jersey Institute of Technology").role == "Student"
-    assert extract("Game developer from New Orlean").role == "Dev"
-    assert extract("Intern at Microsoft").role == "Student"
-    assert extract("Internship at Netflix").role == "Student"
-    assert extract("Financial University under the government of Russia").role is None
-
-  def test_extract_set20(self, extract) -> None:
-    assert extract("Junior Dev @ free lance") == Cats("Dev", is_freelancer=True)
+  def test_extract_bios9(self, extract) -> None:
     assert extract("""
       Master of Science in Information Systems student at Stevens Institute of Technology, NJ, USA.
     """) == Cats("Student")
-    assert extract("Web developer studying to become a therapist").role == "Dev"
-    assert extract("Full time Architect, Consultant, Learner, Author").role == "Dev"
-    assert extract("Engineer, learning PHP at the moment").role == "Dev"
-    assert extract("I've just learned a bit of HTML & CSS").role is None # too contextual
+    assert extract("Web developer studying to become a therapist") == Cats("Dev")
+    assert extract("Full time Architect, Consultant, Learner, Author") == Cats("Dev", is_freelancer=True)
+    assert extract("Engineer, learning PHP at the moment") == Cats("Dev")
+    assert extract("I've just learned a bit of HTML & CSS") == Cats() # too contextual
 
-  def test_extract_set21(self, extract) -> None:
-    assert extract("Software Developer learning Systems Analysis and Development.").role == "Dev"
-    assert extract("Software engineer studying mathematics").role == "Dev"
-    assert extract("Aspiring engineer studying networking & security.").role == "Student"
+  def test_extract_bios10(self, extract) -> None:
+    assert extract("Software Developer learning Systems Analysis and Development.") == Cats("Dev")
+    assert extract("Software engineer studying mathematics") == Cats("Dev")
+    assert extract("Aspiring engineer studying networking & security.") == Cats("Student")
     # ^ OK "aspiring" cancels "engineer", then "studying" is captured
     # assert is_student("Aspiring 16 y/o software engineer studying networking & security.")
     # ^ Spacy model fails to parse such a long noun phrase properly, needs to be retrained
-    assert extract("iOS architect, studying Rust").role == "Dev"
-    assert extract("Frontend dev who currently learning Rust & Elixir").role == "Dev"
+    assert extract("iOS architect, studying Rust") == Cats("Dev")
+    assert extract("Frontend dev who currently learning Rust & Elixir") == Cats("Dev")
     assert extract("Teenager, freelancer, backend developer (TypeScript, C++)") == Cats(
       "Student", is_freelancer = True
     )
 
-  def test_extract_set22(self, extract) -> None:
-    assert extract("Formerly a student at Something").role is None
-    assert extract("A former student at Something").role is None
-    assert extract("Programming newbie").role == "Student"
-    assert extract("Just a noob").role == "Student"
+  def test_extract_bios11(self, extract) -> None:
+    assert extract("""
+      daily.dev is a professional network for developers to learn, collaborate, and grow together.
+    """) == Cats("Org")
+    assert extract("""
+      participated in incubating many projects about zero trust and Web3 organization
+    """) == Cats()
+    assert extract("""
+      I am Viktor Klang, a finder, researcher, problem solver, improver of things,
+      life-long student, developer/programmer, leader, mentor/advisor, public speaker…
+    """) == Cats("Dev", is_lead=True)
+    assert extract("""
+      Specializing generalist. CS PhD, student of life. Lover of words and hyperbole. Remote.
+    """) == Cats("Dev", is_remote=True)
 
-  # def test_extract_set23() -> None:
-  #   assert extract("Bachelor student of Comp Sci @ Concordia University").role == "Student"
-  #   assert extract("Bachelor of Comp Sci student @ Concordia University").role == "Student"
-  #   assert extract("Private Pilot | Bachelor of Science").role == "Student"
-  #   assert extract("Computer Engineer & MSc Student").role == "Dev"
-  #   assert extract("MSCS Student").role == "Student"
-  #
-  # def test_extract_set24() -> None:
-  #   assert extract("""
-  #     I am Viktor Klang, a finder, researcher, problem solver, improver of things,
-  #     life-long student, developer/programmer, leader, mentor/advisor, public speaker…
-  #   """) == Cats("Dev", is_lead=True)
-  #   assert extract("""
-  #     Specializing generalist. CS PhD, student of life. Lover of words and hyperbole. Remote.
-  #   """) == Cats("Dev", is_remote=True)
-  #   assert extract("music student java elasticsearch ai subversion git node").role == "Student"
-  #   assert extract("Back-End Developer | Information Systems bachelor").role == "Dev"
-  #   assert extract("CS Bachelor student at USI").role == "Student"
-  #   assert extract("CS Bachelor at USI").role == "Student"
-  #
-  # def test_extract_set25() -> None:
-  #   assert extract("Biotech student and sometimes software developer.").role == "Student"
-  #   assert extract("Software developer and sometimes biotech student.").role == "Dev"
-  #   assert extract("Everlasting student · Freelance · Life lover") == Cats(is_freelancer=True)
-  #   assert extract("rookie front-end developer").role == "Student"
-  #   assert extract("""
-  #     Professor of the Practice in Computer Science, Program Director
-  #     for the Fundamentals of Computing Undergraduate Certificate Program
-  #   """).role == "Nondev"
-  #
-  # def test_extract_set26() -> None:
-  #   assert extract("""
-  #     NET Developer with front-end skills, Freelancer, Photographer and Science Lover
-  #   """) == Cats("Dev", is_freelancer=True)
-  #   assert extract("""
-  #     Arman is a full-stack developer who mainly focuses on web development
-  #   """).role == "Dev"
-  #   assert extract("""
-  #     Teenager, freelancer, backend developer (TypeScript, C++17)
-  #   """) == Cats("Student", is_freelancer=True)
-  #   assert extract("Oleg Rybnikov - a freelancing web artisan specializing in Vite").is_freelancer
-  #   assert extract("#backend #java #freelancer").is_freelancer
-  #
-  # def test_extract_set27() -> None:
-  #   assert extract("""
-  #     applied artificial intelligence student, free to relocate
-  #   """) == Cats("Student")
-  #   assert extract("""
-  #     🇸🇰 Freelancer full-stack developer. #React #ReactNative
-  #   """) == Cats("Dev", is_freelancer=True)
-  #   assert extract("""
-  #     Full stack software engineer at dextra | Freelancer
-  #   """) == Cats("Dev", is_freelancer=True)
-  #   assert extract("""
-  #     Self-taught Developer graded in Back-end Development. -Freelancer
-  #   """) == Cats("Dev", is_freelancer=True)
-  #
-  # def test_extract_set28() -> None:
-  #   assert extract("indie dev • iOS & macOS • freelance") == Cats("Dev", is_freelancer=True)
-  #   assert extract("Freelancer Jedi Padawan") == Cats(is_freelancer=True)
-  #   assert extract("freelance math teacher, freelance front-end developer") == Cats("Nondev", is_freelancer=True)
-  #   assert extract("I'm a Software Engineer, Ethical Hacker, and security enthusiast") == Cats("Dev")
-  #   assert extract("⭐️ Senior Software Developer ⭐️ Blockchain / Backend / ETL") == Cats("Dev")
-  #
-  # def test_extract_set29() -> None:
-  #   assert extract("Gopher. Former TL of Go CDK and author of Wire.") == Cats("Dev", is_lead=False)
-  #   assert extract("TL, JavaScript Developer") == Cats("Dev", is_lead=True)
-  #   assert extract("CTO, TL") == Cats("Nondev", is_lead=True)
-  #   assert extract("Typographer, Tech Lead") == Cats(is_lead=True)
-  #   assert extract("TL;DR : DJ turned software engineer") == Cats("Dev")
-  #   assert extract("Founder and SVP Creative at Frac.tl") == Cats("Nondev")
-  #   assert extract("Senior Site Reliability Engineer, TL") == Cats("Dev", is_lead=True)
-  #
-  # def test_extract_set31() -> None:
-  #   assert extract("✒️ Co-founder of CollBoard.com").role == "Nondev"
-  #   assert extract("Founder").role == "Nondev"
-  #   assert extract("Cofounder").role == "Nondev"
-  #   assert extract("Co founder").role == "Nondev"
-  #   assert extract("Co-founder").role == "Nondev"
-  #   assert extract("Engineer").role == "Dev"
-  #   assert extract("Developer").role == "Dev"
-  #   assert extract("Dev").role == "Dev"
-  #   assert extract("Programmer").role == "Dev"
-  #   assert extract("Coder").role == "Dev"
-  #   assert extract("Mentor").role == "Nondev"
-  #   assert extract("Teacher").role == "Nondev"
-  #   assert extract("Lecturer").role == "Nondev"
-  #   assert extract("Mathematician").role == "Dev"
-  #   assert extract("Agency").role == "Org"
-  #   assert extract("Company").role == "Org"
-  #   assert extract("Solidity developer with 10+ years experience. CTO at entro.solutions").role == "Dev"
-  #   assert extract("company founder at 18yo, programmer, game developer, VR enthusiast").role == "Nondev"
-  #   assert extract("Fullstack web design agency").role == "Org"
-  #
-  # def test_extract_set32() -> None:
-  #   assert extract("AWESOME Developer/Lead") == Cats("Dev", is_lead=True)
-  #   assert extract("Software Dev & Tech Lead") == Cats("Dev", is_lead=True)
-  #   assert extract("Lead Cloud Engineer @ Namecheap") == Cats("Dev", is_lead=True)
-  #   assert extract("Horizon 2020 Project LEAD: Low-Emission logistics") == Cats(is_lead=True)
-  #   assert extract("Technical Content Lead") == Cats(is_lead=True)
-  #   assert extract("IT Sec guy, @zaproxy co-lead") == Cats("Dev", is_lead=True)
-  #   assert extract("Raising the bar for leadership in tech.") == Cats(is_lead=True)
-  #   assert extract("The leading platform for local cloud development") == Cats("Org")
-  #
-  # def test_extract_set34() -> None:
-  #   assert extract("Founder & CEO @QualiSage | Team Lead | Senior Full-Stack Developer") == Cats("Nondev", is_lead=True)
-  #   assert extract("Junior Programmer @BohemiaInteractive | Founder @QX-Interactive") == Cats("Dev")
-  #   assert extract("Lecturer at Rowan University") == Cats("Nondev")
-  #   assert extract("freshman at Rowan University") == Cats("Student")
-  #   assert extract("sophomore at Rowan University") == Cats("Student")
-  #
-  # def test_extract_set35() -> None:
-  #   assert extract("""
-  #     My name is Devin and I am a Senior Gameplay Designer at
-  #     CD Projekt Red working on the next Witcher.
-  #   """).role == "Nondev"
-  #   assert extract("""
-  #     "Striving to become a front-end developer. Formerly climbing gym founder and co-owner"
-  #   """).role == "Student"
-  #   assert extract("""
-  #     Founder, CBB Analytics. Sports Data Scientist and Web Developer.
-  #   """).role == "Nondev"
-  #   assert extract("""
-  #     Twas brillig, and the slithy toves
-  #     Did gyre and gimble in the wabe
-  #   """).role is None
-  #
-  # def test_extract_set36() -> None:
-  #   assert extract("Bachelor").role == "Student"
-  #   assert extract("Bachelor student").role == "Student"
-  #   assert extract("Bachelor student engineer").role == "Student"
-  #   assert extract("Bachelor engineer student").role == "Student"
-  #   assert extract("Bachelor engineering student").role == "Student"
-  #   assert extract("BS engineering student").role == "Student"
-  #   assert extract("B.S engineering student").role == "Student"
-  #   assert extract("B.Sc engineering student").role == "Student"
-  #   assert extract("Master-of-Science engineering student").role == "Student"
-  #   assert extract("MS engineering student").role == "Student"
-  #   assert extract("M.S engineering student").role == "Student"
-  #   assert extract("M.Sc engineering student").role == "Student"
-  #
+  def test_extract_bios12(self, extract) -> None:
+    assert extract("music student java elasticsearch ai subversion git node") == Cats("Student")
+    assert extract("Back-End Developer | Information Systems bachelor") == Cats("Dev")
+    assert extract("CS Bachelor student at USI") == Cats("Student")
+    assert extract("CS Bachelor at USI") == Cats("Student")
+    assert extract("""
+      Professor of the Practice in Computer Science, Program Director
+      for the Fundamentals of Computing Undergraduate Certificate Program
+    """) == Cats("Nondev")
+
+  def test_extract_bios13(self, extract) -> None:
+    assert extract("""
+      NET Developer with front-end skills, Freelancer, Photographer and Science Lover
+    """) == Cats("Dev", is_freelancer=True)
+    assert extract("Biotech student and sometimes software developer") == Cats("Student")
+    assert extract("Software developer and sometimes biotech student") == Cats("Dev")
+    assert extract("Everlasting student · Freelance · Life lover") == Cats(is_freelancer=True)
+    assert extract("rookie front-end developer") == Cats("Student")
+
+  def test_extract_bios14(self, extract) -> None:
+    assert extract("""
+      Arman is a full-stack developer who mainly focuses on web development
+    """) == Cats("Dev")
+    assert extract("""
+      Teenager, freelancer, backend developer (TypeScript, C++17)
+    """) == Cats("Student", is_freelancer=True)
+    assert extract("""
+      Game Producer & Lead Development | Network & Systems Admin
+    """) == Cats("Nondev", is_lead=True)
+    assert extract("""
+      Oleg Rybnikov - a freelancing web artisan specializing in Vite
+    """) == Cats(is_freelancer=True)
+
+  def test_extract_bios15(self, extract) -> None:
+    assert extract("""
+      applied artificial intelligence student, free to relocate
+    """) == Cats("Student")
+    assert extract("""
+      🇸🇰 Freelancer full-stack developer. #React #ReactNative
+    """) == Cats("Dev", is_freelancer=True)
+    assert extract("""
+      Full stack software engineer at dextra | Freelancer
+    """) == Cats("Dev", is_freelancer=True)
+    assert extract("""
+      Self-taught Developer graded in Back-end Development. -Freelancer
+    """) == Cats("Dev", is_freelancer=True)
+
+  def test_extract_bios16(self, extract) -> None:
+    assert extract("indie dev • iOS & macOS • freelance") == Cats("Dev", is_freelancer=True)
+    assert extract("Freelancer Jedi Padawan") == Cats(is_freelancer=True)
+    assert extract("freelance math teacher, freelance front-end developer") == Cats("Nondev", is_freelancer=True)
+    assert extract("I'm a Software Engineer, Ethical Hacker, and security enthusiast") == Cats("Dev")
+    assert extract("⭐️ Senior Software Developer ⭐️ Blockchain / Backend / ETL") == Cats("Dev")
+
+  def test_extract_bios17(self, extract) -> None:
+    assert extract("AWESOME Developer/Lead") == Cats("Dev", is_lead=True)
+    assert extract("Software Dev & Tech Lead") == Cats("Dev", is_lead=True)
+    assert extract("Lead Cloud Engineer @ Namecheap") == Cats("Dev", is_lead=True)
+    assert extract("Horizon 2020 Project LEAD: Low-Emission logistics") == Cats(is_lead=True)
+
+  def test_extract_bios18(self, extract) -> None:
+    assert extract("Technical Content Lead") == Cats(is_lead=True)
+    assert extract("IT Sec guy, @zaproxy co-lead") == Cats("Dev", is_lead=True)
+    assert extract("Raising the bar for leadership in tech.") == Cats(is_lead=True)
+    assert extract("The leading platform for local cloud development") == Cats("Org")
+
+  def test_extract_bios19(self, extract) -> None:
+    assert extract("Founder & CEO @QualiSage | Team Lead | Senior Full-Stack Developer") == Cats("Nondev", is_lead=True)
+    assert extract("Junior Programmer @BohemiaInteractive | Founder @QX-Interactive") == Cats("Dev")
+    assert extract("Lecturer at Rowan University") == Cats("Nondev")
+    assert extract("freshman at Rowan University") == Cats("Student")
+
+  def test_extract_bios20(self, extract) -> None:
+    assert extract("sophomore at Rowan University") == Cats("Student")
+    assert extract("""
+      My name is Devin and I am a Senior Gameplay Designer at
+      CD Projekt Red working on the next Witcher.
+    """) == Cats("Nondev")
+    assert extract("""
+      Striving to become a front-end developer. Formerly climbing gym founder and co-owner
+    """) == Cats("Student")
+    assert extract("""
+     Founder, CBB Analytics. Sports Data Scientist and Web Developer.
+   """) == Cats("Nondev")
+
+  def test_extract_bios21(self, extract) -> None:
+    assert extract("""
+      Twas brillig, and the slithy toves
+      Did gyre and gimble in the wabe
+    """) == Cats()
+    assert extract("Associate Professor of CS at Augusta University.") == Cats("Nondev")
+    assert extract("Head of developer advocacy @pieces-app") == Cats("Nondev")
+    assert extract("""
+      👨‍💻 developer of 🌐 coora-ai.com 🧭 igapo.xyz / tech enthusiast / applied artificial intelligence student
+    """) == Cats("Dev")
+
+  def test_extract_bios22(self, extract) -> None:
+    assert extract("""
+      👨 VP Eng. at MedScout, storyteller, student of disasters.
+    """) == Cats("Nondev")
+    assert extract("Freelance ⠁⣿⣿ ⣿⣿⣿ ⣿⣿⣿") == Cats(is_freelancer=True)
+
   # def test_extract_set37() -> None:
-  #   assert extract("Head of Design @github.").role == "Nondev"
-  #   assert extract("Associate Professor of CS at Augusta University.").role == "Nondev"
-  #   assert extract("Head of developer advocacy @pieces-app").role == "Nondev"
-  #   assert extract("permanent head damage").role is None
   #   assert extract("Code samples from the book Head First Go").role is None
-  #   assert extract("Growth Head").role == "Nondev"
   #   assert extract("Head Coach @nashville-software-school").role == "Nondev"
   #   assert extract("Head of Engineering @gigs").role == "Nondev"
   #   assert extract("Head of OSS @huggingface. Open Source developer.").role == "Nondev"
@@ -677,9 +731,7 @@ class Test_CategoryExtractor:
   #   assert extract("Head of SRE @Billhop").role == "Nondev"
   #   assert extract("Head of DS @UW").role == "Nondev"
   #   assert extract("Co-Founder and Training Head @AltCampus").role == "Nondev"
-  #   assert extract("Author of Head First Ruby and Head First Go, published by O'Reilly Media.").role is None
   #   assert extract("Hot Headed & Stubborn Programmer").role == "Dev"
-  #   assert extract("head in ☁️").role is None
   #   assert extract("git reset HEAD~1").role is None
   #   assert extract("Head of Oxford Research Software Engineering").role == "Nondev"
   #
@@ -703,14 +755,6 @@ class Test_CategoryExtractor:
   #   assert extract("Opensource enthusiast, Skillbox teacher, Blogger").is_freelancer is None
   #   assert extract("Free-lancer @ BYTESADMIN • Security Researcher").is_freelancer
   #   assert extract("Freelance Clojure programmer").is_freelancer
-  #   assert extract("Freelance ⠁⣿⣿ ⣿⣿⣿ ⣿⣿⣿").is_freelancer
-  #   assert extract("Weblancer").is_freelancer is None
-  #
-  # def test_extract_set42() -> None:
-  #   assert extract("I am a passionate student who loves to learn and explore").role == "Student"
-  #   assert extract("undergraduate student of Tongji university").role == "Student"
-  #   assert extract("Undergraduate at UC Berkeley, double major in CS and Math.").role == "Student"
-  #   assert extract("Formerly Stanford CS PhD Student.").role is None
   #
   # def test_extract_set43() -> None:
   #   assert extract("👨 tech enthusiast / applied ai student").role == "Student"
@@ -731,12 +775,6 @@ class Test_CategoryExtractor:
   #   # ^ known false positive. Can't fix due to Spacy model limitations,
   #
   # def test_extract_mixed51() -> None:
-  #   assert extract("""
-  #     👨‍💻 developer of 🌐 coora-ai.com 🧭 igapo.xyz / tech enthusiast / applied artificial intelligence student
-  #   """) == Cats("Dev")
-  #   assert extract("""
-  #     👨 VP Eng. at MedScout, storyteller, student of disasters.
-  #   """) == Cats("Nondev")
   #   assert extract("""
   #     Technology leader at Gartner (Managing Vice President).
   #     Graduate student at University of Illinois getting my MBA. Forever an engineer.
