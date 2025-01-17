@@ -13,19 +13,19 @@ from .xpatterns import DEP, HEAD, IN, IS_PUNCT, IS_SENT_START, LOWER, OP, ORTH, 
 # - https://corenlp.run/
 
 def normalize(text: str, pipechar: str = ".") -> str:
-  # Correct separators for grammar
-  text = text.replace("：", ": ")
-  text = re.sub(r"\s+[•|]+\s+", f" {pipechar} ", text)
-  text = re.sub(r"\s+/{2,}\s+", " . ", text)
-  # Phone indicators
-  text = re.sub(r"(📞|☎️|📱|☎)\s*:?\s*", "Phone: ", text, flags=re.UNICODE)
   # Drop "etc" in Japanese – e.g handle "Salesforceなど"
   text = text.replace("など", "")
    # Drop emojis
   text = replace_emoji(text, "!")
+  # Correct separators for grammar
+  text = text.replace("：", ": ")
+  # Phone indicators
+  text = re.sub(r"(📞|☎️|📱|☎)\s*:?\s*", "Phone: ", text, flags=re.UNICODE)
   # Drop sudo-emojis like ":snowflake:" which might overlap with skills
   text = re.sub(r":[-\w]+:", "!", text)
-  # Workaround FPs for URLs – cases like "next.js/nuxt"
+  # Replace pipe chars with "." or ","
+  text = re.sub(r"(\s+|(?<=[\w!?]))([•|]+|/[/•|]+)(\s+|(?=[\w!?]))", f"{pipechar} ", text)
+  # Workaround FPs for URLs – cases like "next.js/nuxt", look like URLs to NLP
   text = re.sub(r"(\.js)/(?=\w)", r"\1 / ", text, flags=re.IGNORECASE)
   # Workarounds for C# and C++ joined with separators
   text = re.sub(r"(?<!\w)(c(?:\+\+|#))([,/])(?=\w)", sep_splitter, text, flags=re.IGNORECASE)
@@ -380,3 +380,18 @@ def includes[T](itr: Iterable[T], subitr: Iterable[T]) -> bool:
     except (IndexError, ValueError):
       pass
   return False
+
+# def merge_overlapping(matches: list[set[int]]) -> list[set[int]]:
+#   rs: list[set[int]] = []
+#   for k, match in enumerate(matches):
+#     for l, other_match in enumerate(matches):
+#       if k != l:
+#         if match & other_match:
+#           ms = [match | other_match]
+#           ms.extend(match for m, match in enumerate(matches) if m != k and m != l)
+#           return merge_overlapping(ms)
+#     rs.append(match)
+#   if rs == matches:
+#     return matches
+#   else:
+#     return merge_overlapping(rs)
