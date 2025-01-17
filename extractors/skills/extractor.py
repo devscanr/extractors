@@ -3,7 +3,7 @@ from spacy.tokens import Doc, Token
 from typing import Callable, Sequence
 from ..extractor import BaseExtractor
 from ..utils import uniq
-from .skill import Skill
+from .tag import Skill
 
 type Resolve = Callable[[Token], list[str]]
 

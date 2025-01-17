@@ -1,4 +1,4 @@
-from ..skill import Skill, Company, Tech
+from ..tag import Skill, Company, Tech
 from ..utils import dis_context
 
 dis_ctx = dis_context("yandex")

@@ -1,4 +1,4 @@
-from ..skill import Company, Skill
+from ..tag import Company, Skill
 
 SKILLS: list[Skill] = [
   # == Companies not (yet/intentionally) extracted into their own modules ==

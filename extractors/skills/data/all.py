@@ -1,5 +1,5 @@
 from ...xpatterns import IN, LOWER, OP, propn, ver1
-from ..skill import Skill, Tech
+from ..tag import Skill, Tech
 from ..utils import dis_context, dis_neighbours
 from .adobe import SKILLS as ADOBE_SKILLS
 from .amazon import SKILLS as AMAZON_SKILLS

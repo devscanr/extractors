@@ -1,6 +1,6 @@
 from ...skills.utils import dis_context, dis_neighbours
 from ...xpatterns import noun
-from ..skill import Skill, Topic
+from ..tag import Skill, Topic
 
 SKILLS: list[Skill] = [
   # ANALYSIS >

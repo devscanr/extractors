@@ -1,4 +1,4 @@
-from ..skill import Certificate, Skill
+from ..tag import Certificate, Skill
 
 SKILLS: list[Skill] = [
   Certificate("CompTIA-A+", ["comptia-a+"], "Certificate for tech support and IT ops"),

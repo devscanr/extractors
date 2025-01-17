@@ -1,4 +1,4 @@
-from ..skill import Company, Skill, Tech
+from ..tag import Company, Skill, Tech
 
 SKILLS: list[Skill] = [
   Company("Apple", ["(@)apple"]),

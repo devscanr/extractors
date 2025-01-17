@@ -1,12 +1,19 @@
 import re
 from typing import Any
 
-(DEP, HEAD, IN, IS_PUNCT, IS_SENT_START, LOWER, OP, ORTH, POS, REGEX, TAG) = (
-  "DEP", "HEAD", "IN", "IS_PUNCT", "IS_SENT_START", "LOWER", "OP", "ORTH", "POS", "REGEX", "TAG"
+(DEP, HEAD, IN, IS_PUNCT, IS_SENT_START, LOWER, OP, ORTH, POS, REGEX, TAG, TEXT) = (
+  "DEP", "HEAD", "IN", "IS_PUNCT", "IS_SENT_START", "LOWER", "OP", "ORTH", "POS",
+  "REGEX", "TAG", "TEXT"
 )
 
 type XToken = dict[str, Any]
 type XPattern = list[XToken]
+
+def lower(word: str) -> XToken:
+  return {LOWER: word}
+
+def regex(word: str) -> XToken:
+  return {TEXT: {REGEX: word}}
 
 def orth_or_lower(word: str) -> XToken:
   return {ORTH: word} if re.search(r"[A-Z]", word) else {LOWER: word}

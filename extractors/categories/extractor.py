@@ -3,7 +3,7 @@ from typing import cast, Literal, Sequence
 from ..extractor import BaseExtractor, TMatch
 from ..markers import is_future, is_hashtagged, is_negated, is_past
 from ..spacyhelpers import ancestors, left_lowerwords
-from .categorized import Categorized, Role
+from .categorized import Categorized, CategorizedRole
 from .data import CANCELING_TAGS
 from ..utils import includes
 
@@ -40,7 +40,7 @@ class CategoryExtractor(BaseExtractor):
     # print("tmatches2:", tmatches2)
 
     # Extract roles
-    role: Role | None = None
+    role: CategorizedRole | None = None
     is_freelancer, is_lead, is_remote, is_hireable = None, None, None, None
     for name, _, maintoken in tmatches2:
       if role is None:

@@ -233,6 +233,18 @@ def expand_gtgt(phrase: str) -> list[DPattern]:
     exp_ancestor(modifier, anchor, rev=True),
   ]
 
+# Parse `(modifier)<(anchor)` to dpatterns
+def expand_lt(phrase: str) -> list[DPattern]:
+  parts = phrase.partition("<")
+  assert len(parts) == 3
+  modifier, _, anchor = parts
+  return [
+    exp_concat(modifier, anchor),   # (modifier)
+    exp_dash(modifier, anchor),     # (modifier) . (-) . (anchor)
+    exp_sequence(modifier, anchor), # (modifier) . (anchor)
+    exp_parent(modifier, anchor),   # (modifier) < (anchor)
+  ]
+
 # Parse `(modifier)<~(anchor)` to dpatterns
 def expand_lttilda(phrase: str) -> list[DPattern]:
   parts = phrase.partition("<~")
@@ -305,8 +317,10 @@ def expand_lttilda(phrase: str) -> list[DPattern]:
 #     # }]
 #   ]
 
-OP_RE = r">>|<~| "
-DPHRASE_RE = re.compile(rf"(\w+(?: \w+)?)({OP_RE})(\w+(?: \w+)?)")
+WORD = r"\w+[+.#]?"
+OP_RE = r">>|<~|<| "
+# DPHRASE_RE = re.compile(rf"(\w+(?: {WORD})?)({OP_RE})(\w+(?: {WORD})?)")
+DPHRASE_RE = re.compile(rf"({WORD})({OP_RE})({WORD})")
 
 def expand_dphrase(phrase: str) -> list[DPattern]:
   # Can probably support N spaces on each side, but it's not done yet for simplicity.
@@ -367,6 +381,8 @@ def expand_dphrase(phrase: str) -> list[DPattern]:
       raise Exception("space support for <~ operation is not implemented yet")
     case "<~":
       return expand_lttilda(phrase)
+    case "<":
+      return expand_lt(phrase)
     case " ":
       return expand_space(phrase)
     case _:

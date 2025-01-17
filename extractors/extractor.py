@@ -68,9 +68,9 @@ class BaseExtractor:
       # Update matchers with patterns
       for phrase in tag.phrases:
         if isinstance(phrase, str):
-          if "<~" in phrase or ">>" in phrase:
-            assert "-" not in phrase, f"Dashes are not supported yet with <~ or >> operations: {phrase!r}"
-            assert " " not in phrase, f"Spaces are not supported yet with <~ or >> operations: {phrase!r}"
+          if "<" in phrase or ">" in phrase:
+            assert "-" not in phrase, f"Dashes are not supported yet with dep. operations: {phrase!r}"
+            assert " " not in phrase, f"Spaces are not supported yet with dep. operations: {phrase!r}"
             dpatterns = to_dpatterns2([phrase])
             for k, dpattern in enumerate(dpatterns):
               dpattern, dphantoms = separate_dphantoms(dpattern)
@@ -127,11 +127,11 @@ class BaseExtractor:
     for mname, offsets in raw_omatches:
       name = detach_maybe(mname)
       other_matches: list[tuple[str, list[int]]] = []
-      for k, ofs in raw_omatches:
-        if ofs == offsets and detach_maybe(k) != name:
-          raise Exception(f"tags {mname!r} and {k!r} overlap at {offsets!r}")
-        elif not (mname == k and offsets == ofs):
-          other_matches.append((k, ofs))
+      for mnam, ofs in raw_omatches:
+        if ofs == offsets and detach_maybe(mnam) != name:
+          raise Exception(f"tags {mname!r} and {mnam!r} overlap at {offsets!r}")
+        elif not (mname == mnam and offsets == ofs):
+          other_matches.append((mnam, ofs))
       if not any(
         self.should_ignore((mname, offsets), other_match)
         for other_match in other_matches
@@ -166,9 +166,7 @@ class BaseExtractor:
     return tmatches, tunmatches
 
   def should_ignore(self, match: OMatch, other_match: OMatch) -> bool:
-    # print("@ should_ignore")
     mname, offsets = match
-    # print("mname:", mname, "offsets:", offsets)
     other_mname, other_offsets = other_match
     name, other_name = detach_maybe(mname), detach_maybe(other_mname)
     exclusive, other_exclusive = self.exclusives[name], self.exclusives[other_name]
@@ -176,11 +174,11 @@ class BaseExtractor:
       # Other match of the same tag disambiguates this match
       return True
     if set(offsets) & set(other_offsets):
-      # print("name:", repr(name), "overlaps with other_name:", repr(other_name))
       if other_mname in {"-", "-" + name}:
         # Found a canceling match
         return True
       if exclusive and other_exclusive:
+        # Found a wider match
         return set(offsets) < set(other_offsets)
     return False
 

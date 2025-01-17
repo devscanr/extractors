@@ -1,5 +1,5 @@
 from ...skills.utils import dis_context
-from ..skill import Skill, Topic
+from ..tag import Skill, Topic
 
 SKILLS: list[Skill] = [
   # PROCESSES / INDUSTRIES / DEV SUB-INDUSTRIES

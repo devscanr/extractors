@@ -1,5 +1,5 @@
 from ...xpatterns import ver1, propn
-from ..skill import Company, Skill, Tech
+from ..tag import Company, Skill, Tech
 from ..utils import dis_context, dis_neighbours
 
 dis_ctx = dis_context("microsoft")

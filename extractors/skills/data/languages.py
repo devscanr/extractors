@@ -1,6 +1,6 @@
 from spacy.tokens import Token
 from ...xpatterns import propn, ver1
-from ..skill import Language, Skill
+from ..tag import Language, Skill
 from ..utils import Disambiguate, dis_context, dis_letter
 
 def dis_julia() -> Disambiguate:

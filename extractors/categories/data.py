@@ -2,7 +2,7 @@ from ..extractor import Tag
 from ..ppatterns import expand_parens
 from ..xpatterns import LOWER, verb
 from ..xpatterns import dep_root
-from .cattag import CatTag
+from .tag import CatTag
 
 SEARCH_ANCHORS = [p for ph in [
   "open(ed)", # for # to

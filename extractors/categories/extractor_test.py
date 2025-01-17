@@ -4,11 +4,11 @@ import pytest
 from spacy import Language
 from ..utils import fix_grammar, normalize
 from .data import TAGS
-from .extractor import Categorized, CategoryExtractor, Role
+from .extractor import Categorized, CategoryExtractor, CategorizedRole
 
 @dataclass
 class Cats(Categorized):
-  role: Role | None = None
+  role: CategorizedRole | None = None
   is_freelancer: bool | None = None
   is_lead: bool | None = None
   is_remote: bool | None = None
