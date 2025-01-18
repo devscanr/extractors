@@ -21,6 +21,12 @@ def orth_or_lower(word: str) -> XToken:
 def pos_nounlike() -> XToken:
   return {POS: {IN: ["NOUN", "PROPN", "ADJ"]}}
 
+def pos_propn() -> XToken:
+  return {POS: {IN: ["PROPN"]}}
+
+def pos_verb() -> XToken:
+  return {POS: {IN: ["VERB"]}}
+
 # no IS_SENT_END in Spacy, can't define `singleton`
 dep_root = {DEP: "ROOT"}
 tag_nn = {TAG: "NN", POS: "NOUN"}
@@ -32,19 +38,25 @@ def ver1(word: str) -> XPattern:
     {LOWER: {REGEX: r"^" + word + r"[-\d.]{0,4}$"}}
   ]
 
-def noun(word: str) -> XPattern:
+def noun(word: str | None = None) -> XPattern:
+  if not word:
+    return [pos_nounlike()]
   return [
     orth_or_lower(word) | pos_nounlike()
   ]
 
-def propn(word: str) -> XPattern:
+def propn(word: str | None = None) -> XPattern:
+  if not word:
+    return [pos_propn()]
   return [
-    orth_or_lower(word) | {POS: {IN: ["PROPN"]}}
+    orth_or_lower(word) | pos_propn()
   ]
 
-def verb(word: str) -> XPattern:
+def verb(word: str | None = None) -> XPattern:
+  if not word:
+    return [pos_verb()]
   return [
-    orth_or_lower(word) | {POS: {IN: ["VERB"]}}
+    orth_or_lower(word) | pos_verb()
   ]
 
 def literal(phrase: str) -> XPattern:
