@@ -1,9 +1,6 @@
 from spacy.tokens import Token
 from typing import cast
-
-# EX_MARKERS = {
-#   "ex"
-# }
+from extractors.ppatterns import expand_parens
 
 PAST_MARKERS = {
   "ex",
@@ -72,46 +69,65 @@ def is_negated(noun: Token) -> bool:
 
 def is_past(noun: Token) -> bool:
   # print("@ is_past", noun)
-  # root = token.sent.root
-  # for tok in noun.sent:
-  #   pprint({"token": tok.lower_, "head": tok.head})
   for tok in noun.sent:
     if tok == noun.head and tok.lower_ in {"was", "were"}:
-      return True # was <- developer
+      # was <- developer
+      return True
     if (tok.head == noun) and tok.lower_ in {"ex", "former", "formerly", "previous", "previously", "retired"}:
-      #  or tok.head == noun.head
-      # print("-1-")
-      # print("noun:", noun)
-      # print("tok:", tok)
-      # print("tok.head:", tok.head)
-      # print("noun.head:", noun.head)
-      return True # former -> developer, retired -> developer
+      # former -> developer, retired -> developer
+      return True
     if tok.lower_ == "ago":
-      return True # "time ago", "years ago", etc.
+      # "time ago", "years ago", etc.
+      return True
   return False
 
 def is_future(noun: Token) -> bool:
   # print("@ is_future", noun)
-  # for tok in noun.sent:
-  #   pprint({"token": tok.lower_, "pos": tok.pos_, "dep": tok.dep_, "lemma": tok.lemma_, "head": tok.head})
   for tok in noun.sent:
     if tok == noun.head and tok.lower_ in {"be", "become"}:
-      if any(t.head == tok and t.lemma_ == WILL_WORD for t in noun.sent):
-        return True # will be/become <- developer
-      if any(t == tok.head and t.lemma_ in PLAN_WORDS for t in noun.sent):
-        return True # going/plan/want/wishing to be/become <- developer
+      # (tok:be) > (noun:developer)
+      if any(t.head == tok and t.lower_ in WILL_WORDS for t in noun.sent):
+        # (t:_verb) < (tok:be) > (noun:developer)
+        return True
+      if tok.head.lower_ in PLAN_WORDS:
+        # (tok.head:_verb) > (tok:be) > (noun:developer)
+        return True
     if tok == noun.head and tok.lower_ in {"wannabe"}:
-      return True # developer -> wannabe
+      # (noun:developer) < (tok:wannabe)
+      return True
     if (tok.head == noun or tok.head.head == noun) and tok.lower_ in FUTURE_WORDS:
-      return True # wannabe/future -> developer, future -> laravel -> developer
+      # (tok:future) < (noun:developer)
+      # (tok:future) < (laravel) < (noun:developer) -- wrong Spacy parsing
+      return True
   return False
 
-WILL_WORD = "will"
-PLAN_WORDS = {"aspire", "go", "plan", "strive", "want", "wish"}
-FUTURE_WORDS = {"aspiring", "future", "gonnabe", "striving", "upcoming", "wannabe"}
+# Lemmas are confusing and inconsistent, intentionally not using them
+def expand_words(words: list[str]) -> set[str]:
+  return set(
+    patt for word in words
+    for patt in expand_parens(word)
+  )
 
-# METAPHORIC_MARKERS = {
-#   "always", "constant", "eternal", "everlasting",
-#   "forever", "frantically", "life", "lifelong", "never",
-#   "permanent", "perpetual",
-# }
+WILL_WORDS = expand_words([
+  # (verb) < be > developer
+  "will(s)", "'ll",
+])
+
+PLAN_WORDS = expand_words([
+  # (_verb) > (be) > (developer)
+  "aspire(s)", "aspiring",
+  "go(es)", "going", "gon", # gonna -> gon na
+  "plan(s)", "planning",
+  "look(s)", "looking",
+  "strive(s)", "striving",
+  "want(s)", "wanting", "wan", # wanna -> wan na
+  "wish(es)", "wishing"
+  "work(s)", "working",
+  "willing",
+])
+
+FUTURE_WORDS = {
+  # (_adj) < (developer), (_adj) < (_) < (developer)
+  "aspiring", "future", "gonnabe",
+  "striving", "upcoming", "wannabe",
+}
