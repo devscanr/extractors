@@ -33,10 +33,6 @@ def normalize(text: str, pipechar: str = ".") -> str:
   text = re.sub(r"(^[-~=\s]+)|([-~=#@\s]+$)", "", text)
   # Collapse whitespace
   text = re.sub(r"\s+", " ", text)
-  # Ensure the trailing dot if necessary
-  last_word = text.split(" ")[-1]
-  if not last_word.endswith((".", "?", "!")) and not "." in last_word:
-    text += "."
   # print(repr(text))
   return text
 
@@ -145,6 +141,10 @@ GRAMMAR_FIXES: list[tuple[str, str, re.RegexFlag | int]] = [
 def fix_grammar(text: str) -> str:
   for pattern, replacement, flags in GRAMMAR_FIXES:
     text = re.sub(pattern, replacement, text, count=0, flags=flags)
+  # Ensure the trailing dot
+  last_word = text.split(" ")[-1]
+  if not last_word.endswith((".", "?", "!")) and not "." in last_word:
+    text += "."
   return text
 
 def add_dev_exceptions(nlp: Language) -> None:
