@@ -29,7 +29,7 @@ def normalize(text: str, pipechar: str = ".") -> str:
   text = re.sub(r"(\.js)/(?=\w)", r"\1 / ", text, flags=re.IGNORECASE)
   # Workarounds for C# and C++ joined with separators
   text = re.sub(r"(?<!\w)(c(?:\+\+|#))([,/])(?=\w)", sep_splitter, text, flags=re.IGNORECASE)
-  # Strip decorations
+  # Strip wrapping decorations and whitespace
   text = re.sub(r"(^[-~=\s]+)|([-~=#@\s]+$)", "", text)
   # Collapse whitespace
   text = re.sub(r"\s+", " ", text)
@@ -121,20 +121,26 @@ def omit_parens(input: str) -> str:
 # it's much easier to fix common errors preventively, than to fight them post-factum.
 # --------------------------------------------------------------------------------------------------
 
-LB = r"(?<!\w)"
-RB = r"(?!\w)"
+LB = r"(?<!\w)" # Builtin r"\b" does not fit us. E.g.
+RB = r"(?!\w)"  # r"\beng.\b" won't match as right r"\b" wants left-side to be alphanum!
+
+def drop_lastchar(match: re.Match) -> str:
+  return match.group(0)[0:-1]
+
+def endwith_space(match: re.Match) -> str:
+  return str(match.group(0)).rstrip("- ") + " "
 
 GRAMMAR_FIXES: list[tuple[str, str, re.RegexFlag | int]] = [
-  (rf"{LB}free[-\s]+lanc([edring]*){RB}", r"freelanc\1", re.IGNORECASE),
+  (rf"{LB}free[-\s]+lanc([edring]*){RB}", r"freelanc\1", re.IGNORECASE), # minor bug: does not yet preserve casing...
   (rf"{LB}B\.?S\.?C?\.?{RB}|{LB}SC?\.?B\.?{RB}", r"B.S", re.IGNORECASE), # B.S  = Bachelor of Science
   (rf"{LB}M\.?S\.?C?\.?{RB}|{LB}SC\.?M\.?{RB}", r"M.S", re.IGNORECASE),  # M.S  = Master of Science (not handling "SM" forms for now)
   (rf"{LB}P\.?H\.?D?\.?{RB}", r"Ph.D", re.IGNORECASE),                   # Ph.D = Doctor of Philosophy
-  (rf"{LB}eng\.{RB}", r"eng", re.IGNORECASE),
-  (rf"{LB}ex\s*[-.]\s*(?=\w)", r"ex ", re.IGNORECASE),
-  (rf"{LB}non\s*-\s*(?=\w)", r"non ", re.IGNORECASE),
+  (rf"{LB}eng\.{RB}", drop_lastchar, re.IGNORECASE),
+  (rf"{LB}ex\s*[-.]\s*(?=\w)", endwith_space, re.IGNORECASE),
+  (rf"{LB}non\s*-\s*(?=\w)", endwith_space, re.IGNORECASE),
   (r" @ ", r" at ", 0),
   (r" & ", r" and ", 0),
-  (r"(?<=[\w\s])/co-founder", r" / co-founder", re.IGNORECASE),
+  (r"(?<=[\w\s])/co-founder", r" / co-founder", re.IGNORECASE), # minor bug: does not yet preserve casing...
   (r"(?<=[\w\s])/\.net", r" / .net", re.IGNORECASE),
 ]
 
