@@ -2,7 +2,7 @@ from ..dpatterns import DPattern, LEFT_ID, REL_OP, RIGHT_ATTRS, RIGHT_ID
 from ..extractor import Tag
 from .tag import ExpTag
 from ..ppatterns import expand_parens, to_ppatterns
-from ..xpatterns import lower, regex
+from ..xpatterns import lower, orth_or_lower, pos_nounlike, regex
 
 ROLES = [p for ph in [
   "architect",
@@ -55,12 +55,26 @@ def term_exp_patterns() -> list[Tag]:
   ]
 
 def init_role_patterns(phrases: list[str]) -> list[str | DPattern]:
-  return [
-    f"{modifier}<{anchor}"
-    for anchor in ROLES
-    for phrase in phrases
-    for modifier in expand_parens(phrase)
-  ]
+  patterns: list[str | DPattern] = []
+  for anchor in ROLES:
+    for phrase in phrases:
+      for modifier in expand_parens(phrase):
+        patterns.append(f"{modifier}<{anchor}")
+        patterns.append([{
+          RIGHT_ID: modifier,
+          RIGHT_ATTRS: orth_or_lower(modifier),
+        }, {
+          LEFT_ID: modifier,
+          REL_OP: "<",
+          RIGHT_ID: "_noun",
+          RIGHT_ATTRS: pos_nounlike(),
+        }, {
+          LEFT_ID: "_noun",
+          REL_OP: "<",
+          RIGHT_ID: anchor,
+          RIGHT_ATTRS: orth_or_lower(anchor),
+        }])
+  return patterns
 
 def init_sudorole_patterns(phrases: list[str]) -> list[str | DPattern]:
   return [
