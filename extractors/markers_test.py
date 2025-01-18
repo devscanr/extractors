@@ -1,3 +1,4 @@
+# mypy: disable-error-code=no-untyped-def
 import pytest
 from spacy import Language
 from .utils import fix_grammar, normalize
