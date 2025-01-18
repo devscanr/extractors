@@ -110,7 +110,6 @@ class BaseExtractor:
     for dmatch in dmatches:
       # print("dmatch:", dmatch)
       [match_id, offsets] = dmatch
-      offsets = sorted(offsets)
       pname = self.nlp.vocab.strings[match_id]
       if pname in self.phantoms:
         offsets = [o for o in offsets if o not in self.phantoms[pname]]
@@ -122,6 +121,12 @@ class BaseExtractor:
     return raw_omatches
 
   def find_omatches(self, doc: Doc) -> list[OMatch]:
+    """
+    == Algorithm to merge non-collapsible overlaps ==
+    'Senior Frontend Developer' can match 'Senior Frontend' and 'Senior Developer' in which case
+    we want to merge them and deal with a single match. It concerns only matching tagnames, of course.
+    In case any of overlapping patterns is certain (non-maybe) – their union becomes certain.
+    """
     raw_omatches = self.find_raw_omatches(doc)
     omatches: list[OMatch] = []
     for mname, offsets in raw_omatches:
@@ -137,7 +142,13 @@ class BaseExtractor:
         for other_match in other_matches
       ):
         omatches.append((mname, offsets))
-    # print("omatches:", omatches)
+    # Merge overlapping sets of offsets
+    _omatches = merge_overlapping([
+      (match[0], set(match[1]))
+      for match in omatches
+    ])
+    # # Restore matches, sort offsets
+    omatches = [(mname, sorted(offsets)) for mname, offsets in _omatches]
     return omatches
 
   def find_tmatches(self, doc: Doc) -> tuple[list[TMatch], list[TMatch]]:
@@ -159,6 +170,7 @@ class BaseExtractor:
         assert mname in self.disambiguates # TEMP
         if any(disambiguate(maintoken) for disambiguate in self.disambiguates[mname]):
           tmatches.append((name, tokens, maintoken))
+    # Sort matches and unmatches
     tmatches.sort(key=lambda m: m[2].i)
     tunmatches.sort(key=lambda m: m[2].i)
     # print("tmatches:", tmatches)
@@ -182,15 +194,19 @@ class BaseExtractor:
         return set(offsets) < set(other_offsets)
     return False
 
+def is_mname(name: str) -> bool:
+  return ":maybe:" in name
+
 def attach_maybe(name: str) -> str:
   return name + ":maybe:" + hash_skillname(name)
-
-def attach_phantom(name: str, k: int) -> str:
-  return name + f":ph{k}"
 
 def detach_maybe(mname: str) -> str:
   name = re.sub(r":maybe:.+(?=$|:)", "", mname)
   return name
+
+# Phantoms (skills with dedicated DPattern offset-dropping rules)
+def attach_phantom(name: str, k: int) -> str:
+  return name + f":ph{k}"
 
 def detach_phantom(pname: str) -> str:
   name = re.sub(r":ph\d+(?=$|:)", "", pname)
@@ -201,4 +217,33 @@ def is_semanticparent(name: str, other_name: str) -> bool:
   # "Science" is a superterm of "Computer-Science" (sub-pattern syntactically)
   return re.search(rf"(?<!\w){name}(?!\w)", other_name, re.IGNORECASE) is not None
 
-# @ is_superterm SQL MS-SQLServer
+type M = tuple[str, set[int]]
+
+def merge_overlapping(matches: list[M]) -> list[M]:
+  # Recursive solution, can be probably be rewritten in imperative `while (True)` style if necessary.
+  """
+  assert merge_overlapping([
+    ("JS", {7}),
+    ("Senior", {1, 2}),
+    ("Senior", {1, 3}), # [senior fullstack] developer vs [senior] fullstack [developer]
+    ("SQL", {1}),
+    ("PHP", {4}),
+    ("Senior", {1, 2, 3}),
+  ]) == [("JS", {7}), ('Senior', {1, 2, 3}), ('SQL', {1}), ('PHP', {4})]
+  """
+  rs: list[M] = []
+  for k, (mname, offsets) in enumerate(matches):
+    name = detach_maybe(mname)
+    for l, (other_mname, other_offsets) in enumerate(matches):
+      other_name = detach_maybe(other_mname)
+      if k != l:
+        if name == other_name and offsets & other_offsets:
+          common_name = name if is_mname(other_name) else other_name
+          ms = [(common_name, offsets | other_offsets)]
+          ms.extend(match for m, match in enumerate(matches) if m != k and m != l)
+          return merge_overlapping(ms)
+    rs.append((mname, offsets))
+  if rs == matches:
+    return matches
+  else:
+    return merge_overlapping(rs)
