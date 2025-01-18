@@ -124,13 +124,15 @@ def omit_parens(input: str) -> str:
 LB = r"(?<!\w)" # Builtin r"\b" does not fit us. E.g.
 RB = r"(?!\w)"  # r"\beng.\b" won't match as right r"\b" wants left-side to be alphanum!
 
-def drop_lastchar(match: re.Match) -> str:
+def drop_lastchar(match: re.Match[str]) -> str:
   return match.group(0)[0:-1]
 
-def endwith_space(match: re.Match) -> str:
+def endwith_space(match: re.Match[str]) -> str:
   return str(match.group(0)).rstrip("- ") + " "
 
-GRAMMAR_FIXES: list[tuple[str, str, re.RegexFlag | int]] = [
+type ReplaceFn = Callable[[re.Match[str]], str]
+
+GRAMMAR_FIXES: list[tuple[str, str | ReplaceFn, re.RegexFlag | int]] = [
   (rf"{LB}free[-\s]+lanc([edring]*){RB}", r"freelanc\1", re.IGNORECASE), # minor bug: does not yet preserve casing...
   (rf"{LB}B\.?S\.?C?\.?{RB}|{LB}SC?\.?B\.?{RB}", r"B.S", re.IGNORECASE), # B.S  = Bachelor of Science
   (rf"{LB}M\.?S\.?C?\.?{RB}|{LB}SC\.?M\.?{RB}", r"M.S", re.IGNORECASE),  # M.S  = Master of Science (not handling "SM" forms for now)
@@ -355,22 +357,6 @@ def lookslike(lower: str, patt: re.Pattern[str]) -> bool:
     if is_left_bounded and is_right_bounded:
       return True
   return False
-  # print(is_separated("amazon"), "-- Should be True")
-  # print(is_separated("Amazon"), "-- Should be True")
-  # print(is_separated("amazon-foo"), "-- Should be True")
-  # print(is_separated("foo-amazon"), "-- Should be True")
-  #
-  # print(is_separated("amazonFoo"), "-- Should be True")
-  # print(is_separated("barAmazon"), "-- Should be True")
-  #
-  # print(is_separated("amazon_foo"), "-- Should be True")
-  # print(is_separated("bar_amazon"), "-- Should be True")
-  #
-  # print(is_separated("AMAZONFOO"), "-- Should be False")
-  # print(is_separated("amazonfoo"), "-- Should be False")
-  # print(is_separated("baramazon"), "-- Should be False")
-  # print(is_separated("BARAMAZON"), "-- Should be False")
-  # print(is_separated("zzz"), "-- Should be False")
 
 def includes[T](itr: Iterable[T], subitr: Iterable[T]) -> bool:
   arr, subarr = list(itr), list(subitr)

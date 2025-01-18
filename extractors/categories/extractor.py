@@ -148,8 +148,8 @@ class CategoryExtractor(BaseExtractor):
     elif is_negated(token):
       return False
     lowers = [tok.lower_ for tok in token.sent]
-    for combination in [("tool", "for"), ("working", "on")]:
-      if includes(lowers, combination):
+    for marker in [("tool", "for"), ("working", "on")]:
+      if includes(lowers, marker):
         return None
     return True
 
