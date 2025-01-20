@@ -4,7 +4,7 @@ from pathlib import Path
 import re
 import spacy
 from spacy import Language
-from spacy.tokens import Doc
+from spacy.tokens import Doc, Token
 from typing import Any, Callable, cast, Iterable
 from .xpatterns import DEP, HEAD, IN, IS_PUNCT, IS_SENT_START, LOWER, OP, ORTH, TAG, tag_jj, tag_nn, tag_nnp
 
@@ -93,19 +93,29 @@ def omit_parens(input: str) -> str:
 #   next = get(seq, offset + 1)
 #   return prev, next
 
-# def prev_token(token: Token) -> Token | None:
-#   sent = list(token.sent)
-#   try:
-#     return sent[token._.i - 1]
-#   except Exception:
-#     return None
-#
-# def next_token(token: Token) -> Token | None:
-#   sent = list(token.sent)
-#   try:
-#     return sent[token._.i + 1]
-#   except Exception:
-#     return None
+def is_number(numstr: str) -> bool:
+  return bool(re.fullmatch(r"\d+(\.\d+)?", numstr))
+
+def is_numeric_token(token: Token | None) -> bool:
+  return is_number(token.text) if token else False
+
+def prev_token(token: Token | None) -> Token | None:
+  if not token:
+    return None
+  sent = list(token.sent)
+  try:
+    return cast(Token, sent[token._.i - 1])
+  except Exception:
+    return None
+
+def next_token(token: Token | None) -> Token | None:
+  if not token:
+    return None
+  sent = list(token.sent)
+  try:
+    return cast(Token, sent[token._.i + 1])
+  except Exception:
+    return None
 
 # def prev_next_tokens(token: Token) -> tuple[Token | None, Token | None]:
 #   sent = list(token.sent)

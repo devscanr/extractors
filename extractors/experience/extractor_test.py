@@ -64,10 +64,10 @@ class Test_ExperienceExtractor:
     assert extract("One day I will be a senior developer") == []
     assert extract("Middle developer wannabe") == []
 
-  # def test_extract_adhoc4(self, extract) -> None:
-  #   # Plus should not be captured by mistake
-  #   assert extract("Senior Backend + Frontend developer") == [Experience("Senior", over=False)]
-  #   assert extract("Backend + Frontend: 2 years of experience") == [Experience("Exact", months=24, over=False)]
+  def test_extract_adhoc4(self, extract) -> None:
+    # Plus should not be captured by mistake
+    assert extract("Senior Backend + Frontend developer") == [Experience("Senior", over=False)]
+    assert extract("Backend + Frontend: 2 years of experience") == [Experience("Exact", months=24, over=False)]
 
   def test_extract_adhoc5(self, extract) -> None:
     # Internship
@@ -195,14 +195,18 @@ class Test_ExperienceExtractor:
     assert extract("""
       Application Developer(Android and Flutter ) || 3+ Year Experience
     """)  == [Experience("Exact", months=36, over=True)]
-    # assert extract("Just a senior middle school student.") == []
-    # assert extract("I'm a senior at Middle Tennessee State University.") == []
+    assert extract("Just a senior middle school student.") == []
+    assert extract("I'm a senior at Middle Tennessee State University.") == []
 
-  # def test_extract_bios11(self, extract) -> None:
-  #   assert extract("Senior Data Scientist at Capgemini Middle East") == [Experience("Senior")]
-  #   assert extract("Middle 1C Developer. Junior DevOps") == [Experience("Middle"), Experience("Junior")]
-  #   assert extract("Middle Software Engineer IUT Senior") == [Experience("Middle")]
-  #   assert extract("Cloud Platform Maintenance Senior System Administrator") == [Experience("Senior")]
+  def test_extract_bios11(self, extract) -> None:
+    assert extract("Senior Data Scientist at Capgemini Middle East") == [Experience("Senior")]
+    assert extract("Middle Software Engineer IUT Senior") == [Experience("Middle")]
+    assert extract("Cloud Platform Maintenance Senior System Administrator") == [Experience("Senior")]
+    assert extract("Middle-Senior Infrastructure Engineer") == [Experience("Middle", over=True)]
+
+  def test_extract_bios12(self, extract) -> None:
+    assert extract("Middle 1C Developer. Junior DevOps") == [Experience("Middle"), Experience("Junior")]
+    assert extract("Junior/Middle PHP coder, Laravel abuser") == [Experience("Junior", over=True)]
 
     # assert extract("""
     #   Working remotely for over 10 years

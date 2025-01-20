@@ -1,8 +1,10 @@
+from pprint import pprint
 import re
 from spacy.tokens import Doc, Token
 from typing import Sequence
 from ..extractor import BaseExtractor
 from ..markers import is_future, is_negated, is_past
+from ..utils import is_numeric_token, prev_token
 from .experience import is_OtherExperienceKind
 from .experience import Experience
 
@@ -17,12 +19,12 @@ class ExperienceExtractor(BaseExtractor):
   def extract(self, text_or_doc: str | Doc) -> list[Experience]:
     doc = self.nlp(text_or_doc) if isinstance(text_or_doc, str) else text_or_doc
     # pprint(list(self.nlp.tokenizer.explain(text_or_doc)))
-    # pprint([{
-    #   "token": tok, "pos": tok.pos_, "dep": tok.dep_, "head": tok.head}
-    #   for tok in doc # if not tok.is_punct
-    # ])
+    pprint([{
+      "token": tok, "pos": tok.pos_, "dep": tok.dep_, "head": tok.head}
+      for tok in doc # if not tok.is_punct
+    ])
     tmatches, _ = self.find_tmatches(doc)
-    # print("tmatches:", tmatches)
+    print("tmatches:", tmatches)
 
     # Filter negated and future matches
     tmatches = [
@@ -31,7 +33,6 @@ class ExperienceExtractor(BaseExtractor):
       if not any(pred(maintoken) for pred in [is_negated, is_future, is_past])
     ]
     # Take 2nd and drop 1st matches in "middle-senior"-like scenarios
-    # print("tmatches before:", tmatches)
     tmatches = [
       (name, tokens, maintoken)
       for name, tokens, maintoken in tmatches
@@ -45,7 +46,7 @@ class ExperienceExtractor(BaseExtractor):
           )
         )
     ]
-    # print("tmatches after:", tmatches)
+    print("tmatches after:", tmatches)
     # Extract experiences
     experiences: list[Experience] = []
     for name, tokens, _ in tmatches:
@@ -61,7 +62,9 @@ class ExperienceExtractor(BaseExtractor):
     sent = tokens[0].sent
     # Search for `over`
     over = any(
-      tok.lower_ in {"+", "more", "over"} for tok in sent
+      tok.lower_ == "+" and is_numeric_token(prev_token(tok)) or
+      tok.lower_ in {"more", "over"}
+      for tok in sent
       if tok not in tokens
       if tok.head in tokens or tok.head.head in tokens
     ) or any (
@@ -72,7 +75,7 @@ class ExperienceExtractor(BaseExtractor):
       tok.lower_ for tok in sent
       if tok not in tokens
       if (tok.head in tokens or tok.head.head in tokens)
-      if re.fullmatch(r"\d+(\.\d+)?", tok.text)
+      if is_numeric_token(tok)
     ]
     num = parse_numstr(numstrs[0]) if len(numstrs) == 1 else None
     if num is not None and num > 0:
@@ -93,7 +96,8 @@ class ExperienceExtractor(BaseExtractor):
     sent = tokens[0].sent
     # Search for `over`
     over = any(
-      tok.lower_ in {"+"} for tok in sent
+      tok.lower_ == "+" and is_numeric_token(prev_token(tok))
+      for tok in sent
       if tok not in tokens
       if tok.head in tokens or tok.head.head in tokens
     ) or any (
@@ -105,7 +109,7 @@ class ExperienceExtractor(BaseExtractor):
         case "Junior": extra = "middle"
         case "Middle": extra = "senior"
         case "Senior": extra = "principal"
-      over = any(t.lower_ == extra for t in sent if t.head == tokens[1])
+      over = any(t.lower_ == extra for t in sent if t.head == tokens[1] or t.head.head == tokens[1])
     # TODO search "over", handle Middle+ or Middle-Senior
     if is_OtherExperienceKind(tagname):
       return Experience(tagname, over=over)
