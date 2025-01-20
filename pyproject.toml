@@ -1,7 +1,7 @@
 [tool.poetry]
 package-mode = true
 name = "extractors"
-version = "0.46.0"
+version = "0.47.0"
 description = ""
 authors = ["DevScanr team <info@devscanr.com>"]
 readme = "README.md"
@@ -14,7 +14,7 @@ lingua-language-detector = "^2.0.2"
 urlextract = "^1.9.0"
 beautifulsoup4 = "^4.12.3"
 emoji = "^2.14.1"
-spacy-universal-sentence-encoder = "^0.4.6"
+ # spacy-universal-sentence-encoder = "^0.4.6"
 
 [tool.poetry.group.dev.dependencies]
 mypy = "^1.14.0"
