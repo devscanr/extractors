@@ -111,11 +111,11 @@ def exp_cc_parent(lword: str, rword: str) -> DPattern:
   }, {
     LEFT_ID: "cc",
     REL_OP: ".",
-    RIGHT_ID: "_noun",
+    RIGHT_ID: "$noun",
     RIGHT_ATTRS: pos_nounlike(),
     "PHANTOM": True,
   }, {
-    LEFT_ID: "_noun",
+    LEFT_ID: "$noun",
     REL_OP: "<",
     RIGHT_ID: rword,
     RIGHT_ATTRS: orth_or_lower(rword),
@@ -129,11 +129,11 @@ def exp_parent_cc(lword: str, rword: str) -> DPattern:
   }, {
     LEFT_ID: lword,
     REL_OP: "<",
-    RIGHT_ID: "_noun",
+    RIGHT_ID: "$noun",
     RIGHT_ATTRS: pos_nounlike(),
     "PHANTOM": True,
   }, {
-    LEFT_ID: "_noun",
+    LEFT_ID: "$noun",
     REL_OP: ".",
     RIGHT_ID: "cc",
     RIGHT_ATTRS: {LOWER: {IN: ["/", "and"]}},
@@ -195,11 +195,11 @@ def exp_of_parent_cc(lword: str, rword: str) -> DPattern:
   }, {
     LEFT_ID: "of",
     REL_OP: ">",
-    RIGHT_ID: "_noun",
+    RIGHT_ID: "$noun",
     RIGHT_ATTRS: pos_nounlike(),
     "PHANTOM": True,
   }, {
-    LEFT_ID: "_noun",
+    LEFT_ID: "$noun",
     REL_OP: ".",
     RIGHT_ID: "cc",
     RIGHT_ATTRS: {LOWER: {IN: ["/", "and"]}},

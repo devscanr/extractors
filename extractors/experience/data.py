@@ -66,10 +66,10 @@ def init_role_patterns(phrases: list[str]) -> list[str | DPattern]:
         }, {
           LEFT_ID: modifier,
           REL_OP: "<",
-          RIGHT_ID: "_noun",
+          RIGHT_ID: "$noun",
           RIGHT_ATTRS: pos_nounlike(),
         }, {
-          LEFT_ID: "_noun",
+          LEFT_ID: "$noun",
           REL_OP: "<",
           RIGHT_ID: anchor,
           RIGHT_ATTRS: orth_or_lower(anchor),
