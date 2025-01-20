@@ -10,21 +10,21 @@ class Test_SkillExtractor:
   @pytest.fixture(scope="class")
   def extract(self, nlp: Language):
     ex = SkillExtractor(nlp, SKILLS)
-    def extract(text: str) -> list[str]:
+    def do(text: str) -> list[str]:
       return ex.extract(fix_grammar(normalize(text, pipechar=",")))
-    return extract
+    return do
 
   @pytest.fixture(scope="class")
   def extract_many(self, extract) -> Callable[[list[str]], list[list[str]]]:
-    def extract_many(texts: list[str]) -> list[list[str]]:
+    def do(texts: list[str]) -> list[list[str]]:
       return [extract(text) for text in texts]
-    return extract_many
+    return do
 
   @pytest.fixture(scope="class")
   def extractset(self, extract) -> Callable[[str], set[str]]:
-    def extractset(text: str) -> set[str]:
+    def do(text: str) -> set[str]:
       return set(extract(text))
-    return extractset
+    return do
 
   # SMOKE
   def test_extract_smoke(self, extract) -> None:

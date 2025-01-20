@@ -18,7 +18,7 @@ class Test_CategoryExtractor:
   @pytest.fixture(scope="class")
   def extract(self, nlp: Language):
     ex = CategoryExtractor(nlp, TAGS)
-    def extract(text: str) -> Categorized:
+    def do(text: str) -> Categorized:
       cats = ex.extract(fix_grammar(normalize(text)))
       return Cats(
         role = cats.role,
@@ -27,7 +27,7 @@ class Test_CategoryExtractor:
         is_remote = cats.is_remote,
         is_hireable = cats.is_hireable
       )
-    return extract
+    return do
 
   def test_extract_smoke(self, extract) -> None:
     assert extract("I'm a someone") == Cats()

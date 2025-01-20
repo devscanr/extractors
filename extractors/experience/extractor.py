@@ -1,18 +1,18 @@
-# from pprint import pprint
 import re
 from spacy.tokens import Doc, Token
+from typing import Sequence
 from ..extractor import BaseExtractor
 from ..markers import is_future, is_negated
 from .experience import is_OtherExperienceKind
 from .experience import Experience
 
 class ExperienceExtractor(BaseExtractor):
-  # def extract_many(self, text_or_docs: Sequence[str | Doc]) -> list[Categorized]:
-  #   if not text_or_docs:
-  #     return []
-  #   docs = self.nlp.pipe(text_or_docs) if isinstance(text_or_docs[0], str) else text_or_docs
-  #   # LATER: `n_process` for multiprocessing
-  #   return [self.extract(doc) for doc in docs]
+  def extract_many(self, text_or_docs: Sequence[str | Doc]) -> list[list[Experience]]:
+    if not text_or_docs:
+      return []
+    docs = self.nlp.pipe(text_or_docs) if isinstance(text_or_docs[0], str) else text_or_docs
+    # LATER: `n_process` for multiprocessing
+    return [self.extract(doc) for doc in docs]
 
   def extract(self, text_or_doc: str | Doc) -> list[Experience]:
     doc = self.nlp(text_or_doc) if isinstance(text_or_doc, str) else text_or_doc

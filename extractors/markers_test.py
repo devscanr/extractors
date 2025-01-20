@@ -10,10 +10,10 @@ from . import markers
 class Test_is_hashtagged:
   @pytest.fixture(scope="class")
   def is_hashtagged(self, nlp: Language):
-    def is_hashtagged(text: str, i: int) -> bool:
+    def do(text: str, i: int) -> bool:
       ntext = fix_grammar(normalize(text))
       return markers.is_hashtagged(nlp(ntext)[i])
-    return is_hashtagged
+    return do
 
   def test_smoke(self, is_hashtagged) -> None:
     assert not is_hashtagged("Developer", 0)
@@ -25,10 +25,10 @@ class Test_is_hashtagged:
 class Test_is_negated:
   @pytest.fixture(scope="class")
   def is_negated(self, nlp: Language):
-    def is_negated(text: str, i: int) -> bool:
+    def do(text: str, i: int) -> bool:
       ntext = fix_grammar(normalize(text))
       return markers.is_negated(nlp(ntext)[i])
-    return is_negated
+    return do
 
   def test_no_indicators(self, is_negated) -> None:
     assert not is_negated("Developer", 0)
@@ -47,10 +47,10 @@ class Test_is_negated:
 class Test_is_past:
   @pytest.fixture(scope="class")
   def is_past(self, nlp: Language):
-    def is_past(text: str, i: int) -> bool:
+    def do(text: str, i: int) -> bool:
       ntext = fix_grammar(normalize(text))
       return markers.is_past(nlp(ntext)[i])
-    return is_past
+    return do
 
   def it_handles_no_indicators(self, is_past) -> None:
     assert not is_past("Non-developer", 1) # offset after norm.
@@ -96,10 +96,10 @@ class Test_is_past:
 class Test_is_future:
   @pytest.fixture(scope="class")
   def is_future(self, nlp: Language):
-    def is_future(text: str, i: int) -> bool:
+    def do(text: str, i: int) -> bool:
       ntext = fix_grammar(normalize(text))
       return markers.is_future(nlp(ntext)[i])
-    return is_future
+    return do
 
   def test_no_indicators(self, is_future) -> None:
     assert not is_future("Non-developer", 1) # offset after norm.

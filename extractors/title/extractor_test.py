@@ -9,10 +9,10 @@ class Test_TitleExtractor:
   @pytest.fixture(scope="class")
   def extract(self, nlp: Language):
     ex = TitleExtractor(nlp, TAGS)
-    def extract(text: str) -> str:
+    def do(text: str) -> str:
       ntext = omit_parens(fix_more_grammar(fix_grammar(normalize(text))))
       return ex.extract(ntext, tagfilter="Human")
-    return extract
+    return do
 
   def test_extract_smoke(self, extract) -> None:
     assert extract("A developer") == "Developer"

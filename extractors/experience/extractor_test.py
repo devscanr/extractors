@@ -10,9 +10,23 @@ class Test_ExperienceExtractor:
   @pytest.fixture(scope="class")
   def extract(self, nlp: Language):
     ex = ExperienceExtractor(nlp, TAGS)
-    def extract(text: str) -> list[Experience]:
+    def do(text: str) -> list[Experience]:
       return ex.extract(fix_grammar(normalize(text)))
-    return extract
+    return do
+
+  @pytest.fixture(scope="class")
+  def extract_many(self, nlp: Language):
+    ex = ExperienceExtractor(nlp, TAGS)
+    def do(texts: list[str]) -> list[list[Experience]]:
+      return ex.extract_many([fix_grammar(normalize(text)) for text in texts])
+    return do
+
+  def test_extract_many_smoke(self, extract_many) -> None:
+    assert extract_many([
+      "Senior dev",
+      "1 month of experience",
+      "Blah-blah",
+    ]) == [[Experience("Senior")], [Experience("Exact", months=1)], []]
 
   def test_extract_smoke(self, extract) -> None:
     # Exact months
@@ -180,3 +194,26 @@ class Test_ExperienceExtractor:
     assert extract("""
       Application Developer(Android and Flutter ) || 3+ Year Experience
     """)  == [Experience("Exact", months=36, over=True)]
+    # assert extract("""
+    #   Working remotely for over 10 years
+    # """)  == [Experience("Exact", months=120, over=True)]
+    # 9 years of working experience as a software developer.
+    # -> 9 years
+    # (9) < (years*) > (of) > (experience)
+    # I have been working with PHP/Laravel and JavaScript/Node.js, AWS and Firebase for +8 years.
+    # (+8) < (years) < (for) < (working*)
+    # Full Stack Developer for 25 years currently working for a private company that doesn't use Github.
+    # (25) < (years) < (for) < (working*)
+    # A font-end expert with 17 years working experience.
+    # (17) < (years) < (with) < (expert*), (working) < (experience) < (expert*)
+    # -- non-parsable?
+    # DevOps Engineer with + 15 years working in startups and multinational companies
+    # (+) < (with) < (engineer), (15) < (years) < (with) < (Engineer), (working) < (Engineer)
+    # -- similar to above, hard to parse?!
+    # I've been working for an internet service company 10+ years
+    # (10) < (company), (+) < (years) < (working)
+    # -- another somewhat tricky case, numbers are unrelated to years, likely a Spacy mistake
+    # Talented Engineer with more than 9 years' experience in the Machine Learning and Data Science fields.
+    # In addition to working as a web developer for 14 years.
+    # -> 9+, 14 years
+    # (14) < (years) < (for) < (working)
