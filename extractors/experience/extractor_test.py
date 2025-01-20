@@ -58,8 +58,10 @@ class Test_ExperienceExtractor:
   def test_extract_adhoc5(self, extract) -> None:
     # Internship
     assert extract("Intern at Microsoft") == [Experience("Intern")]
-    # assert extract("Internship at Netflix") == [] # Not implemented yet, should be
-    # assert extract("Looking for internship") == []
+    assert extract("Internship at Netflix") == [Experience("Intern")]
+    assert extract("Looking for internship") == []
+    assert extract("Open to internship opportunities") == []
+    assert extract("Seeking internship") == []
 
   def test_extract_bios1(self, extract) -> None:
     assert extract("me is Senior fullstack developer") == [Experience("Senior")]

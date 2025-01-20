@@ -103,7 +103,7 @@ TAGS: list[Tag] = [
   *term_exp_patterns(),
 
   # OTHER
-  ExpTag("Intern", init_all_patterns(["intern(+)", "trainee(+)"])),
+  ExpTag("Intern", init_all_patterns(["intern", "internship", "trainee"])),
   ExpTag("Junior", init_double_patterns(["junior(+)"])), # TODO accept if "Junior" is ROOT
   ExpTag("Middle", init_double_patterns(["middle(+)", "intermediate(+)"])), # TODO accept if "Middle" is ROOT
   ExpTag("Senior", init_double_patterns(["senior(+)"])),
