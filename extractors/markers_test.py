@@ -145,3 +145,14 @@ class Test_is_future:
     assert is_future("Carl wants to be a developer", 5)
     assert is_future("I wish to be a developer", 5)
     assert is_future("looking forward to become a developer", 5)
+
+  def test_search_indicators(self, is_future) -> None:
+    assert is_future("Looking for internship", 2)
+    assert is_future("Looking for an internship", 3)
+    assert is_future("Looking for internship opportunities", 2)
+    assert is_future("Looking for an internship opportunity", 3)
+    assert is_future("Seeking internship", 1)
+    assert is_future("Seeking an internship", 2)
+    assert is_future("Seeking internship opportunities", 1)
+    assert is_future("Seeking an internship opportunity", 2)
+    assert is_future("Open to an internship opportunity", 3)

@@ -37,68 +37,63 @@ def is_hashtagged(token: Token) -> bool:
   j = cast(int, token._.i)
   return j > 0 and token.sent[j - 1].lower_ == "#"
 
-# def is_exed(token: Token) -> bool:
-#   j = cast(int, token._.i)
-#   if j > 0:
-#     if token.sent[j - 1].lower_ in {"ex"}:
-#       return True # e.g. "ex engineer"
-#   if j > 1:
-#     if token.sent[j - 2].lower_ in {"ex"}:
-#       return True # e.g. "ex-engineer" or "ex. engineer"
-#   if j > 2:
-#     if token.sent[j - 3].lower_ in {"ex"}:
-#       return True # e.g. "ex-web engineer"
-#   return False
-
 def is_negated(noun: Token) -> bool:
   root = noun.sent.root
   for tok in noun.sent:
-    if tok.is_punct:
-      continue
-    if (
-      tok.head == root or # "am not", "were not"
-      tok.head == noun or # "not developer", "not a developer"
-      tok.head.head == noun and tok.head.dep_ == "compound" # "not job seeking"
-    ) and tok.dep_ == "neg":
+    if tok.head == root and tok.dep_ == "neg":
+      # (not) < ($root) -- "never was a developer"
       return True
-    if tok.head == noun and tok.lower_ == "non":
+    elif tok.head == noun and tok.dep_ == "neg" or tok.lower_ == "non":
+      # (not) < ($noun) -- "not a developer"
+      # (non) < ($noun) -- "non developer"
       return True
-    # if (tok.head.head == root or tok.head.head == noun) and tok.head.dep_ == "compound":
-    #   return True
+    elif tok.head.head == noun and tok.head.dep_ == "compound" and tok.dep_ == "neg":
+      # (not) < ($) < ($noun) -- "not job seeking"
+      return True
   return False
 
 def is_past(noun: Token) -> bool:
   # print("@ is_past", noun)
+  if noun.head.lower_ in {"was", "were"}:
+    # (was) > $noun
+    return True
   for tok in noun.sent:
-    if tok == noun.head and tok.lower_ in {"was", "were"}:
-      # was <- developer
+    if tok.head == noun and tok.lower_ in {"ex", "former", "formerly", "previous", "previously", "retired"}:
+      # (former) < ($noun)
       return True
-    if (tok.head == noun) and tok.lower_ in {"ex", "former", "formerly", "previous", "previously", "retired"}:
-      # former -> developer, retired -> developer
-      return True
-    if tok.lower_ == "ago":
-      # "time ago", "years ago", etc.
+    elif tok.lower_ == "ago":
+      # (ago) < ($noun) -- "developer, some time ago"
       return True
   return False
 
 def is_future(noun: Token) -> bool:
   # print("@ is_future", noun)
-  for tok in noun.sent:
-    if tok == noun.head and tok.lower_ in {"be", "become"}:
-      # (tok:be) > (noun:developer)
-      if any(t.head == tok and t.lower_ in WILL_WORDS for t in noun.sent):
-        # (t:_verb) < (tok:be) > (noun:developer)
-        return True
-      if tok.head.lower_ in PLAN_WORDS:
-        # (tok.head:_verb) > (tok:be) > (noun:developer)
-        return True
-    if tok == noun.head and tok.lower_ in {"wannabe"}:
-      # (noun:developer) < (tok:wannabe)
+  if noun.head.lower_ in {"wannabe"}:
+    # ($noun) < (wannabe)
+    return True
+  elif noun.head.lower_ in OPPORTUNITY_WORDS:
+    # ($noun) < (opportunity)
+    return True
+  elif noun.head.lower_ in {"be", "become"}:
+    # (be) > ($noun)
+    if any(t.head == noun.head and t.lower_ in WILL_WORDS for t in noun.sent):
+      # (will) < (be) > ($noun)
       return True
-    if (tok.head == noun or tok.head.head == noun) and tok.lower_ in FUTURE_WORDS:
-      # (tok:future) < (noun:developer)
-      # (tok:future) < (laravel) < (noun:developer) -- wrong Spacy parsing
+    elif noun.head.head.lower_ in PLAN_WORDS:
+      # (plan) > (be) > ($noun)
       return True
+  elif any(tok.head == noun and tok.lower_ in FUTURE_WORDS for tok in noun.sent):
+    # (future) < ($noun)
+    return True
+  elif any(tok.head.head == noun and tok.lower_ in FUTURE_WORDS for tok in noun.sent):
+    # (future) < ($) < ($noun) -- accounting for certain Spacy issues
+    return True
+  elif noun.head.lower_ in SEARCH_WORDS:
+    # (search) > ($noun) -- "seeking an intership"
+    return True
+  elif noun.head.lower_ == "for" and noun.head.head.lower_ in SEARCH_WORDS:
+    # (search) > (for) > ($noun) -- "looking for intership"
+    return True
   return False
 
 # Lemmas are confusing and inconsistent, intentionally not using them
@@ -114,11 +109,12 @@ WILL_WORDS = expand_words([
 ])
 
 PLAN_WORDS = expand_words([
-  # (_verb) > (be) > (developer)
+  # ($verb) > (be) > ($noun)
   "aspire(s)", "aspiring",
   "go(es)", "going", "gon", # gonna -> gon na
+  # "hop(es)", "hoping",
   "plan(s)", "planning",
-  "look(s)", "looking",
+  "look(s)", "looking", # e.g "looking forward"
   "strive(s)", "striving",
   "want(s)", "wanting", "wan", # wanna -> wan na
   "wish(es)", "wishing"
@@ -127,7 +123,25 @@ PLAN_WORDS = expand_words([
 ])
 
 FUTURE_WORDS = {
-  # (_adj) < (developer), (_adj) < (_) < (developer)
+  # ($adj) < ($noun)
+  # ($adj) < ($) < ($noun)
   "aspiring", "future", "gonnabe",
   "striving", "upcoming", "wannabe",
 }
+
+SEARCH_WORDS = expand_words([
+  # ($verb) > (for) > ($noun)                 -- "looking for intership"
+  # ($verb) > (for) > (opportunity) < ($noun) -- "looking for intership opportunities"
+  # ($verb) > ($noun)                         -- "seeking an intership"
+  # ($verb) > (opportunity) < ($noun)         -- "seeking an intership opportunity"
+  "look(s)", "looking",
+  "search(es)", "searching",
+  "seek(s)", "seeking",
+])
+
+OPPORTUNITY_WORDS = expand_words([
+  "offer(s)",
+  "opportunity", "opportunities",
+  "option(s)",
+  "proposal(s)",
+])
