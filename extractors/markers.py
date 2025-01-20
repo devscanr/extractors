@@ -38,9 +38,10 @@ def is_hashtagged(token: Token) -> bool:
   return j > 0 and token.sent[j - 1].lower_ == "#"
 
 def is_negated(noun: Token) -> bool:
+  # print("@ is_negated", noun)
   root = noun.sent.root
   for tok in noun.sent:
-    if tok.head == root and tok.dep_ == "neg":
+    if tok.head == root and (tok.dep_ == "neg" or tok.lower_ == "non"):
       # (not) < ($root) -- "never was a developer"
       return True
     elif tok.head == noun and tok.dep_ == "neg" or tok.lower_ == "non":
@@ -76,16 +77,16 @@ def is_future(noun: Token) -> bool:
     return True
   elif noun.head.lower_ in {"be", "become"}:
     # (be) > ($noun)
-    if any(t.head == noun.head and t.lower_ in WILL_WORDS for t in noun.sent):
+    if any(t.lower_ in WILL_WORDS for t in noun.head.lefts):
       # (will) < (be) > ($noun)
       return True
     elif noun.head.head.lower_ in PLAN_WORDS:
       # (plan) > (be) > ($noun)
       return True
-  elif any(tok.head == noun and tok.lower_ in FUTURE_WORDS for tok in noun.sent):
+  elif any(tok.lower_ in FUTURE_WORDS for tok in noun.lefts):
     # (future) < ($noun)
     return True
-  elif any(tok.head.head == noun and tok.lower_ in FUTURE_WORDS for tok in noun.sent):
+  elif any(tok.head == noun and tok.lower_ in FUTURE_WORDS for tok in noun.lefts):
     # (future) < ($) < ($noun) -- accounting for certain Spacy issues
     return True
   elif noun.head.lower_ in SEARCH_WORDS:
