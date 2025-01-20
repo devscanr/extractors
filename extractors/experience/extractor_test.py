@@ -50,9 +50,9 @@ class Test_ExperienceExtractor:
 
   def test_extract_adhoc1(self, extract) -> None:
     # Past markers don't affect the extractor
-    assert extract("Former principal developer") == [Experience("Principal")]
-    assert extract("Ex middle developer") == [Experience("Middle")]
-    assert extract("Retired senior developer") == [Experience("Senior")]
+    assert extract("Former principal developer") == []
+    assert extract("Ex middle developer") == []
+    assert extract("Retired senior developer") == []
 
   def test_extract_adhoc2(self, extract) -> None:
     # Negations affect the behavior
@@ -154,6 +154,7 @@ class Test_ExperienceExtractor:
     assert extract("""
       rookie frontend developer
     """) == []
+    assert extract("Middle aged man") == []
 
   def test_extract_bios8(self, extract) -> None:
     assert extract("""
@@ -194,6 +195,15 @@ class Test_ExperienceExtractor:
     assert extract("""
       Application Developer(Android and Flutter ) || 3+ Year Experience
     """)  == [Experience("Exact", months=36, over=True)]
+    # assert extract("Just a senior middle school student.") == []
+    # assert extract("I'm a senior at Middle Tennessee State University.") == []
+
+  # def test_extract_bios11(self, extract) -> None:
+  #   assert extract("Senior Data Scientist at Capgemini Middle East") == [Experience("Senior")]
+  #   assert extract("Middle 1C Developer. Junior DevOps") == [Experience("Middle"), Experience("Junior")]
+  #   assert extract("Middle Software Engineer IUT Senior") == [Experience("Middle")]
+  #   assert extract("Cloud Platform Maintenance Senior System Administrator") == [Experience("Senior")]
+
     # assert extract("""
     #   Working remotely for over 10 years
     # """)  == [Experience("Exact", months=120, over=True)]

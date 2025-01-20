@@ -5,13 +5,22 @@ from ..ppatterns import expand_parens, to_ppatterns
 from ..xpatterns import lower, orth_or_lower, pos_nounlike, regex
 
 ROLES = [p for ph in [
+  "administrator", "admin",
   "architect",
   "analyst",
   "coder",
+  "dataop(s)",
   "developer", "dev",
+  "devop(s)",
   "engineer", "eng",
+  "mlop(s)",
+  "netop(s)",
+  "op(s)",
   "programmer",
+  "qa",
   "scientist",
+  "secop(s)",
+  "tester",
 ] for p in expand_parens(ph)]
 
 SUDOROLES = to_ppatterns([

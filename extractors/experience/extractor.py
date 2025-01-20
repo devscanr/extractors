@@ -2,7 +2,7 @@ import re
 from spacy.tokens import Doc, Token
 from typing import Sequence
 from ..extractor import BaseExtractor
-from ..markers import is_future, is_negated
+from ..markers import is_future, is_negated, is_past
 from .experience import is_OtherExperienceKind
 from .experience import Experience
 
@@ -28,8 +28,24 @@ class ExperienceExtractor(BaseExtractor):
     tmatches = [
       (name, tokens, maintoken)
       for name, tokens, maintoken in tmatches
-      if not any(pred(maintoken) for pred in [is_negated, is_future])
+      if not any(pred(maintoken) for pred in [is_negated, is_future, is_past])
     ]
+    # Take 2nd and drop 1st matches in "middle-senior"-like scenarios
+    # print("tmatches before:", tmatches)
+    tmatches = [
+      (name, tokens, maintoken)
+      for name, tokens, maintoken in tmatches
+      if tokens[0].lower_ not in {"junior", "middle", "senior", "principal"} or
+        not any(
+          tmatch for tmatch in tmatches
+          if (
+            tmatch[2] == maintoken and
+            tmatch[1][0].lower_ in {"junior", "middle", "senior", "principal"} and
+            tmatch[1][0].i < tokens[0].i
+          )
+        )
+    ]
+    # print("tmatches after:", tmatches)
     # Extract experiences
     experiences: list[Experience] = []
     for name, tokens, _ in tmatches:
@@ -83,7 +99,13 @@ class ExperienceExtractor(BaseExtractor):
     ) or any (
       "+" in tok.text for tok in tokens
     )
-
+    if not over and tagname in {"Junior", "Middle", "Senior"}:
+      extra = None
+      match tagname:
+        case "Junior": extra = "middle"
+        case "Middle": extra = "senior"
+        case "Senior": extra = "principal"
+      over = any(t.lower_ == extra for t in sent if t.head == tokens[1])
     # TODO search "over", handle Middle+ or Middle-Senior
     if is_OtherExperienceKind(tagname):
       return Experience(tagname, over=over)
