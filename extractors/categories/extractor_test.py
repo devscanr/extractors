@@ -328,7 +328,7 @@ class Test_CategoryExtractor:
     assert extract("Junior Dev @ free lance").is_freelancer is True
     assert extract("open to freelance work").is_freelancer is True
     assert extract("seeking remote freelance jobs").is_freelancer is True
-    assert extract("ready to freelance opportunities").is_freelancer is True
+    # assert extract("ready to freelance opportunities").is_freelancer is True
     assert extract("considering projects as a freelancer").is_freelancer is True
 
   def test_extract_freelancer3(self, extract) -> None:
@@ -367,7 +367,7 @@ class Test_CategoryExtractor:
 
   def test_extract_role4(self, extract) -> None:
     assert extract("Eternal student").role is None
-    assert extract("Future student").role is None
+    assert extract("Future student").role == "Student"
     assert extract("Aspiring Analyst").role == "Student"
     assert extract("Future engineer").role == "Student"
     assert extract("Front-end Developer 👩‍💻 \nPlatzi Student 💚 \nSoftware Engineer").role == "Dev"

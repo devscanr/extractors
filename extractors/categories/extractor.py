@@ -110,8 +110,8 @@ class CategoryExtractor(BaseExtractor):
       return None
     elif is_past(token):
       return None
-    elif is_future(token):
-      return None
+    # elif is_future(token): -- in our domain we treat future students as also students
+    #   return None
     return "Student"
 
   def check_organization(self, token: Token) -> Literal["Org", None]:
