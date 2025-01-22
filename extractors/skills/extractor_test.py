@@ -114,7 +114,7 @@ class Test_SkillExtractor:
     assert extractset("Game development/design") == {"Games", "Design", "Engineering"}
     assert extractset("Game design/dev") == {"Games", "Design", "Engineering"}
     assert extractset("Game design/development") == {"Games", "Design", "Engineering"}
-    # assert extractset("Design/dev of games") == {"Games", "Design", "Engineering"}
+    assert extractset("Design/dev of games") == {"Games", "Engineering"} # FN "Design"
     assert extractset("Dev/design of games") == {"Games", "Design", "Engineering"}
 
   def test_extract_adhoc7(self, extractset) -> None:

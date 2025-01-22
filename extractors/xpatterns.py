@@ -1,31 +1,34 @@
 import re
 from typing import Any
 
-(DEP, HEAD, IN, IS_PUNCT, IS_SENT_START, LOWER, OP, ORTH, POS, REGEX, TAG, TEXT) = (
-  "DEP", "HEAD", "IN", "IS_PUNCT", "IS_SENT_START", "LOWER", "OP", "ORTH", "POS",
+(DEP, HEAD, IN, IS_PUNCT, IS_SENT_START, LOWER, NOT_IN, OP, ORTH, POS, REGEX, TAG, TEXT) = (
+  "DEP", "HEAD", "IN", "IS_PUNCT", "IS_SENT_START", "LOWER", "NOT_IN", "OP", "ORTH", "POS",
   "REGEX", "TAG", "TEXT"
 )
 
 type XToken = dict[str, Any]
 type XPattern = list[XToken]
 
-def lower(word: str) -> XToken:
-  return {LOWER: word}
-
-def regex(word: str) -> XToken:
+def x_regex(word: str) -> XToken:
   return {TEXT: {REGEX: word}}
 
-def orth_or_lower(word: str) -> XToken:
+def x_lower(words: str | list[str]) -> XToken:
+  if isinstance(words, list):
+    return {LOWER: {IN: words}}
+  else:
+    return {LOWER: words}
+
+def x_orth(words: str | list[str]) -> XToken:
+  if isinstance(words, list):
+    return {ORTH: {IN: words}}
+  else:
+    return {ORTH: words}
+
+def x_orthlower(word: str) -> XToken:
   return {ORTH: word} if re.search(r"[A-Z]", word) else {LOWER: word}
 
-def pos_nounlike() -> XToken:
+def x_nounlike() -> XToken:
   return {POS: {IN: ["NOUN", "PROPN", "ADJ"]}}
-
-def pos_propn() -> XToken:
-  return {POS: {IN: ["PROPN"]}}
-
-def pos_verb() -> XToken:
-  return {POS: {IN: ["VERB"]}}
 
 # no IS_SENT_END in Spacy, can't define `singleton`
 dep_root = {DEP: "ROOT"}
@@ -40,23 +43,23 @@ def ver1(word: str) -> XPattern:
 
 def noun(word: str | None = None) -> XPattern:
   if not word:
-    return [pos_nounlike()]
+    return [x_nounlike()]
   return [
-    orth_or_lower(word) | pos_nounlike()
+   x_orthlower(word) | x_nounlike()
   ]
 
 def propn(word: str | None = None) -> XPattern:
   if not word:
-    return [pos_propn()]
+    return [{POS: "PROPN"}]
   return [
-    orth_or_lower(word) | pos_propn()
+    x_orthlower(word) | {POS: "PROPN"}
   ]
 
 def verb(word: str | None = None) -> XPattern:
   if not word:
-    return [pos_verb()]
+    return [{POS: "VERB"}]
   return [
-    orth_or_lower(word) | pos_verb()
+    x_orthlower(word) | {POS: "VERB"}
   ]
 
 def literal(phrase: str) -> XPattern:

@@ -1,10 +1,10 @@
-from ..dpatterns import DPattern, LEFT_ID, REL_OP, RIGHT_ATTRS, RIGHT_ID
+from ..dpatterns import DPattern, DToken, LEFT_ID, PHANTOM, REL_OP, RIGHT_ATTRS, RIGHT_ID
 from ..extractor import Tag
 from .tag import ExpTag
-from ..ppatterns import expand_parens, to_ppatterns
-from ..xpatterns import lower, orth_or_lower, pos_nounlike, regex
+from ..ppatterns import expandlist_parens as expl
+from ..xpatterns import DEP, LOWER, XPattern, x_lower, x_nounlike, x_orth, x_orthlower, x_regex
 
-ROLES = [p for ph in [
+ROLES = expl([
   "administrator", "admin",
   "architect",
   "analyst",
@@ -18,35 +18,70 @@ ROLES = [p for ph in [
   "op(s)",
   "programmer",
   "qa",
+  "researcher",
   "scientist",
   "secop(s)",
+  "sysop(s)",
   "tester",
-] for p in expand_parens(ph)]
+  # Special
+  "backender",
+  "frontender",
+  "fullstacker",
+])
 
-SUDOROLES = to_ppatterns([
+SUDOROLES = expl([
   # Languages
   "c", "c.",
+  "c++",
   "c#",
+  "go",
   "javascript", "js",
+  "kotlin",
   "php",
   "python",
   "ruby",
+  "rust",
+  "sql",
   "typescript", "ts",
   # Fields
-  "backend", "blockchain(s)",
-  "frontend", "fullstack", "game(s)",
-  "mobile(s)", "network(s)",
-  "security", "system(s)",
+  "backend",
+  "blockchain(s)",
+  "frontend",
+  "fullstack",
+  "game(s)",
+  "mobile(s)",
+  "network(s)",
+  "security",
+  "system(s)",
   "web",
+  # Platforms
+  "android",
+  "ios",
+  # Frameworks
+  ".net",
+  "asp.net",
+  "angular(js)",
+  "react(js)",
+  "unity",
+  "unreal",
+  "vue",
 ])
+
+P = {PHANTOM: True}
+
+def d_token(word: str) -> DToken:
+  return {RIGHT_ID: word, RIGHT_ATTRS: x_orthlower(word)}
+
+def d_parent(child: str) -> DToken:
+  return {REL_OP: "<", LEFT_ID: child}
 
 def term_of_exp_patterns() -> list[Tag]:
   # Example: years* > of > experience
   return [
     ExpTag(name, [[
-      {RIGHT_ID: "term", RIGHT_ATTRS: regex(termreg)},
-      {RIGHT_ID: "of", RIGHT_ATTRS: lower("of"), LEFT_ID: "term", REL_OP: ">"},
-      {RIGHT_ID: exp, RIGHT_ATTRS: lower(exp), LEFT_ID: "of", REL_OP: ">"},
+      {RIGHT_ID: "term", RIGHT_ATTRS: x_regex(termreg)},
+      {RIGHT_ID: "of", RIGHT_ATTRS: x_orthlower("of"), LEFT_ID: "term", REL_OP: ">"},
+      {RIGHT_ID: exp, RIGHT_ATTRS: x_orthlower(exp), LEFT_ID: "of", REL_OP: ">"},
     ]])
     for name, termreg in [("YOE", r"(?i)^years?\+?$"), ("MOE", r"(?i)^months?\+?$")]
     for exp in ["experience", "expertise"]
@@ -56,52 +91,147 @@ def term_exp_patterns() -> list[Tag]:
   # Example: years < experience*
   return [
     ExpTag(name, [[
-      {RIGHT_ID: "term", RIGHT_ATTRS: regex(reg)},
-      {RIGHT_ID: exp, RIGHT_ATTRS: lower(exp), LEFT_ID: "term", REL_OP: "<"},
+      {RIGHT_ID: "term", RIGHT_ATTRS: x_regex(reg)},
+      {RIGHT_ID: exp, RIGHT_ATTRS: x_orthlower(exp), LEFT_ID: "term", REL_OP: "<"},
     ]])
     for name, reg in [("YOE", r"(?i)^years?\+?$"), ("MOE", r"(?i)^months?\+?$")]
     for exp in ["experience", "expertise"]
   ]
 
-def init_role_patterns(phrases: list[str]) -> list[str | DPattern]:
-  patterns: list[str | DPattern] = []
-  for anchor in ROLES:
-    for phrase in phrases:
-      for modifier in expand_parens(phrase):
-        patterns.append(f"{modifier}<{anchor}")
-        patterns.append([{
-          RIGHT_ID: modifier,
-          RIGHT_ATTRS: orth_or_lower(modifier),
-        }, {
-          LEFT_ID: modifier,
-          REL_OP: "<",
-          RIGHT_ID: "$noun",
-          RIGHT_ATTRS: pos_nounlike(),
-        }, {
-          LEFT_ID: "$noun",
-          REL_OP: "<",
-          RIGHT_ID: anchor,
-          RIGHT_ATTRS: orth_or_lower(anchor),
-        }])
-  return patterns
-
-def init_sudorole_patterns(phrases: list[str]) -> list[str | DPattern]:
+def init_root_patterns(modifiers: list[str]) -> list[XPattern]:
   return [
-    f"{modifier}-{anchor}"
-    for anchor in SUDOROLES
-    for phrase in phrases
-    for modifier in expand_parens(phrase)
+    [{DEP: "ROOT", LOWER: modifier}]
+    for modifier in modifiers
   ]
 
-def init_all_patterns(modifiers: list[str]) -> list[str | DPattern]:
+def init_role_patterns(modifiers: list[str]) -> list[str | DPattern]:
+  return [
+    pattern
+    for anchor in ROLES
+    for modifier in modifiers
+    for pattern in [
+      [
+        # (modifier) (^anchor)
+        x_orthlower(modifier),
+        x_orthlower(anchor) | P,
+      ],
+      [
+        # (modifier) (^-) (^anchor)
+        x_orthlower(modifier),
+        x_orth("-") | P,
+        x_orthlower(anchor) | P,
+      ],
+      [
+        # (modifier) ($nounlike) (^anchor)
+        x_orthlower(modifier),
+        x_nounlike() | P,
+        x_orthlower(anchor) | P,
+      ],
+      [
+        # (modifier) ($nounlike) ($nounlike) (^anchor)
+        x_orthlower(modifier),
+        x_nounlike() | P,
+        x_nounlike() | P,
+        x_orthlower(anchor) | P,
+      ],
+      [
+        # (^anchor) (^-) (modifier)
+        x_orthlower(anchor) | P,
+        x_orth("-") | P,
+        x_orthlower(modifier),
+      ],
+      [
+        # (modifier) < (^anchor)
+        d_token(modifier),
+        d_token(anchor) | d_parent(modifier) | P,
+      ],
+    ]
+  ]
+
+def init_sudorole_patterns(modifiers: list[str]) -> list[str | DPattern]:
+  return [
+    pattern
+    for anchor in SUDOROLES
+    for modifier in modifiers
+    for pattern in [
+      [
+        # (modifier) (^anchor)
+        x_orthlower(modifier),
+        x_orthlower(anchor) | P,
+      ],
+      [
+        # (modifier) (^-) (^anchor)
+        x_orthlower(modifier),
+        x_orth("-") | P,
+        x_orthlower(anchor) | P,
+      ],
+      [
+        # (^anchor) (modifier)
+        x_orthlower(anchor) | P,
+        x_orthlower(modifier),
+      ],
+      [
+        # (^anchor) (^-) (modifier)
+        x_orthlower(anchor) | P,
+        x_orth("-") | P,
+        x_orthlower(modifier),
+      ],
+      [
+        # (modifier) < (^anchor)
+        d_token(modifier),
+        d_token(anchor) | d_parent(modifier) | P,
+      ],
+    ]
+  ]
+
+def init_sep_patterns(modifiers: list[str]) -> list[str | DPattern]:
+  return [
+    [
+      x_lower(modifiers),
+      x_orth(["/", "-", "|", ",", "->"]) | P, # pipe is replaced with ',' or '.' as a part of normalization :(
+      x_nounlike() | P,
+    ]
+  ]
+
+def init_intern_patterns() -> list[str | DPattern]:
+  modifiers = expl(["intern", "internship", "trainee"])
   return [
     *modifiers,
     *init_role_patterns(modifiers),
     *init_sudorole_patterns(modifiers),
   ]
 
-def init_double_patterns(modifiers: list[str]) -> list[str | DPattern]:
+def init_junior_patterns() -> list[str | DPattern]:
+  modifiers = expl(["junior(+)"])
   return [
+    *init_root_patterns(modifiers),
+    *init_role_patterns(modifiers),
+    *init_sudorole_patterns(modifiers),
+    *init_sep_patterns(modifiers),
+  ]
+
+def init_middle_patterns() -> list[str | DPattern]:
+  modifiers = expl(["middle(+)", "intermediate(+)"])
+  return [
+    *init_root_patterns(modifiers),
+    *init_role_patterns(modifiers),
+    *init_sudorole_patterns(modifiers),
+    *init_sep_patterns(modifiers),
+  ]
+
+def init_senior_patterns() -> list[str | DPattern]:
+  modifiers = expl(["senior(+)"])
+  return [
+    *init_root_patterns(modifiers),
+    *init_role_patterns(modifiers),
+    *init_sudorole_patterns(modifiers),
+    *init_sep_patterns(modifiers),
+  ]
+
+def init_principal_patterns() -> list[str | DPattern]:
+  modifiers = expl(["principal(+)"])
+  return [
+    *init_root_patterns(modifiers),
     *init_role_patterns(modifiers),
     *init_sudorole_patterns(modifiers),
   ]
@@ -112,9 +242,9 @@ TAGS: list[Tag] = [
   *term_exp_patterns(),
 
   # OTHER
-  ExpTag("Intern", init_all_patterns(["intern", "internship", "trainee"])),
-  ExpTag("Junior", init_double_patterns(["junior(+)"])), # TODO accept if "Junior" is ROOT
-  ExpTag("Middle", init_double_patterns(["middle(+)", "intermediate(+)"])), # TODO accept if "Middle" is ROOT
-  ExpTag("Senior", init_double_patterns(["senior(+)"])),
-  ExpTag("Principal", init_double_patterns(["principal(+)"])),
+  ExpTag("Intern", init_intern_patterns()),
+  ExpTag("Junior", init_junior_patterns()),
+  ExpTag("Middle", init_middle_patterns()),
+  ExpTag("Senior", init_senior_patterns()),
+  ExpTag("Principal", init_principal_patterns()),
 ]

@@ -37,63 +37,93 @@ def is_hashtagged(token: Token) -> bool:
   j = cast(int, token._.i)
   return j > 0 and token.sent[j - 1].lower_ == "#"
 
-def is_negated(noun: Token) -> bool:
-  # print("@ is_negated", noun)
-  root = noun.sent.root
-  for tok in noun.sent:
-    if tok.head == root and (tok.dep_ == "neg" or tok.lower_ == "non"):
-      # (not) < ($root) -- "never was a developer"
+def get_ancestors(token: Token) -> list[Token]:
+  tok = token
+  toks: list[Token] = []
+  while tok != tok.head and tok.dep_ != "dep":
+    i = tok.i
+    tok = tok.head
+    if (
+      tok.pos_ in {"AUX", "VERB"} or
+      tok.pos_ in {"ADJ", "NOUN", "PROPN", "DET"} and tok.i > i
+    ):
+      toks.append(tok)
+    else:
+      break
+  return toks
+
+# is_negated
+def is_negated(token: Token) -> bool:
+  # print("@ is_negated", token)
+  # Note: Spacy makes mistakes with 'not' head as major as it does with other things @_@
+  chain = [token, *get_ancestors(token)]
+  return any(_is_negated(item) for item in chain)
+
+def _is_negated(token: Token) -> bool:
+  # print("@ _is_negated", token)
+  for tok in token.sent:
+    if (tok.head == token and tok.dep_ == "neg") or (tok.lower_ == "non" and token.dep_ != "dep"):
+      # (not) < ($token) -- "not a developer"
+      # (non) < ($token) -- "non developer"
       return True
-    elif tok.head == noun and tok.dep_ == "neg" or tok.lower_ == "non":
-      # (not) < ($noun) -- "not a developer"
-      # (non) < ($noun) -- "non developer"
-      return True
-    elif tok.head.head == noun and tok.head.dep_ == "compound" and tok.dep_ == "neg":
-      # (not) < ($) < ($noun) -- "not job seeking"
+    elif tok.head.head == token and tok.head.dep_ == "compound" and tok.dep_ == "neg":
+      # (not) < ($) < ($token) -- "not job seeking"
       return True
   return False
 
-def is_past(noun: Token) -> bool:
-  # print("@ is_past", noun)
-  if noun.head.lower_ in {"was", "were"}:
-    # (was) > $noun
+# is_past
+def is_past(token: Token) -> bool:
+  # print("@ is_past", token)
+  chain = [token, *get_ancestors(token)]
+  return any(_is_past(item) for item in chain)
+
+def _is_past(token: Token) -> bool:
+  # print("@ _is_past", token)
+  if token.head.lower_ in {"was", "were"}:
+    # (was) > $token
     return True
-  for tok in noun.sent:
-    if tok.head == noun and tok.lower_ in {"ex", "former", "formerly", "previous", "previously", "retired"}:
-      # (former) < ($noun)
+  for tok in token.sent:
+    if tok.head == token and tok.lower_ in {"ex", "former", "formerly", "previous", "previously", "retired"}:
+      # (former) < ($token)
       return True
     elif tok.lower_ == "ago":
-      # (ago) < ($noun) -- "developer, some time ago"
+      # (ago) < ($token) -- "developer, some time ago"
       return True
   return False
 
-def is_future(noun: Token) -> bool:
-  # print("@ is_future", noun)
-  if noun.head.lower_ in {"wannabe"}:
-    # ($noun) < (wannabe)
+# is_future
+def is_future(token: Token) -> bool:
+  # print("@ is_future", token)
+  chain = [token, *get_ancestors(token)]
+  return any(_is_future(item) for item in chain)
+
+def _is_future(token: Token) -> bool:
+  # print("@ _is_future", token)
+  if token.head.lower_ in {"wannabe"} and token.dep_ != "dep":
+    # ($token) < (wannabe)
     return True
-  elif noun.head.lower_ in OPPORTUNITY_WORDS:
-    # ($noun) < (opportunity)
+  elif token.head.lower_ in OPPORTUNITY_WORDS and token.dep_ != "dep":
+    # ($token) < (opportunity)
     return True
-  elif noun.head.lower_ in {"be", "become"}:
-    # (be) > ($noun)
-    if any(t.lower_ in WILL_WORDS for t in noun.head.lefts):
-      # (will) < (be) > ($noun)
+  elif token.head.lower_ in {"be", "become"} and token.dep_ != "dep":
+    # (be) > ($token)
+    if any(t.lower_ in WILL_WORDS for t in token.head.lefts):
+      # (will) < (be) > ($token)
       return True
-    elif noun.head.head.lower_ in PLAN_WORDS:
-      # (plan) > (be) > ($noun)
+    elif token.head.head.lower_ in PLAN_WORDS:
+      # (plan) > (be) > ($token)
       return True
-  elif any(tok.lower_ in FUTURE_WORDS for tok in noun.lefts):
-    # (future) < ($noun)
+  elif token.head.lower_ in SEARCH_WORDS and token.dep_ != "dep":
+    # (search) > ($token) -- "seeking an intership"
     return True
-  elif any(tok.head == noun and tok.lower_ in FUTURE_WORDS for tok in noun.lefts):
-    # (future) < ($) < ($noun) -- accounting for certain Spacy issues
+  elif token.head.lower_ == "for" and token.head.head.lower_ in SEARCH_WORDS and token.dep_ != "dep":
+    # (search) > (for) > ($token) -- "looking for intership"
     return True
-  elif noun.head.lower_ in SEARCH_WORDS:
-    # (search) > ($noun) -- "seeking an intership"
+  elif any(tok.lower_ in FUTURE_WORDS for tok in token.lefts):
+    # (future) < ($token)
     return True
-  elif noun.head.lower_ == "for" and noun.head.head.lower_ in SEARCH_WORDS:
-    # (search) > (for) > ($noun) -- "looking for intership"
+  elif any(tok.head == token and tok.lower_ in FUTURE_WORDS for tok in token.lefts):
+    # (future) < ($) < ($token) -- accounting for certain Spacy issues
     return True
   return False
 
@@ -110,7 +140,7 @@ WILL_WORDS = expand_words([
 ])
 
 PLAN_WORDS = expand_words([
-  # ($verb) > (be) > ($noun)
+  # ($verb) > (be) > ($token)
   "aspire(s)", "aspiring",
   "go(es)", "going", "gon", # gonna -> gon na
   # "hop(es)", "hoping",
@@ -124,17 +154,17 @@ PLAN_WORDS = expand_words([
 ])
 
 FUTURE_WORDS = {
-  # ($adj) < ($noun)
-  # ($adj) < ($) < ($noun)
+  # ($adj) < ($token)
+  # ($adj) < ($) < ($token)
   "aspiring", "future", "gonnabe",
   "striving", "upcoming", "wannabe",
 }
 
 SEARCH_WORDS = expand_words([
-  # ($verb) > (for) > ($noun)                 -- "looking for intership"
-  # ($verb) > (for) > (opportunity) < ($noun) -- "looking for intership opportunities"
-  # ($verb) > ($noun)                         -- "seeking an intership"
-  # ($verb) > (opportunity) < ($noun)         -- "seeking an intership opportunity"
+  # ($verb) > (for) > ($token)                 -- "looking for intership"
+  # ($verb) > (for) > (opportunity) < ($token) -- "looking for intership opportunities"
+  # ($verb) > ($token)                         -- "seeking an intership"
+  # ($verb) > (opportunity) < ($token)         -- "seeking an intership opportunity"
   "look(s)", "looking",
   "search(es)", "searching",
   "seek(s)", "seeking",

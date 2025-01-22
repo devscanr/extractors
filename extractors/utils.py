@@ -289,7 +289,7 @@ def get_nlp(name: str | Path = "en_core_web_sm") -> Language:
   def token_match(token: str) -> bool | None:
     lower = token.lower()
     # Preserve special cases
-    if lower in {"c+", "c++", "c#", ".net", "ph.d"}:
+    if lower in {"c+", "c++", "c#", ".net", "ph.d", "->"}:
       return True
     # Preserve tokens like "@foo-bar"
     if lower[0] == "@" and lower[-1].isalnum():
@@ -306,6 +306,8 @@ def get_nlp(name: str | Path = "en_core_web_sm") -> Language:
   # Infixes
   infixes = list(nlp.Defaults.infixes or [])
   infixes.append(r"(?<=[a-zA-Z)])[&+()/](?=[a-zA-Z(])")
+  infixes.append(r"(?<=\w\+)[/](?=\w)")
+  infixes.append(r"(?<=\w)->(?=\w)")
   infix_finditer = spacy.util.compile_infix_regex(infixes)
   nlp.tokenizer.infix_finditer = infix_finditer.finditer # type: ignore
 

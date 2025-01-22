@@ -29,14 +29,14 @@ class CategoryExtractor(BaseExtractor):
 
     # Cancel certain roles by mathed ancestor roles
     tmatches2: list[TMatch] = []
-    for name, tokens, maintoken in tmatches:
-      cancelingset = next((CANCELING_TAGS[uname] for uname in unfold_names(name) if uname in CANCELING_TAGS), set())
-      ancs = set(ancestors(maintoken))
+    for tmatch in tmatches:
+      cancelingset = next((CANCELING_TAGS[uname] for uname in unfold_names(tmatch.name) if uname in CANCELING_TAGS), set())
+      ancs = set(ancestors(tmatch.maintoken))
       if not any(
-        maintok in ancs and set(unfold_names(nm)) & cancelingset and not is_distant(maintoken, maintok)
+        maintok in ancs and set(unfold_names(nm)) & cancelingset and not is_distant(tmatch.maintoken, maintok)
         for nm, _, maintok in tmatches
       ):
-        tmatches2.append((name, tokens, maintoken))
+        tmatches2.append(tmatch)
     # print("tmatches2:", tmatches2)
 
     # Extract roles
@@ -126,8 +126,6 @@ class CategoryExtractor(BaseExtractor):
     elif is_negated(token):
       return False
     elif is_past(token):
-      return False
-    elif is_future(token):
       return False
     return True
 

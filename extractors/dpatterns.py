@@ -1,10 +1,10 @@
 import re
 from typing import Any
 from .ppatterns import to_ppatterns
-from .xpatterns import IN, LOWER, ORTH, orth_or_lower, pos_nounlike
+from .xpatterns import IN, LOWER, ORTH, XPattern, x_orthlower, x_nounlike
 
-(LEFT_ID, REL_OP, RIGHT_ID, RIGHT_ATTRS) = (
-  "LEFT_ID", "REL_OP", "RIGHT_ID", "RIGHT_ATTRS"
+(LEFT_ID, REL_OP, RIGHT_ID, RIGHT_ATTRS, PHANTOM) = (
+  "LEFT_ID", "REL_OP", "RIGHT_ID", "RIGHT_ATTRS", "PHANTOM"
 )
 
 type DToken = dict[str, Any]
@@ -19,14 +19,14 @@ def exp_concat(lword: str, rword: str) -> DPattern:
   # (lword_rword)
   return [{
     RIGHT_ID: lword + rword,
-    RIGHT_ATTRS: orth_or_lower(lword + rword),
+    RIGHT_ATTRS: x_orthlower(lword + rword),
   }]
 
 def exp_dash(lword: str, rword: str) -> DPattern:
   # (lword) . (-) . (rword)
   return [{
     RIGHT_ID: lword,
-    RIGHT_ATTRS: orth_or_lower(lword),
+    RIGHT_ATTRS: x_orthlower(lword),
   }, {
     LEFT_ID: lword,
     REL_OP: ".",
@@ -36,7 +36,7 @@ def exp_dash(lword: str, rword: str) -> DPattern:
     LEFT_ID: "-",
     REL_OP: ".",
     RIGHT_ID: rword,
-    RIGHT_ATTRS: orth_or_lower(rword),
+    RIGHT_ATTRS: x_orthlower(rword),
   }]
 
 def exp_sequence(lword: str, rword: str, rev: bool=False) -> DPattern:
@@ -44,34 +44,34 @@ def exp_sequence(lword: str, rword: str, rev: bool=False) -> DPattern:
     # (rword) ; (lword)
     return [{
       RIGHT_ID: rword,
-      RIGHT_ATTRS: orth_or_lower(rword),
+      RIGHT_ATTRS: x_orthlower(rword),
     }, {
       LEFT_ID: rword,
       REL_OP: ";",
       RIGHT_ID: lword,
-      RIGHT_ATTRS: orth_or_lower(lword),
+      RIGHT_ATTRS: x_orthlower(lword),
     }]
   # (lword) . (rword)
   return [{
     RIGHT_ID: lword,
-    RIGHT_ATTRS: orth_or_lower(lword),
+    RIGHT_ATTRS: x_orthlower(lword),
   }, {
     LEFT_ID: lword,
     REL_OP: ".",
     RIGHT_ID: rword,
-    RIGHT_ATTRS: orth_or_lower(rword),
+    RIGHT_ATTRS: x_orthlower(rword),
   }]
 
 def exp_parent(lword: str, rword: str) -> DPattern:
   # (lword) < (rword)
   return [{
     RIGHT_ID: lword,
-    RIGHT_ATTRS: orth_or_lower(lword),
+    RIGHT_ATTRS: x_orthlower(lword),
   }, {
     LEFT_ID: lword,
     REL_OP: "<",
     RIGHT_ID: rword,
-    RIGHT_ATTRS: orth_or_lower(rword),
+    RIGHT_ATTRS: x_orthlower(rword),
   }]
 
 def exp_ancestor(lword: str, rword: str, rev: bool=False) -> DPattern:
@@ -79,136 +79,136 @@ def exp_ancestor(lword: str, rword: str, rev: bool=False) -> DPattern:
     # (rword) >> (lword)
     return [{
       RIGHT_ID: rword,
-      RIGHT_ATTRS: orth_or_lower(rword),
+      RIGHT_ATTRS: x_orthlower(rword),
     }, {
       LEFT_ID: rword,
       REL_OP: ">>",
       RIGHT_ID: lword,
-      RIGHT_ATTRS: orth_or_lower(lword),
+      RIGHT_ATTRS: x_orthlower(lword),
     }]
   # (lword) << (rword)
   return [{
     RIGHT_ID: rword,
-    RIGHT_ATTRS: orth_or_lower(rword),
+    RIGHT_ATTRS: x_orthlower(rword),
   }, {
     LEFT_ID: rword,
     REL_OP: ">>",
     RIGHT_ID: lword,
-    RIGHT_ATTRS: orth_or_lower(lword),
+    RIGHT_ATTRS: x_orthlower(lword),
   }]
 
 def exp_cc_parent(lword: str, rword: str) -> DPattern:
   # (lword) . (cc) . (noun) < (rword) where (cc=/,and...)
   return [{
     RIGHT_ID: lword,
-    RIGHT_ATTRS: orth_or_lower(lword),
+    RIGHT_ATTRS: x_orthlower(lword),
   }, {
     LEFT_ID: lword,
     REL_OP: ".",
     RIGHT_ID: "cc",
     RIGHT_ATTRS: {LOWER: {IN: ["/", "and"]}},
-    "PHANTOM": True,
+    PHANTOM: True,
   }, {
     LEFT_ID: "cc",
     REL_OP: ".",
     RIGHT_ID: "$noun",
-    RIGHT_ATTRS: pos_nounlike(),
-    "PHANTOM": True,
+    RIGHT_ATTRS: x_nounlike(),
+    PHANTOM: True,
   }, {
     LEFT_ID: "$noun",
     REL_OP: "<",
     RIGHT_ID: rword,
-    RIGHT_ATTRS: orth_or_lower(rword),
+    RIGHT_ATTRS: x_orthlower(rword),
   }]
 
 def exp_parent_cc(lword: str, rword: str) -> DPattern:
   # (lword) < (noun) . (cc) . (rword) where (cc=/,and...)
   return [{
     RIGHT_ID: lword,
-    RIGHT_ATTRS: orth_or_lower(lword),
+    RIGHT_ATTRS: x_orthlower(lword),
   }, {
     LEFT_ID: lword,
     REL_OP: "<",
     RIGHT_ID: "$noun",
-    RIGHT_ATTRS: pos_nounlike(),
-    "PHANTOM": True,
+    RIGHT_ATTRS: x_nounlike(),
+    PHANTOM: True,
   }, {
     LEFT_ID: "$noun",
     REL_OP: ".",
     RIGHT_ID: "cc",
     RIGHT_ATTRS: {LOWER: {IN: ["/", "and"]}},
-    "PHANTOM": True,
+    PHANTOM: True,
   }, {
     LEFT_ID: "cc",
     REL_OP: ".",
     RIGHT_ID: rword,
-    RIGHT_ATTRS: orth_or_lower(rword),
+    RIGHT_ATTRS: x_orthlower(rword),
   }]
 
 def exp_of_parent(lword: str, rword: str) -> DPattern:
   # (rword) > of > (lword)
   return [{
     RIGHT_ID: rword,
-    RIGHT_ATTRS: orth_or_lower(rword),
+    RIGHT_ATTRS: x_orthlower(rword),
   }, {
     LEFT_ID: rword,
     REL_OP: ">",
     RIGHT_ID: "of",
     RIGHT_ATTRS: {LOWER: "of"},
-    "PHANTOM": True,
+    PHANTOM: True,
   }, {
     LEFT_ID: "of",
     REL_OP: ">",
     RIGHT_ID: lword,
-    RIGHT_ATTRS: orth_or_lower(lword),
+    RIGHT_ATTRS: x_orthlower(lword),
   }]
 
 def exp_of_sequence(lword: str, rword: str) -> DPattern:
   # (rword) . of . (lword)
   return [{
     RIGHT_ID: rword,
-    RIGHT_ATTRS: orth_or_lower(rword),
+    RIGHT_ATTRS: x_orthlower(rword),
   }, {
     LEFT_ID: rword,
     REL_OP: ".",
     RIGHT_ID: "of",
     RIGHT_ATTRS: {LOWER: "of"},
-    "PHANTOM": True,
+    PHANTOM: True,
   }, {
     LEFT_ID: "of",
     REL_OP: ".",
     RIGHT_ID: lword,
-    RIGHT_ATTRS: orth_or_lower(lword),
+    RIGHT_ATTRS: x_orthlower(lword),
   }]
 
 def exp_of_parent_cc(lword: str, rword: str) -> DPattern:
   # (rword) > of > (noun) . (cc) . (lword) where (cc=/,and...)
   return [{
     RIGHT_ID: rword,
-    RIGHT_ATTRS: orth_or_lower(rword),
+    RIGHT_ATTRS: x_orthlower(rword),
   }, {
     LEFT_ID: rword,
     REL_OP: ">",
     RIGHT_ID: "of",
     RIGHT_ATTRS: {LOWER: "of"},
-    "PHANTOM": True,
+    PHANTOM: True,
   }, {
     LEFT_ID: "of",
     REL_OP: ">",
     RIGHT_ID: "$noun",
-    RIGHT_ATTRS: pos_nounlike(),
-    "PHANTOM": True,
+    RIGHT_ATTRS: x_nounlike(),
+    PHANTOM: True,
   }, {
     LEFT_ID: "$noun",
     REL_OP: ".",
     RIGHT_ID: "cc",
     RIGHT_ATTRS: {LOWER: {IN: ["/", "and"]}},
-    "PHANTOM": True,
+    PHANTOM: True,
   }, {
     LEFT_ID: "cc",
     REL_OP: ".",
     RIGHT_ID: lword,
-    RIGHT_ATTRS: orth_or_lower(lword),
+    RIGHT_ATTRS: x_orthlower(lword),
   }]
 
 # EXPANDS ------------------------------------------------------------------------------------------
@@ -273,47 +273,47 @@ def expand_lttilda(phrase: str) -> list[DPattern]:
 #     # (lword_rword) -- should we return PPattern (str) here?
 #     [{
 #       RIGHT_ID: lword + rword,
-#       RIGHT_ATTRS: orth_or_lower(lword + rword),
+#       RIGHT_ATTRS: x_orthlower(lword + rword),
 #     }],
 #     # (lword) << (rword)
 #     [{
 #       RIGHT_ID: lword,
-#       RIGHT_ATTRS: orth_or_lower(lword),
+#       RIGHT_ATTRS: x_orthlower(lword),
 #     }, {
 #       LEFT_ID: lword,
 #       REL_OP: "<<",
 #       RIGHT_ID: rword,
-#       RIGHT_ATTRS: orth_or_lower(rword),
+#       RIGHT_ATTRS: x_orthlower(rword),
 #     }],
 #     # # (lword) << (noun) > (rword)
 #     # [{
 #     #   RIGHT_ID: rword,
-#     #   RIGHT_ATTRS: orth_or_lower(rword)
+#     #   RIGHT_ATTRS: x_orthlower(rword)
 #     # }, {
 #     #   LEFT_ID: lword,
 #     #   REL_OP: "<<",
 #     #   RIGHT_ID: "noun",
-#     #   RIGHT_ATTRS: pos_nounlike(),
+#     #   RIGHT_ATTRS: x_nounlike(),
 #     # }, {
 #     #   LEFT_ID: "noun",
 #     #   REL_OP: ">",
 #     #   RIGHT_ID: rword,
-#     #   RIGHT_ATTRS: orth_or_lower(rword)
+#     #   RIGHT_ATTRS: x_orthlower(rword)
 #     # }],
 #     # # (lword) < (noun) >> (rword)
 #     # [{
 #     #   RIGHT_ID: lword,
-#     #   RIGHT_ATTRS: orth_or_lower(lword)
+#     #   RIGHT_ATTRS: x_orthlower(lword)
 #     # }, {
 #     #   LEFT_ID: lword,
 #     #   REL_OP: "<",
 #     #   RIGHT_ID: "noun",
-#     #   RIGHT_ATTRS: pos_nounlike(),
+#     #   RIGHT_ATTRS: x_nounlike(),
 #     # }, {
 #     #   LEFT_ID: "noun",
 #     #   REL_OP: ">>",
 #     #   RIGHT_ID: rword,
-#     #   RIGHT_ATTRS: orth_or_lower(rword)
+#     #   RIGHT_ATTRS: x_orthlower(rword)
 #     # }]
 #   ]
 
@@ -327,14 +327,14 @@ def expand_dphrase(phrase: str) -> list[DPattern]:
   m = re.fullmatch(DPHRASE_RE, phrase)
   # print("@ expand_dphrase", repr(phrase))
   if not m:
-    raise Exception(f"bad dphrase {phrase!r}")
+    raise ValueError(f"bad dphrase {phrase!r}")
   _left, op, _right = m.group(1), m.group(2), m.group(3)
   # print("left:", left)
   # print("op:", op)
   # print("right:", right)
   match op:
     case ">>" if " " in phrase:
-      raise Exception("space support for >> operation is not implemented yet")
+      raise ValueError("space support for >> operation is not implemented yet")
       # print(">>> phrase", repr(phrase))
       # left, right = phrase.split(op)
       # print(">>> left", repr(left))
@@ -378,7 +378,7 @@ def expand_dphrase(phrase: str) -> list[DPattern]:
       # print("??", expand_gtgt(phrase))
       return expand_gtgt(phrase)
     case "<~" if " " in phrase:
-      raise Exception("space support for <~ operation is not implemented yet")
+      raise ValueError("space support for <~ operation is not implemented yet")
     case "<~":
       return expand_lttilda(phrase)
     case "<":
@@ -386,7 +386,7 @@ def expand_dphrase(phrase: str) -> list[DPattern]:
     case " ":
       return expand_space(phrase)
     case _:
-      raise Exception("code error, must not go here")
+      raise ValueError("code error, must not go here")
 
 def to_dpatterns(phrases: list[str]) -> list[DPattern]:
   return [
@@ -416,6 +416,19 @@ def to_dpatterns2(phrases: list[str]) -> list[DPattern]:
 # lword > noun / rword
 # rword > noun / lword
 # rword / noun < lword
+
+def separate_xphantoms(pattern: XPattern) -> tuple[XPattern, list[int]]:
+  newpattern: XPattern = []
+  phantoms: list[int] = []
+  for o, xtoken in enumerate(pattern):
+    if "PHANTOM" in xtoken:
+      phantoms.append(o)
+      newtoken = {**xtoken}
+      del newtoken["PHANTOM"]
+      newpattern.append(newtoken)
+    else:
+      newpattern.append(xtoken)
+  return newpattern, phantoms
 
 def separate_dphantoms(pattern: DPattern) -> tuple[DPattern, list[int]]:
   newpattern: DPattern = []

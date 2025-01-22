@@ -1,10 +1,11 @@
+from typing import Sequence
 from ..extractor import Disambiguate, Tag
 from ..xpatterns import XPattern
 from ..dpatterns import DPattern
 
 def ExpTag(
   name: str,
-  phrases: list[
+  phrases: Sequence[
     str |      # Custom (converted to XPattern, DPattern or expanded)
     XPattern | # Matcher pattern
     DPattern   # DependencyMatcher pattern

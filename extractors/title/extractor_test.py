@@ -275,8 +275,7 @@ class Test_TitleExtractor:
     assert extract("""
       A student of life, working as a QA at a Bay Area
     """) == "QA at a Bay Area"
-    assert extract("Former CEO/co-founder of Tuple, a tool for remote pair programming") == "CEO"
-    # ^ known bug caused by Spacy
+    assert extract("Former CEO/co-founder of Tuple, a tool for remote pair programming") == ""
 
   def test_extract_bios19(self, extract) -> None:
     assert extract("""

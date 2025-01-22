@@ -71,8 +71,7 @@ class Test_CategoryExtractor:
     assert extract("iOS Developer | Remote").is_remote is True
     assert extract("17yo dev; @dotcute & @remote-kakao").is_remote is None
     assert extract("# FE Engineer @ remote.com Prev: Panalyt.com").is_remote is None
-    # assert extract("EE,PhD,Remote Sensing and GIS developer").is_remote is None
-    # TODO
+    assert extract("EE,PhD,Remote Sensing and GIS developer").is_remote is None
 
   def test_extract_remote5(self, extract) -> None:
     assert extract("baby girl's father. Looking for a remote work opportunity").is_remote is True
@@ -328,7 +327,7 @@ class Test_CategoryExtractor:
     assert extract("Junior Dev @ free lance").is_freelancer is True
     assert extract("open to freelance work").is_freelancer is True
     assert extract("seeking remote freelance jobs").is_freelancer is True
-    # assert extract("ready to freelance opportunities").is_freelancer is True
+    assert extract("ready to freelance opportunities").is_freelancer is True
     assert extract("considering projects as a freelancer").is_freelancer is True
 
   def test_extract_freelancer3(self, extract) -> None:

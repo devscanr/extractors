@@ -53,27 +53,27 @@ def expand_parens(phrase: str) -> list[str]:
     if "(" in phrase else [phrase])
   ]
 
+def expandlist_parens(phrases: list[str]) -> list[str]:
+  return [
+    patt
+    for phrase in phrases
+    for patt in expand_parens(phrase)
+  ]
+
 # Chain expand_dashes over phrases
-# def to_ppatterns1(phrases: list[str]) -> list[str]:
-#   return [
-#     patt
-#     for phrase in phrases
-#     for patt in expand_dashes(phrase)
-#   ]
-#
-# # Chain expand_parens over phrases
-# def to_ppatterns2(phrases: list[str]) -> list[str]:
-#   return [
-#     patt
-#     for phrase in phrases
-#     for patt in expand_parens(phrase)
-#   ]
+def expandlist_dashes(phrases: list[str]) -> list[str]:
+  return [
+    patt
+    for phrase in phrases
+    for patt in expand_dashes(phrase)
+  ]
+
 
 # Chain expand_dashes and expand_parens over phrases
 def to_ppatterns(phrases: list[str]) -> list[str]:
   return [
-    p2
+    patt2
     for phrase in phrases
-    for p1 in expand_dashes(phrase)
-    for p2 in expand_parens(p1)
+    for patt1 in expand_dashes(phrase)
+    for patt2 in expand_parens(patt1)
   ]

@@ -36,13 +36,24 @@ class Test_is_negated:
     assert not is_negated("I am a developer", 3)
 
   def test_not_indicators(self, is_negated) -> None:
-    assert is_negated("not developer", 1)
-    assert is_negated("not a developer", 2)
-    assert is_negated("I am not a developer", 4)
+    assert is_negated("not developer", 1)        # ?developer
+    assert is_negated("not a developer", 2)      # ?developer
+    assert is_negated("not a web developer", 2)  # ?web
+    assert is_negated("I am not a developer", 4) # ?developer
 
   def test_non_indicators(self, is_negated) -> None:
-    assert is_negated("non developer", 1)
-    assert is_negated("non-developer", 1) # offset after norm.
+    assert is_negated("non developer", 1)     # ?developer
+    assert is_negated("non web developer", 2) # ?web
+    assert is_negated("non-developer", 1)     # offset after norm.
+
+  def test_adhoc1(self, is_negated):
+    text = "not a senior web developer, a junior mobile qa"
+    assert is_negated(text, 4) # ?developer
+    assert is_negated(text, 3) # ?web
+    assert is_negated(text, 2) # ?senior
+    assert not is_negated(text, 9) # ?qa
+    assert not is_negated(text, 8) # ?mobile
+    assert not is_negated(text, 7) # ?junior
 
 class Test_is_past:
   @pytest.fixture(scope="class")
@@ -92,6 +103,12 @@ class Test_is_past:
     text = "Former developer, currently a manager"
     assert is_past(text, 1)     # developer
     assert not is_past(text, 5) # manager
+
+  def test_adhoc1(self, is_past):
+    text = "An engineer, formerly a junior devops"
+    assert is_past(text, 6) # ?devops
+    assert is_past(text, 5) # ?junior
+    assert not is_past(text, 1) # ?engineer
 
 class Test_is_future:
   @pytest.fixture(scope="class")
@@ -156,3 +173,9 @@ class Test_is_future:
     assert is_future("Seeking internship opportunities", 1)
     assert is_future("Seeking an internship opportunity", 2)
     assert is_future("Open to an internship opportunity", 3)
+
+  def test_adhoc1(self, is_future):
+    text = "Currently a student, I will be a junior devops soon"
+    assert is_future(text, 9) # ?devops
+    assert is_future(text, 8) # ?junior
+    assert not is_future(text, 2) # ?student
