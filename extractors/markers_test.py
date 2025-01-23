@@ -42,9 +42,11 @@ class Test_is_negated:
     assert is_negated("I am not a developer", 4) # ?developer
 
   def test_non_indicators(self, is_negated) -> None:
-    assert is_negated("non developer", 1)     # ?developer
-    assert is_negated("non web developer", 2) # ?web
-    assert is_negated("non-developer", 1)     # offset after norm.
+    # post-normalization offsets
+    assert is_negated("non developer", 2)     # ?developer
+    assert is_negated("non-developer", 2)     # ?developer
+    assert is_negated("non web developer", 2) # ?developer
+    assert is_negated("non web developer", 1) # ?web
 
   def test_adhoc1(self, is_negated):
     text = "not a senior web developer, a junior mobile qa"

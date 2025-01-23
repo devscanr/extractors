@@ -191,7 +191,11 @@ class BaseExtractor:
     tunmatches: list[TMatch] = []
     for omatch in omatches:
       tokens = [doc[offset] for offset in omatch.offsets]
-      maintoken = min(tokens, key=lambda t: token_level(t)) # not sure about this part...
+      maintoken = (
+        tokens[-1]
+        if all([token_level(t) == token_level(tokens[0]) for t in tokens])
+        else min(tokens, key=lambda t: token_level(t))
+      )
       name = detach_maybe(omatch)
       if name == omatch.mname:
         if omatch.mname.startswith("-"):

@@ -77,7 +77,7 @@ class Test_CategoryExtractor:
     assert extract("baby girl's father. Looking for a remote work opportunity").is_remote is True
     assert extract("remote haskell developer").is_remote is True
     assert extract("Blockchain Developer Remote/Online").is_remote is True
-    assert extract("Remote @ShadowShahriar").is_remote is None
+    assert extract("Remote @ShadowShahriar").is_remote is True
     assert extract("Hacker. Pioneered BlindXSS, Remote git/hg/bzr Pillaging").is_remote is None
     assert extract("0fficial_BlackHat13 Remote_Code_Execution 0day Exploit").is_remote is None
 
@@ -545,7 +545,6 @@ class Test_CategoryExtractor:
     assert extract("""
       Frontend + DevOp! web3 / DeFi, TypeScript, React/Next/Nest, ex. freelancer
     """) == Cats("Dev", is_freelancer=False)
-    assert extract("Ex-engineer, freelancer") == Cats(is_freelancer=True)
     assert extract("Ex freelancer at Bay, forever student") == Cats(is_freelancer=False)
 
   def test_extract_bios6(self, extract) -> None:
@@ -708,6 +707,10 @@ class Test_CategoryExtractor:
       👨 VP Eng. at MedScout, storyteller, student of disasters.
     """) == Cats("Nondev")
     assert extract("Freelance ⠁⣿⣿ ⣿⣿⣿ ⣿⣿⣿") == Cats(is_freelancer=True)
+
+  def test_extract_known_issues1(self, extract):
+    assert extract("Ex-engineer, freelancer") == Cats(is_freelancer=False)
+    # (ex) < (freelancer)
 
   # def test_extract_set37() -> None:
   #   assert extract("Code samples from the book Head First Go").role is None

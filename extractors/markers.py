@@ -1,6 +1,8 @@
+import re
 from spacy.tokens import Token
 from typing import cast
 from extractors.ppatterns import expand_parens
+from extractors.utils import prev_token, revlist, revtakeuntil
 
 PAST_MARKERS = {
   "ex",
@@ -60,9 +62,21 @@ def is_negated(token: Token) -> bool:
   return any(_is_negated(item) for item in chain)
 
 def _is_negated(token: Token) -> bool:
-  # print("@ _is_negated", token)
+  # print("@ _is_negated:", token)
+  non_chain = [*revlist(revtakeuntil(lambda tok: tok.text in {",", ";"}, token.lefts)), token]
+  for tok in non_chain:
+    if re.match(r"non[-.]?(?!\w)", tok.lower_):
+      return True
+  ## Hacks for Spacy invalid dep. parsing ##
+  pt1 = prev_token(token)
+  pt2 = prev_token(pt1)
+  if pt1 and re.match(r"non[-.]?(?!\w)", pt1.lower_):
+    return True
+  if pt2 and re.match(r"non[-.]?(?!\w)", pt2.lower_) and pt1 and pt1.text in {".", "-"}:
+    return True
+  ## ##
   for tok in token.sent:
-    if (tok.head == token and tok.dep_ == "neg") or (tok.lower_ == "non" and token.dep_ != "dep"):
+    if tok.head == token and tok.dep_ == "neg":
       # (not) < ($token) -- "not a developer"
       # (non) < ($token) -- "non developer"
       return True
@@ -79,6 +93,18 @@ def is_past(token: Token) -> bool:
 
 def _is_past(token: Token) -> bool:
   # print("@ _is_past", token)
+  ex_chain = [*revlist(revtakeuntil(lambda tok: tok.text in {",", ";"}, token.lefts)), token]
+  for tok in ex_chain:
+    if re.match(r"ex[-.]?(?!\w)", tok.lower_):
+      return True
+  ## Hacks for Spacy invalid dep. parsing ##
+  pt1 = prev_token(token)
+  pt2 = prev_token(pt1)
+  if pt1 and re.match(r"ex[-.]?(?!\w)", pt1.lower_):
+    return True
+  if pt2 and re.match(r"ex[-.]?(?!\w)", pt2.lower_) and pt1 and pt1.text in {".", "-"}:
+    return True
+  ## ##
   if token.head.lower_ in {"was", "were"}:
     # (was) > $token
     return True

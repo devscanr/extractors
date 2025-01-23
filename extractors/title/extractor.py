@@ -69,7 +69,6 @@ def is_hanging(token: Token) -> bool:
   return True
 
 def find_noun_span(token: Token, acc_spans: list[list[Token]]) -> Span:
-  # print("@ find_noun_span:", repr(str(token)))
   toks: list[Token] = []
   for tok in token.sent:
     if tok.is_punct:
@@ -77,15 +76,19 @@ def find_noun_span(token: Token, acc_spans: list[list[Token]]) -> Span:
     if tok == token:
       toks.append(tok) # [Developer]
     if not any(tok in span for span in acc_spans):
-      if tok.head == token and tok.i < token.i:
+      if tok.text.startswith("@"):
+        toks.append(tok)
+      elif tok.head == token and tok.i < token.i:
         toks.append(tok) # [Senior] Developer, [Senior] PHP Developer
       elif tok.head.head == token and tok.i < token.i:
         toks.append(tok) # [Full]-Stack Developer
       elif tok.head.head.head == token and tok.i < token.i:
         toks.append(tok) # [Game] Engine Development Amateur
-      elif  tok.head.head == token and tok.i > token.i and tok.head.lower_ in {"at", "of"}:
-        # Not comparing with pos=ADP to intentionally drop "by" and other adps.
-        toks.append(tok) # Founder of [Something]
+      elif tok.head == token and tok.i > token.i and tok.lower_ in {"at", "of"}:
+        toks.append(tok)
+      elif tok.head.head == token and tok.i > token.i and tok.head.lower_ in {"at", "of"}:
+        toks.append(tok)
+  # print("toks:", toks)
   toks = list(dropwhile(is_hanging, toks))
   toks = list(dropwhile(is_hanging, reversed(toks)))
   toks = list(reversed(toks))

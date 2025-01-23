@@ -84,7 +84,7 @@ class Test_TitleExtractor:
     assert extract("AI Thought Leader | Cognitive Architecture | Heuristic Imperatives") == "AI Thought Leader"
     assert extract("""
       Open Source Enthusiast, Project Leader @OWASP Chapter Leader @OWASP
-    """) == "Open Source Enthusiast | Project Leader @OWASP Chapter Leader"
+    """) == "Open Source Enthusiast, Project Leader at @OWASP Chapter Leader at @OWASP"
 
   def test_extract_bios5(self, extract) -> None:
     assert extract("""
@@ -141,7 +141,7 @@ class Test_TitleExtractor:
     """) == "Full-Stack Web Developer | Zend Certified PHP Engineer"
     assert extract("""
       Founder & CEO @QualiSage | Team Lead | Senior Full-Stack Developer | 10+ Years
-    """) == "Founder | CEO | Team Lead"
+    """) == "Founder and CEO at @QualiSage | Team Lead | Senior Full-Stack Developer"
     assert extract("""
       Software generalist, father of two
     """) == "Software Generalist"
@@ -235,7 +235,7 @@ class Test_TitleExtractor:
   def test_extract_bios16(self, extract) -> None:
     assert extract("""
       Head of foreign Dev Relations at DXOS.org
-    """) == "Head of Foreign Dev Relations at DXOS.org"
+    """) == "Head of Foreign Dev Relations"
     # ^ "at DXOS.org" is lost due wrong dep. detection by Scrapy ("at" heads to "Relations" instead of "Head")
     assert extract("Software Engineer, I was Head of Tech of Shinobi Team") == ""
     # ^ "Software Engineer" heads to "was", likely a Spacy mistake

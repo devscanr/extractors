@@ -12,10 +12,13 @@ from .xpatterns import DEP, HEAD, IN, IS_PUNCT, IS_SENT_START, LOWER, OP, ORTH, 
 # - https://stackoverflow.com/questions/15388831/what-are-all-possible-pos-tags-of-nltk
 # - https://corenlp.run/
 
-def normalize(text: str, pipechar: str = ".") -> str:
+def clean_asian(text: str) -> str:
   # Drop "etc" in Japanese – e.g handle "Salesforceなど"
   text = text.replace("など", "")
-   # Drop emojis
+  return text
+
+def clean_emojis(text: str) -> str:
+  # Handle emojis
   text = replace_emoji(text, "!")
   # Correct separators for grammar
   text = text.replace("：", ": ")
@@ -23,18 +26,52 @@ def normalize(text: str, pipechar: str = ".") -> str:
   text = re.sub(r"(📞|☎️|📱|☎)\s*:?\s*", "Phone: ", text, flags=re.UNICODE)
   # Drop sudo-emojis like ":snowflake:" which might overlap with skills
   text = re.sub(r":[-\w]+:", "!", text)
+  return text
+
+def normalize(text: str, pipechar: str = ".") -> str:
+  # Remove junk characters
+  text = clean_asian(text)
+  text = clean_emojis(text)
+  # Normalize whitespace
+  text = re.sub(r"[ \t]+", " ", text)
   # Replace pipe chars with "." or ","
   text = re.sub(r"(\s+|(?<=[\w!?]))([•|]+|/[/•|]+)(\s+|(?=[\w!?]))", f"{pipechar} ", text)
   # Workaround FPs for URLs – cases like "next.js/nuxt", look like URLs to NLP
   text = re.sub(r"(\.js)/(?=\w)", r"\1 / ", text, flags=re.IGNORECASE)
   # Workarounds for C# and C++ joined with separators
   text = re.sub(r"(?<!\w)(c(?:\+\+|#))([,/])(?=\w)", sep_splitter, text, flags=re.IGNORECASE)
-  # Strip wrapping decorations and whitespace
-  text = re.sub(r"(^[-~=\s]+)|([-~=#@\s]+$)", "", text)
-  # Collapse whitespace
-  text = re.sub(r"\s+", " ", text)
-  # print(repr(text))
-  return text
+  # Handle newlines
+  return compactify(text)
+
+def compactify(text: str) -> str:
+  result = ""
+  paragraphs = re.split(r"\r?\n(\r?\n)+", text.strip())
+  for paragraph in paragraphs:
+    lines = re.split(r"\r?\n", paragraph)
+    for l, line in enumerate(lines):
+      line = trim(line)
+      if line.strip():
+        last_token = line.split(" ")[-1]
+        if last_token.endswith((".", "?", "!", ",", ";", ":")): # and not "." in last_token:
+          result += line
+        else:
+          if l < len(lines) - 1:
+            next_line = lines[l + 1].lstrip()
+            if re.match(r"[-\w]+:", next_line) or re.match(r"--", next_line):
+              result += line + "."
+            elif re.match(r"- \w", next_line):
+              result += line + ";"
+            else:
+              result += line
+          else:
+            result += line + "."
+        result += " "
+  return result.rstrip()
+
+def trim(line: str) -> str:
+  # Trim wrapping decorations and whitespace
+  return re.sub(r"(^[-~=\s>]+)|([-~=#@\s]+$)", "", line)
+  # TODO we should ideally enforce " around > quotes
 
 def sep_splitter(match: re.Match[str]) -> str:
   word, sep = match.group(1), match.group(2)
@@ -137,32 +174,30 @@ RB = r"(?!\w)"  # r"\beng.\b" won't match as right r"\b" wants left-side to be a
 def drop_lastchar(match: re.Match[str]) -> str:
   return match.group(0)[0:-1]
 
-def endwith_space(match: re.Match[str]) -> str:
-  return str(match.group(0)).rstrip("- ") + " "
+def endwith_dash(match: re.Match[str]) -> str:
+  return str(match.group(0)).rstrip("-. ") + "-"
 
 type ReplaceFn = Callable[[re.Match[str]], str]
 
 GRAMMAR_FIXES: list[tuple[str, str | ReplaceFn, re.RegexFlag | int]] = [
-  (rf"{LB}free[-\s]+lanc([edring]*){RB}", r"freelanc\1", re.IGNORECASE), # minor bug: does not yet preserve casing...
+  (rf"{LB}free[-\s]+lanc([edring]*){RB}", r"freelanc\1", re.IGNORECASE), # does not preserve casing yet
   (rf"{LB}B\.?S\.?C?\.?{RB}|{LB}SC?\.?B\.?{RB}", r"B.S", re.IGNORECASE), # B.S  = Bachelor of Science
   (rf"{LB}M\.?S\.?C?\.?{RB}|{LB}SC\.?M\.?{RB}", r"M.S", re.IGNORECASE),  # M.S  = Master of Science (not handling "SM" forms for now)
   (rf"{LB}P\.?H\.?D?\.?{RB}", r"Ph.D", re.IGNORECASE),                   # Ph.D = Doctor of Philosophy
   (rf"{LB}eng\.{RB}", drop_lastchar, re.IGNORECASE),
-  (rf"{LB}ex\s*[-.]\s*(?=\w)", endwith_space, re.IGNORECASE),
-  (rf"{LB}non\s*-\s*(?=\w)", endwith_space, re.IGNORECASE),
-  (r" @ ", r" at ", 0),
-  (r" & ", r" and ", 0),
-  (r"(?<=[\w\s])/co-founder", r" / co-founder", re.IGNORECASE), # minor bug: does not yet preserve casing...
+  (rf"{LB}(co )(?=\w)", endwith_dash, re.IGNORECASE),
+  (rf"{LB}(ex\.? )(?=\w)", endwith_dash, re.IGNORECASE),
+  (rf"{LB}(non )(?=\w)", endwith_dash, re.IGNORECASE),
+  (r" @ ", r" at ", re.IGNORECASE),
+  (r"(?<!\b(at|of|in)) @(?=\w)", r" at @", re.IGNORECASE), # does not construct perfect casing yet
+  (r" & ", r" and ", re.IGNORECASE),
+  (r"(?<=[\w\s])/co-founder", r" / co-founder", re.IGNORECASE), # does not preserve casing yet
   (r"(?<=[\w\s])/\.net", r" / .net", re.IGNORECASE),
 ]
 
 def fix_grammar(text: str) -> str:
   for pattern, replacement, flags in GRAMMAR_FIXES:
     text = re.sub(pattern, replacement, text, count=0, flags=flags)
-  # Ensure the trailing dot
-  last_word = text.split(" ")[-1]
-  if not last_word.endswith((".", "?", "!")) and not "." in last_word:
-    text += "."
   return text
 
 def add_dev_exceptions(nlp: Language) -> None:
@@ -250,6 +285,7 @@ def add_jj_exceptions2(nlp: Language, items: list[str]) -> None:
       ]], tag_jj, index=1)
 
 def add_new_exceptions(nlp: Language) -> None:
+  # Note: swapping HEAD does not change ROOT and can lead to dead-locks @_@
   pass
   # ruler = cast(Any, nlp.get_pipe("attribute_ruler"))
   # ruler.add([[
@@ -289,11 +325,13 @@ def get_nlp(name: str | Path = "en_core_web_sm") -> Language:
   def token_match(token: str) -> bool | None:
     lower = token.lower()
     # Preserve special cases
-    if lower in {"c+", "c++", "c#", ".net", "ph.d", "->"}:
+    if lower in {"c+", "c++", "c#", ".net", "ph.d", "->", "ex."}:
       return True
     # Preserve tokens like "@foo-bar"
     if lower[0] == "@" and lower[-1].isalnum():
       return True
+    # Note: non- and ex- and not merged because there're too many combinations of them
+    # I would not merge "co-" as well if only Spacy would not fail miserably with it
     # Preserve "co-" prefix (Spacy default models do not understand it adequately)
     if lower.startswith("co-") and lower[-1].isalnum():
       return True
@@ -323,6 +361,7 @@ def get_nlp(name: str | Path = "en_core_web_sm") -> Language:
     "deep learning",
     "data science",
     "machine learning",
+    "software engineer",
   ])
   add_jj_exceptions(nlp, [
     # Make the following ADJECTIVEs if before NOUNs
@@ -399,3 +438,33 @@ def includes[T](itr: Iterable[T], subitr: Iterable[T]) -> bool:
 #     return matches
 #   else:
 #     return merge_overlapping(rs)
+
+def takewhile[T](pred: Callable[[T], bool], xs: Iterable[T]) -> Iterable[T]:
+  xs_ = list(xs)
+  for x in xs_:
+    if not pred(x):
+      break
+    yield x
+
+def revtakewhile[T](pred: Callable[[T], bool], xs: Iterable[T]) -> Iterable[T]:
+  xs_ = list(xs)
+  for x in reversed(xs_):
+    if not pred(x):
+      break
+    yield x
+
+def takeuntil[T](pred: Callable[[T], bool], xs: Iterable[T]) -> Iterable[T]:
+  for x in xs:
+    if pred(x):
+      break
+    yield x
+
+def revtakeuntil[T](pred: Callable[[T], bool], xs: Iterable[T]) -> Iterable[T]:
+  xs_ = list(xs)
+  for x in reversed(xs_):
+    if pred(x):
+      break
+    yield x
+
+def revlist[T](xs: Iterable[T]) -> list[T]:
+  return list(reversed(list(xs)))
