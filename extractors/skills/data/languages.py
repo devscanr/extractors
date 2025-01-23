@@ -7,7 +7,7 @@ def dis_julia() -> Disambiguate:
   # dis_seq = dis_sequence()
   def disambiguate(token: Token) -> bool:
     for tok in token.sent:
-      if tok.lemma_ in {"be", "name"}:
+      if tok.lower_ in {"am", "'m", "is", "'s", "name"}:
         return False
     return True
   return disambiguate

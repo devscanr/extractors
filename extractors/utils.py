@@ -314,7 +314,7 @@ def add_new_exceptions(nlp: Language) -> None:
   # ]], {HEAD: 3, DEP: "nmod"}, index=0)
 
 def get_nlp(name: str | Path = "en_core_web_sm") -> Language:
-  nlp = spacy.load(name, exclude=["ner"]) # "lemmatizer",
+  nlp = spacy.load(name, exclude=["lemmatizer", "ner"])
 
   # Custom components
   nlp.add_pipe("index_tokens_by_sents", after="parser")

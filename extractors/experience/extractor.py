@@ -1,4 +1,3 @@
-from pprint import pprint
 import re
 from spacy.tokens import Doc, Token
 from typing import Generator, Sequence
