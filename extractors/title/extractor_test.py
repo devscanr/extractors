@@ -566,3 +566,14 @@ class Test_TitleExtractor:
 # - Sys...Ops!
 # - Software developer, currently using Go language, VS Code, Linux, Windows for Cloud based sys-ops and performance measurement applications.
 # - Front-end Developer { Html/CSS/SCSS/JS.} Part-Time Back-end Developer {Python Django.} IT-Ops / Sys-Admin CCNA MCSA LFCA.
+
+# "Automation test Lead working - having11 years of total experience on Selenum WebDriver 3.4 , and 4 , Cucumber 6 , Serenity BDD,Playwright,WebDriverIO and Cypres" -> "Lead"
+# 8. Past case: "Teacher turned programmer." -> "Teacher"
+
+# Junior Java Developer adept -- counter-examples of excluding "compound", etc from matches
+# Software Engineer - ITCR --/
+
+# "10+ years in IT. Main fields: ML, Data Engineering. Also: MlOps, CI/CD, Cloud Platforms (AWS)" -> "MlOps"
+# -> MLOps
+# Should likely be
+# -> ML, Data Engineering, MlOps

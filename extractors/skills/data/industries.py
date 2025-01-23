@@ -216,12 +216,14 @@ SKILLS: list[Skill] = [
 
   Topic("Computer-Science", [
     "computer(s)<~science", "computer<~scientist",
-    "comp=sci", "CS", "mscs",
+    "comp=sci", "CS",
+    "ms=cs", "bs=cs", "m.s=cs", "b.s=cs",
   ]),
 
   Topic("Data-Science", [
     "data<~science", "data<~scientist",
-    "data=sci", # "DS", "msds",
+    "data=sci", # "DS"
+    "ms=ds", "bs=ds", "m.s=ds", "b.s=ds",
   ]),
 
   Topic("Cryptography", ["cryptography"]),

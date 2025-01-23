@@ -78,24 +78,39 @@ def d_parent(child: str) -> DToken:
 def term_of_exp_patterns() -> list[Tag]:
   # Example: years* > of > experience
   return [
-    ExpTag(name, [[
-      {RIGHT_ID: "term", RIGHT_ATTRS: x_regex(termreg)},
-      {RIGHT_ID: "of", RIGHT_ATTRS: x_orthlower("of"), LEFT_ID: "term", REL_OP: ">"},
-      {RIGHT_ID: exp, RIGHT_ATTRS: x_orthlower(exp), LEFT_ID: "of", REL_OP: ">"},
-    ]])
+    tag
     for name, termreg in [("YOE", r"(?i)^years?\+?$"), ("MOE", r"(?i)^months?\+?$")]
     for exp in ["experience", "expertise"]
+    for tag in [
+      ExpTag(name, [[
+        {RIGHT_ID: "term", RIGHT_ATTRS: x_regex(termreg)},
+        {RIGHT_ID: "of", RIGHT_ATTRS: x_orthlower("of"), LEFT_ID: "term", REL_OP: ">"},
+        {RIGHT_ID: exp, RIGHT_ATTRS: x_orthlower(exp), LEFT_ID: "of", REL_OP: ">"},
+      ]]),
+      ExpTag(name, [[
+        x_regex(termreg),
+        {LOWER: "of"},
+        x_orthlower(exp),
+      ]])
+    ]
   ]
 
 def term_exp_patterns() -> list[Tag]:
   # Example: years < experience*
   return [
-    ExpTag(name, [[
-      {RIGHT_ID: "term", RIGHT_ATTRS: x_regex(reg)},
-      {RIGHT_ID: exp, RIGHT_ATTRS: x_orthlower(exp), LEFT_ID: "term", REL_OP: "<"},
-    ]])
+    tag
     for name, reg in [("YOE", r"(?i)^years?\+?$"), ("MOE", r"(?i)^months?\+?$")]
     for exp in ["experience", "expertise"]
+    for tag in [
+      ExpTag(name, [[
+        {RIGHT_ID: "term", RIGHT_ATTRS: x_regex(reg)},
+        {RIGHT_ID: exp, RIGHT_ATTRS: x_orthlower(exp), LEFT_ID: "term", REL_OP: "<"},
+      ]]),
+      ExpTag(name, [[
+        x_regex(reg),
+        x_orthlower(exp),
+      ]]),
+    ]
   ]
 
 def init_root_patterns(modifiers: list[str]) -> list[XPattern]:

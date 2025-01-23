@@ -707,6 +707,8 @@ class Test_CategoryExtractor:
       👨 VP Eng. at MedScout, storyteller, student of disasters.
     """) == Cats("Nondev")
     assert extract("Freelance ⠁⣿⣿ ⣿⣿⣿ ⣿⣿⣿") == Cats(is_freelancer=True)
+    assert extract("SE @ SJSU") == Cats("Dev")
+    assert extract("Senior SE") == Cats("Dev")
 
   def test_extract_known_issues1(self, extract):
     assert extract("Ex-engineer, freelancer") == Cats(is_freelancer=False)

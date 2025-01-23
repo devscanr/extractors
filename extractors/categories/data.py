@@ -1,8 +1,19 @@
+from spacy.tokens import Token
 from ..extractor import Tag
 from ..ppatterns import expand_parens
+from ..utils import next_token, prev_token
 from ..xpatterns import LOWER, verb
 from ..xpatterns import dep_root
 from .tag import CatTag
+
+def dis_se(token: Token) -> bool:
+  nt = next_token(token)
+  if nt and (nt.lower_ in {"at", "intern", "student"} or nt.lower_.startswith("@")):
+    return True
+  pt = prev_token(token)
+  if pt and (pt.lower_ in {"junior", "middle", "senior", "principal"}):
+    return True
+  return False
 
 SEARCH_ANCHORS = [p for ph in [
   "open(ed)", # for # to
@@ -110,6 +121,29 @@ TAGS: list[Tag] = [
     "systemengineer",
     "webengineer",
   ]),
+  CatTag("Dev:Engineer", ["se"], disambiguate=dis_se),
+
+  # def disambiguate(token: Token) -> bool:
+  #   ltoken = left_token(token)
+  #   rtoken = right_token(token)
+  #   ltoken2 = left_token(ltoken) if ltoken else None
+  #   rtoken2 = right_token(rtoken) if rtoken else None
+  #   if ltoken and ltoken.lower_ == "#":
+  #     # Hashtagged
+  #     return True
+  #   elif re.match("[A-Z]", token.text):
+  #     # Capitalized
+  #     if ltoken and ltoken.text in {",", ")"} and ltoken2 and re.match("[A-Z#]", ltoken2.text):
+  #       # And the prev word is capitalized or hashtagged
+  #       return True
+  #     elif rtoken and rtoken.text in {",", "("} and rtoken2 and re.match("[A-Z#]", rtoken2.text):
+  #       # And the next word is capitalized or hashtagged
+  #       return True
+  #     elif ltoken and rtoken and ltoken.text == "(" and rtoken.text == ")":
+  #       # And the token is within parentheses
+  #       return True
+  #   return False
+
   CatTag("Dev:Programmer", [
     verb("coding"),
     verb("programming"),

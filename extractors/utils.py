@@ -229,6 +229,22 @@ def add_dev_exceptions(nlp: Language) -> None:
     [{LOWER: orth.lower()}, {ORTH: "/"}]
     for orth in problematic
   ], tag_nnp, index=0)
+  # React Native
+  ruler.add([
+    [{LOWER: "react"}, {LOWER: "native"}]
+  ], tag_nnp, index=0)
+  ruler.add([
+    [{LOWER: "react"}, {LOWER: "native"}]
+  ], tag_nnp, index=1)
+  ruler.add([
+    [{LOWER: "react"}, {ORTH: "-"}, {LOWER: "native"}]
+  ], tag_nnp, index=0)
+  ruler.add([
+    [{LOWER: "react"}, {ORTH: "-"}, {LOWER: "native"}]
+  ], tag_nnp, index=1)
+  ruler.add([
+    [{LOWER: "react"}, {ORTH: "-"}, {LOWER: "native"}]
+  ], tag_nnp, index=2)
 
 def add_nnp_exceptions(nlp: Language, items: list[str]) -> None:
   # NN: Noun, singular or mass

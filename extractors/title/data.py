@@ -35,7 +35,9 @@ TAGS: list[Tag] = [
     "engineer", "eng",
     "dataengineer",
     "mlengineer",
-    "softwareengineer", "swe", "sde",
+    "softwareengineer", "swe", "sde", # TODO SE with disambig.
+    "ms=cs", "bs=cs", "m.s=cs", "b.s=cs",
+    "ms=ds", "bs=ds", "m.s=ds", "b.s=ds",
     "systemengineer",
     "webengineer",
   ]),
@@ -207,3 +209,8 @@ TAGS: list[Tag] = [
 ]
 
 # doc? dr? doctor? postdoc?
+
+# TODO consider to resolve "Frontender" and other rare words during normalization phase
+# to not duplicate all that mess in rules. The downside is that more regexes will be searched for
+# in normalization. But less regexes will be compared with during pattern matchings. The major win
+# is that we'll have less terms to train Spacy.

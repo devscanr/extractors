@@ -303,3 +303,9 @@ class Test_ExperienceExtractor:
     # In addition to working as a web developer for 14 years.
     # -> 9+, 14 years
     # (14) < (years) < (for) < (working)
+
+# TODO
+
+# a) "10+ years in IT. Main fields: ML, Data Engineering. Also: MlOps, CI/CD, Cloud Platforms (AWS)"
+# b) "I am in WordPress and Magento development since past 5 years."
+# c) Senior Technical Consultant resided in the Big Apple
