@@ -57,7 +57,9 @@ def compactify(text: str) -> str:
         else:
           if l < len(lines) - 1:
             next_line = lines[l + 1].lstrip()
-            if re.match(r"[-\w]+:", next_line) or re.match(r"--", next_line):
+            if not next_line:
+              result += line + "."
+            elif re.match(r"[-\w]+:", next_line) or re.match(r"--", next_line):
               result += line + "."
             elif re.match(r"- \w", next_line):
               result += line + ";"
