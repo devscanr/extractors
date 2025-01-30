@@ -194,6 +194,7 @@ GRAMMAR_FIXES: list[tuple[str, str | ReplaceFn, re.RegexFlag | int]] = [
   (r"(?<!\b(at|of|in)) @(?=\w)", r" at @", re.IGNORECASE), # does not construct perfect casing yet
   (r" & ", r" and ", re.IGNORECASE),
   (r"(?<=[\w\s])/co-founder", r" / co-founder", re.IGNORECASE), # does not preserve casing yet
+  (r"(?<=[\w\s])/co-owner", r" / co-owner", re.IGNORECASE), # does not preserve casing yet
   (r"(?<=[\w\s])/\.net", r" / .net", re.IGNORECASE),
 ]
 

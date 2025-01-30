@@ -116,7 +116,7 @@ class CategoryExtractor(BaseExtractor):
 
   def check_organization(self, token: Token) -> Literal["Org", None]:
     root = token.sent.root
-    if root == token or root.lower_ in {"is", "'s"}:
+    if root == token or root.lower_ in {"are", "'re", "is", "'s"}:
       return "Org"
     return None
 
