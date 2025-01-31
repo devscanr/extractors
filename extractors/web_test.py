@@ -1,8 +1,9 @@
+# mypy: disable-error-code=no-untyped-def
 from extractors.web import html2text, markdown2text
 from textwrap import dedent
 
-def describe_html2text() -> None:
-  def it_works() -> None:
+class Test_html2text:
+  def test_smoke(self) -> None:
     html = c("""
       text11
       text12
@@ -40,8 +41,8 @@ def describe_html2text() -> None:
     """)
     assert html2text(html) == dedent(text).strip()
 
-def describe_markdown2text() -> None:
-  def it_works1() -> None:
+class Test_markdown2text:
+  def test_smoke1(self) -> None:
     md = c("""
       First 🧡
       ```js
@@ -58,7 +59,7 @@ def describe_markdown2text() -> None:
     """)
     assert markdown2text(md) == text
 
-  def it_works2() -> None:
+  def test_smoke2(self) -> None:
     md = c("""
       <a href="mailto:test1@gmail.com"><img src="https://svg.herokuapp.com"/></a>
       <a href="mailto:test2@gmail.com">test2</a>
@@ -86,7 +87,7 @@ def describe_markdown2text() -> None:
     """)
     assert markdown2text(md) == text
 
-  def it_works3() -> None:
+  def test_smoke3(self) -> None:
     md = c("""
       <div align=center>
         <a href="https://github.com/Sabya-Sachi-Seal">
@@ -109,7 +110,7 @@ def describe_markdown2text() -> None:
     """)
     assert markdown2text(md) == text
 
-  def it_works4() -> None:
+  def test_smoke4(self) -> None:
     md = c("""
       <a></a>  
     """)
