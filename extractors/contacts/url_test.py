@@ -1,11 +1,19 @@
+# mypy: disable-error-code=no-untyped-def
+import pytest
 from ..utils import normalize
 from .url import parse_urls
 
-def parse(text: str) -> list[str]:
-  return parse_urls(normalize(text))
+# The logic is already tested in the library. So just to double-check...
 
-def describe_parse_urls() -> None:
-  def it_parses_set1() -> None:
+class Test_parse_urls:
+  @pytest.fixture(scope="class")
+  def parse(self):
+    def do(text: str) -> list[str]:
+      ntext = normalize(text)
+      return parse_urls(ntext)
+    return do
+
+  def test_parse_urls_smoke(self, parse) -> None:
     assert parse("""
       <a href="https://google.com">test1</a>
       [test2](https://facebook.com)

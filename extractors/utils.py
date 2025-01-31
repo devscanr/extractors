@@ -4,9 +4,12 @@ from pathlib import Path
 import re
 import spacy
 from spacy import Language
+from spacy.lang.tokenizer_exceptions import URL_PATTERN
 from spacy.tokens import Doc, Token
 from typing import Any, Callable, cast, Iterable
 from .xpatterns import DEP, HEAD, IN, IS_PUNCT, IS_SENT_START, LOWER, OP, ORTH, TAG, tag_jj, tag_nn, tag_nnp
+
+URL_PATTERN = re.compile(URL_PATTERN)
 
 # RESOURCES
 # - https://stackoverflow.com/questions/15388831/what-are-all-possible-pos-tags-of-nltk
@@ -52,8 +55,10 @@ def compactify(text: str) -> str:
       line = trim(line)
       if line.strip():
         last_token = line.split(" ")[-1]
-        if last_token.endswith((".", "?", "!", ",", ";", ":")): # and not "." in last_token:
+        if last_token.endswith((".", "?", "!", ",", ";", ":")):
           result += line
+        elif re.search(URL_PATTERN, last_token): # also matches emails, including "mailto:*"
+          result += line + " ." # TODO train NLP to tolerate " ." endings
         else:
           if l < len(lines) - 1:
             next_line = lines[l + 1].lstrip()
