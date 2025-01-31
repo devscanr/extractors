@@ -1,15 +1,15 @@
 [tool.poetry]
 package-mode = true
 name = "extractors"
-version = "0.50.0"
+version = "0.51.0"
 description = ""
 authors = ["DevScanr team <info@devscanr.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "^3.12"
+python = ">=3.12,<3.13"
 markdown = "^3.7"
-spacy = "^3.8.2"
+spacy = "^3.8.4"
 lingua-language-detector = "^2.0.2"
 urlextract = "^1.9.0"
 beautifulsoup4 = "^4.12.3"
