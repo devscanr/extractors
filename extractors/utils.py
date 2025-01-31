@@ -10,6 +10,7 @@ from typing import Any, Callable, cast, Iterable
 from .xpatterns import DEP, HEAD, IN, IS_PUNCT, IS_SENT_START, LOWER, OP, ORTH, TAG, tag_jj, tag_nn, tag_nnp
 
 URL_PATTERN = re.compile(URL_PATTERN)
+I_PATTERN = re.compile("^i[A-Z]")
 
 # RESOURCES
 # - https://stackoverflow.com/questions/15388831/what-are-all-possible-pos-tags-of-nltk
@@ -43,10 +44,10 @@ def normalize(text: str, pipechar: str = ".") -> str:
   text = re.sub(r"(\.js)/(?=\w)", r"\1 / ", text, flags=re.IGNORECASE)
   # Workarounds for C# and C++ joined with separators
   text = re.sub(r"(?<!\w)(c(?:\+\+|#))([,/])(?=\w)", sep_splitter, text, flags=re.IGNORECASE)
-  # Handle newlines
-  return compactify(text)
+  # Normalize sentence flow
+  return normalize_sents(text)
 
-def compactify(text: str) -> str:
+def normalize_sents(text: str) -> str:
   result = ""
   paragraphs = re.split(r"\r?\n(\r?\n)+", text.strip())
   for paragraph in paragraphs:
@@ -54,26 +55,41 @@ def compactify(text: str) -> str:
     for l, line in enumerate(lines):
       line = trim(line)
       if line.strip():
-        last_token = line.split(" ")[-1]
-        if last_token.endswith((".", "?", "!", ",", ";", ":")):
-          result += line
-        elif re.search(URL_PATTERN, last_token): # also matches emails, including "mailto:*"
-          result += line + " ." # TODO train NLP to tolerate " ." endings
-        else:
-          if l < len(lines) - 1:
-            next_line = lines[l + 1].lstrip()
-            if not next_line:
-              result += line + "."
-            elif re.match(r"[-\w]+:", next_line) or re.match(r"--", next_line):
-              result += line + "."
-            elif re.match(r"- \w", next_line):
-              result += line + ";"
-            else:
-              result += line
+        if l < len(lines) - 1:
+          next_line = lines[l + 1].lstrip()
+          if not next_line:
+            result += decorate(line, ".")
+          elif re.match(r"[-\w]+:", next_line) or re.match(r"--", next_line):
+            result += decorate(line, ".")
+          elif re.match(r"- \w", next_line):
+            result += decorate(line, ";")
           else:
-            result += line + "."
+            result += decorate(line, "")
+        else:
+          result += decorate(line, ".")
         result += " "
   return result.rstrip()
+
+def decorate(line: str, sep: str) -> str:
+  tokens = line.split(" ")
+  if should_capitalize_first(tokens[0]):
+    if should_gap_last(tokens[-1]):
+      return line[0].upper() + line[1:] + " " + sep
+    else:
+      sep = "" if tokens[-1].endswith((".", "?", "!", ",", ";", ":")) else sep
+      return line[0].upper() + line[1:] + sep
+  else:
+    if should_gap_last(tokens[-1]):
+      return line + " " + sep
+    else:
+      sep = "" if tokens[-1].endswith((".", "?", "!", ",", ";", ":")) else sep
+      return line + sep
+
+def should_capitalize_first(token: str) -> bool:
+  return not re.search(URL_PATTERN, token) and not re.search(I_PATTERN, token)
+
+def should_gap_last(token: str) -> bool:
+  return bool(re.search(URL_PATTERN, token))
 
 def trim(line: str) -> str:
   # Trim wrapping decorations and whitespace
