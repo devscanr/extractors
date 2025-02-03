@@ -19,7 +19,7 @@ class TitleExtractor(BaseExtractor):
   def extract(self, text_or_doc: str | Doc, tagfilter: Literal["Human", "Org"]) -> str:
     doc = self.nlp(text_or_doc) if isinstance(text_or_doc, str) else text_or_doc
     # pprint(list(self.nlp.tokenizer.explain(text_or_doc)))
-    pprint([{"token": tok, "pos": tok.pos_, "dep": tok.dep_, "head": tok.head} for tok in doc if not tok.is_punct])
+    # pprint([{"token": tok, "pos": tok.pos_, "dep": tok.dep_, "head": tok.head} for tok in doc if not tok.is_punct])
 
     tmatches, tunmatches = self.find_tmatches(doc)
     ignore_tokens = [tok for _, tokens, _ in tunmatches for tok in tokens]
