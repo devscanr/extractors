@@ -1,8 +1,6 @@
 from ...xpatterns import ver1, propn
 from ..tag import Company, Skill, Tech
-from ..utils import dis_context, dis_neighbours
-
-dis_ctx = dis_context("microsoft")
+from ..utils import dis_incontext, dis_nounlike
 
 SKILLS: list[Skill] = [
   Company("Microsoft", ["(@)microsoft"], "Company"),
@@ -18,8 +16,7 @@ SKILLS: list[Skill] = [
   Tech("MS-Sharepoint", ["microsoft-sharepoint", "ms-sharepoint", "sharepoint"]),
   Tech("MS-365", ["microsoft=365", "ms=365"], "New name for MS-Office"),
   Tech("MS-365", ["365"], disambiguate=[
-    dis_neighbours(),
-    dis_context("microsoft", "office")
+    dis_incontext("microsoft", "office"),
   ]),
 
   Tech("Power-Platform", ["power-platform"]),
@@ -38,8 +35,8 @@ SKILLS: list[Skill] = [
   Tech("Blazor", ["blazor"], ".NET-based framework to create fullstack apps"),
   Tech("Unity", ["unity-engine", "unity-platform", "unity=3d"], "Gamedev engine"), # , propn("unity")
   Tech("Unity", ["unity"], disambiguate=[
-    dis_neighbours(),
-    dis_context("c#", "microsoft", "framework")
+    dis_incontext("c#", "microsoft", "framework"),
+    dis_nounlike()
   ]),
   Tech("WCF", ["wcf"], "Windows Communication Foundation: framework for service-oriented apps"),
   Tech("WPF", ["wpf"], "Windows Presentation Foundation: UI framework for desktop apps"),
@@ -79,7 +76,7 @@ SKILLS: list[Skill] = [
     "aarch64", "arm64",
   ], "CPU family"),
   Tech("ARM", ["arm"], disambiguate=[
-    dis_neighbours(),
-    dis_context("microsoft", "cpu", "x86", "x32", "x64", "risc", "arc", "processor(s)")
+    dis_incontext("microsoft", "cpu", "x86", "x32", "x64", "risc", "arc", "processor(s)"),
+    dis_nounlike(),
   ]),
 ]

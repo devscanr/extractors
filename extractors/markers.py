@@ -2,7 +2,8 @@ import re
 from spacy.tokens import Token
 from typing import cast
 from extractors.ppatterns import expand_parens
-from extractors.utils import prev_token, revlist, revtakeuntil
+from extractors.spacyhelpers import left_token
+from extractors.utils import revlist, revtakeuntil
 
 PAST_MARKERS = {
   "ex",
@@ -68,11 +69,11 @@ def _is_negated(token: Token) -> bool:
     if re.match(r"non[-.]?(?!\w)", tok.lower_):
       return True
   ## Hacks for Spacy invalid dep. parsing ##
-  pt1 = prev_token(token)
-  pt2 = prev_token(pt1)
-  if pt1 and re.match(r"non[-.]?(?!\w)", pt1.lower_):
+  lt1 = left_token(token)
+  lt2 = left_token(lt1)
+  if lt1 and re.match(r"non[-.]?(?!\w)", lt1.lower_):
     return True
-  if pt2 and re.match(r"non[-.]?(?!\w)", pt2.lower_) and pt1 and pt1.text in {".", "-"}:
+  if lt2 and re.match(r"non[-.]?(?!\w)", lt2.lower_) and lt1 and lt1.text in {".", "-"}:
     return True
   ## ##
   for tok in token.sent:
@@ -98,11 +99,11 @@ def _is_past(token: Token) -> bool:
     if re.match(r"ex[-.]?(?!\w)", tok.lower_):
       return True
   ## Hacks for Spacy invalid dep. parsing ##
-  pt1 = prev_token(token)
-  pt2 = prev_token(pt1)
-  if pt1 and re.match(r"ex[-.]?(?!\w)", pt1.lower_):
+  lt1 = left_token(token)
+  lt2 = left_token(lt1)
+  if lt1 and re.match(r"ex[-.]?(?!\w)", lt1.lower_):
     return True
-  if pt2 and re.match(r"ex[-.]?(?!\w)", pt2.lower_) and pt1 and pt1.text in {".", "-"}:
+  if lt2 and re.match(r"ex[-.]?(?!\w)", lt2.lower_) and lt1 and lt1.text in {".", "-"}:
     return True
   ## ##
   if token.head.lower_ in {"was", "were"}:

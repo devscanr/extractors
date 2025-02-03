@@ -1,7 +1,4 @@
 from ..tag import Skill, Company, Tech
-from ..utils import dis_context
-
-dis_ctx = dis_context("yandex")
 
 SKILLS: list[Skill] = [
   Company("Yandex", ["(@)yandex"], "Company"),

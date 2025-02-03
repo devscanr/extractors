@@ -182,8 +182,10 @@ class Test_SkillExtractor:
 
   def test_extract_adhoc15(self, extractset) -> None:
     assert extractset("be lit") == set()
-    assert extractset("#lit") == {"Lit"}
+    assert extractset("#lit #react #go") == {"Lit", "React", "Go"}
     assert extractset("using Lit for fun and profit") == {"Lit"}
+    assert extractset("react") == {"React"}
+    assert extractset("go.") == {"Go"}
 
   # BIOS
   def test_extract_bios1(self, extractset) -> None:
@@ -279,7 +281,7 @@ class Test_SkillExtractor:
       "Ethereum", "Flutter"
     }
     assert extractset("Unity, ECS EC2, Node.JS Android") == {
-      "Unity", "Amazon-ECS", "Amazon-EC2", "NodeJS", "Android"
+      "Unity", "AWS-ECS", "AWS-EC2", "NodeJS", "Android"
     }
     assert extractset("Dev & Speaker • Microsoft MVP Azure, .NET, Blazor 🥔 Couch potato") == {
       "Engineering", "Microsoft", "Microsoft-Azure", ".NET", "Blazor"
@@ -288,8 +290,8 @@ class Test_SkillExtractor:
 
   def test_extract_bios8(self, extractset) -> None:
     assert extractset("Engineer on Azure-AWS, Kubernetes AKS-EKS-GKE") == {
-      "Engineering", "Microsoft-Azure", "Amazon-WebServices", "Kubernetes",
-      "Azure-Kubernetes", "Amazon-EKS", "Google-Kubernetes"
+      "Engineering", "Microsoft-Azure", "AWS", "Kubernetes",
+      "Azure-Kubernetes", "AWS-EKS", "Google-Kubernetes"
     }
     assert extractset("Terraform, Golang, Ansible, HashiCorp Vault") == {
       "Terraform", "Go", "Ansible", "HashiCorp", "Vault"
@@ -360,7 +362,7 @@ class Test_SkillExtractor:
      assert extractset("Software Engineer at Google DeepMind working on JAX/Flax") == {
        "Software", "Engineering", "Google", "JAX", "Flax"
      }
-     assert extractset("Jax + Haiku fan. Self-attention for the win") == set() # known FN
+     assert extractset("Jax + Haiku fan. Self-attention for the win") == {"JAX"}
      assert extractset("Julia, GraalVM, LLVM, NVidia, CNCF, Program Synthesis, 3D-QSAR") == {"Julia", "LLVM", "NVidia"}
      assert extractset("Sample for UE5's CommonConversation Feature") == {"Unreal-Engine"}
 
@@ -522,4 +524,4 @@ class Test_SkillExtractor:
       #passwordless-login
       #oauth
       #hacktoberfest
-    """) == {"Open-Source", "Auth0", "Google-Firebase", "Authentication", "Amazon-Cognito", "Java", "OAuth"}
+    """) == {"Open-Source", "Auth0", "Google-Firebase", "Authentication", "AWS-Cognito", "Java", "OAuth"}

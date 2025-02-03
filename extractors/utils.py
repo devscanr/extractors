@@ -134,57 +134,11 @@ def omit_parens(input: str) -> str:
       output += ch
   return re.sub(r"\s+", " ", output)
 
-# def get[T](seq: Sequence[T], offset: int) -> T | None:
-#   try:
-#     return seq[offset]
-#   except Exception:
-#     return None
-#
-# def get_prev[T](seq: Sequence[T], offset: int) -> T | None:
-#   prev = get(seq, offset - 1)
-#   return prev
-#
-# def get_next[T](seq: Sequence[T], offset: int) -> T | None:
-#   next = get(seq, offset + 1)
-#   return next
-#
-# def get_prevnext[T](seq: Sequence[T], offset: int) -> tuple[T | None, T | None]:
-#   prev = get(seq, offset - 1)
-#   next = get(seq, offset + 1)
-#   return prev, next
-
-def is_number(numstr: str) -> bool:
+def is_numstr(numstr: str) -> bool:
   return bool(re.fullmatch(r"\d+(\.\d+)?", numstr))
 
 def is_numeric_token(token: Token | None) -> bool:
-  return is_number(token.text) if token else False
-
-def prev_token(token: Token | None) -> Token | None:
-  if not token:
-    return None
-  sent = list(token.sent)
-  try:
-    return cast(Token, sent[token._.i - 1])
-  except Exception:
-    return None
-
-def next_token(token: Token | None) -> Token | None:
-  if not token:
-    return None
-  sent = list(token.sent)
-  try:
-    return cast(Token, sent[token._.i + 1])
-  except Exception:
-    return None
-
-# def prev_next_tokens(token: Token) -> tuple[Token | None, Token | None]:
-#   sent = list(token.sent)
-#   prev, next = None, None
-#   try: prev = sent[token._.i - 1]
-#   except Exception: pass
-#   try: next = sent[token._.i + 1]
-#   except Exception: pass
-#   return prev, next
+  return is_numstr(token.text) if token else False
 
 # --------------------------------------------------------------------------------------------------
 # Invalid grammar, especially punctuation, ruins Spacy analysis. I've found that
@@ -228,6 +182,13 @@ def add_dev_exceptions(nlp: Language) -> None:
   # Covers most common cases (ideally, we should retrain the model)
   ruler = cast(Any, nlp.get_pipe("attribute_ruler"))
   problematic = ["Go", "Lit", "Next", "Node", "React", "REST"]
+  # "go.", "react."
+  ruler.add([
+    [{LOWER: orth.lower(), IS_SENT_START: True}, {ORTH: "."}]
+    for orth in problematic
+  ], tag_nnp, index=0)
+  # "go", "react" -- can't be trivially implemented due to missing IS_SENT_START (need a custom component mess)
+  # ...           -- solved as disambiguations
   # "foo Go. bar Next"
   ruler.add([
     [{ORTH: orth, IS_SENT_START: False}]

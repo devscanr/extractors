@@ -1,4 +1,4 @@
-from ...skills.utils import dis_context
+from ...skills.utils import dis_incontext
 from ..tag import Skill, Topic
 
 SKILLS: list[Skill] = [
@@ -187,7 +187,7 @@ SKILLS: list[Skill] = [
   Topic("Research", ["research", "reseacher"]),
 
   Topic("Testing", ["testing", "tested", "tester"]),
-  Topic("Testing", ["test(s)"], disambiguate=dis_context(
+  Topic("Testing", ["test(s)"], disambiguate=dis_incontext(
     "acceptance", "automated", "automation", "case", "cases",
     "documentation", "execution", "execute",
     "e2e", "functional", "integration", "load",

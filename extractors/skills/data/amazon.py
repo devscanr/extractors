@@ -1,7 +1,5 @@
 from ..tag import Company, Skill, Tech
-from ..utils import dis_context, dis_neighbours
-
-dis_ctx = dis_context("amazon", "aws")
+from ..utils import dis_incontext, dis_namelike, dis_nounlike
 
 SKILLS: list[Skill] = [
   Company("Amazon", ["(@)amazon"]),
@@ -9,60 +7,60 @@ SKILLS: list[Skill] = [
   Tech("AWS-CDK", ["aws=cdk", "cdk"], "Framework for defining and provisioning cloud IAC"),
 
   # AWS
-  Tech("Amazon-WebServices", ["amazon-web=services", "aws"], "AWS"),
-  Tech("Amazon-Athena", ["aws=athena"], "Analytics, ML + SQL over S3"),
-  Tech("Amazon-Athena", ["athena"], disambiguate=[
-    dis_neighbours(),
-    dis_ctx,
+  Tech("AWS", ["amazon-web=services", "aws"], "AWS"),
+  Tech("AWS-Athena", ["aws=athena", "amazon=athena"], "Analytics, ML + SQL over S3"),
+  Tech("AWS-Athena", ["athena"], disambiguate=[
+    dis_incontext("amazon", "aws"),
+    dis_namelike(),
   ]),
-  Tech("Amazon-Aurora", ["aws=aurora"], "Managed DB"),
-  Tech("Amazon-Aurora", ["aurora"], disambiguate=[
-    dis_neighbours(),
-    dis_ctx,
+  Tech("AWS-Aurora", ["aws=aurora", "amazon=aurora"], "Managed DB"),
+  Tech("AWS-Aurora", ["aurora"], disambiguate=[
+    dis_incontext("amazon", "aws"),
+    dis_namelike(),
   ]),
-  Tech("Amazon-Beanstalk", ["aws=beanstalk", "beanstalk"], "Webapp deployment"),
-  Tech("Amazon-CloudFormation", ["aws=cloudformation", "cloudformation"], "IAC provisioning"),
-  Tech("Amazon-CloudFront", ["aws=cloudfront", "cloudfront"], "CDN"),
-  Tech("Amazon-CloudWatch", ["aws=cloudwatch", "cloudwatch"], "Monitoring umbrella"),
-  Tech("Amazon-Cognito", ["aws=cognito", "cognito"], "Authentication and authorization for web and mobile applications"),
-  Tech("Amazon-DynamoDB", ["aws=dynamo=db", "dynamo=db"], "Distributed NoSQL DB"),
-  Tech("Amazon-EC2", ["aws=ec2", "ec2"], "Elastic compute cloud"),
-  Tech("Amazon-ECS", ["aws=ecs", "ecs"], "Elastic container services"),
-  Tech("Amazon-EBS", ["aws=ebs", "ebs"], "Elastic block store"),
-  Tech("Amazon-EKS", ["aws=eks", "eks"], "Elastic kubernetes service"),
-  Tech("Amazon-ElastiCache", ["aws=elasticache", "elasticache"], "Caching"),
-  Tech("Amazon-Glue", ["aws=glue"], "Batch data ingestion, data pipeline orchestration"),
-  Tech("Amazon-Glue", ["glue"], disambiguate=[
-    dis_neighbours(),
-    dis_ctx,
+  Tech("AWS-Beanstalk", ["aws=beanstalk", "amazon=beanstalk", "beanstalk"], "Webapp deployment"),
+  Tech("AWS-CloudFormation", ["aws=cloudformation", "amazon=cloudformation", "cloudformation"], "IAC provisioning"),
+  Tech("AWS-CloudFront", ["aws=cloudfront", "amazon=cloudfront", "cloudfront"], "CDN"),
+  Tech("AWS-CloudWatch", ["aws=cloudwatch", "amazon=cloudwatch", "cloudwatch"], "Monitoring umbrella"),
+  Tech("AWS-Cognito", ["aws=cognito", "amazon=cognito", "cognito"], "Authentication and authorization for web and mobile applications"),
+  Tech("AWS-DynamoDB", ["aws=dynamo=db", "amazon=dynamo=db", "dynamo=db"], "Distributed NoSQL DB"),
+  Tech("AWS-EC2", ["aws=ec2", "amazon=ec2", "ec2"], "Elastic compute cloud"),
+  Tech("AWS-ECS", ["aws=ecs", "amazon=ecs", "ecs"], "Elastic container services"),
+  Tech("AWS-EBS", ["aws=ebs", "amazon=ebs", "ebs"], "Elastic block store"),
+  Tech("AWS-EKS", ["aws=eks", "amazon=eks", "eks"], "Elastic kubernetes service"),
+  Tech("AWS-ElastiCache", ["aws=elasticache", "amazon=elasticache", "elasticache"], "Caching"),
+  Tech("AWS-Glue", ["aws=glue", "amazon=glue"], "Batch data ingestion, data pipeline orchestration"),
+  Tech("AWS-Glue", ["glue"], disambiguate=[
+    dis_incontext("amazon", "aws"),
+    dis_nounlike(),
   ]),
-  Tech("Amazon-IAM", ["aws=iam"], "Identity and access management"),
-  Tech("Amazon-IAM", ["iam"], disambiguate=[
-    dis_neighbours(),
-    dis_ctx,
+  Tech("AWS-IAM", ["aws=iam", "amazon=iam"], "Identity and access management"),
+  Tech("AWS-IAM", ["iam"], disambiguate=[
+    dis_incontext("amazon", "aws"),
+    dis_nounlike(),
   ]),
-  Tech("Amazon-Lambda", ["aws=lambda"], "Lambda service"),
-  Tech("Amazon-Lambda", ["lambda"], disambiguate=[
-    dis_neighbours(),
-    dis_ctx,
+  Tech("AWS-Lambda", ["aws=lambda", "amazon=lambda"], "Lambda service"),
+  Tech("AWS-Lambda", ["lambda"], disambiguate=[
+    dis_incontext("amazon", "aws"),
+    dis_nounlike(),
   ]),
-  Tech("Amazon-KMS", ["aws=kms"], "Streaming data ingestion & analytics"),
-  Tech("Amazon-KMS", ["kms"], disambiguate=[
-    dis_neighbours(),
-    dis_ctx,
+  Tech("AWS-KMS", ["aws=kms", "amazon=kms"], "Streaming data ingestion & analytics"),
+  Tech("AWS-KMS", ["kms"], disambiguate=[
+    dis_incontext("amazon", "aws"),
+    dis_nounlike(),
   ]),
-  Tech("Amazon-Kinesis", ["aws=kinesis", "kinesis"], "Streaming data ingestion & analytics"),
-  Tech("Amazon-Neptune", ["aws=neptune", "neptune"], "Graph DB"),
-  Tech("Amazon-SNS", ["aws=sns", "sns"], "Simple notification service"),
-  Tech("Amazon-SQS", ["aws=sqs", "sqs"], "Simple queue service"),
-  Tech("Amazon-S3", ["aws=s3", "s3"], "Object storage"),
-  Tech("Amazon-RDS", ["aws=rds", "rds"], "Relational database service"),
-  Tech("Amazon-Redshift", ["aws=redshift", "redshift"], "Data warehouse & BI"),
-  Tech("Amazon-SageMaker", ["aws=sagemaker", "sagemaker"], "Deploy ML"),
-  Tech("Amazon-VPC", ["aws=vpc"], "Virtual private cloud"),
-  Tech("Amazon-VPC", ["vpc"], disambiguate=[
-    dis_neighbours(),
-    dis_ctx,
+  Tech("AWS-Kinesis", ["aws=kinesis", "amazon=kinesis", "kinesis"], "Streaming data ingestion & analytics"),
+  Tech("AWS-Neptune", ["aws=neptune", "amazon=neptune", "neptune"], "Graph DB"),
+  Tech("AWS-SNS", ["aws=sns", "amazon=sns", "sns"], "Simple notification service"),
+  Tech("AWS-SQS", ["aws=sqs", "amazon=sqs", "sqs"], "Simple queue service"),
+  Tech("AWS-S3", ["aws=s3", "amazon=s3", "s3"], "Object storage"), # should we disambiguate S3?
+  Tech("AWS-RDS", ["aws=rds", "amazon=rds", "rds"], "Relational database service"),
+  Tech("AWS-Redshift", ["aws=redshift", "amazon=redshift", "redshift"], "Data warehouse & BI"),
+  Tech("AWS-SageMaker", ["aws=sagemaker", "amazon=sagemaker", "sagemaker"], "Deploy ML"),
+  Tech("AWS-VPC", ["aws=vpc", "amazon=vpc"], "Virtual private cloud"),
+  Tech("AWS-VPC", ["vpc"], disambiguate=[
+    dis_incontext("amazon", "aws"),
+    dis_nounlike(),
   ]),
 
   # SUSPENDED (for now)

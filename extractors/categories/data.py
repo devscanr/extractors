@@ -1,17 +1,17 @@
 from spacy.tokens import Token
 from ..extractor import Tag
 from ..ppatterns import expand_parens
-from ..utils import next_token, prev_token
+from ..spacyhelpers import left_token, right_token
 from ..xpatterns import LOWER, verb
 from ..xpatterns import dep_root
 from .tag import CatTag
 
 def dis_se(token: Token) -> bool:
-  nt = next_token(token)
-  if nt and (nt.lower_ in {"at", "intern", "student"} or nt.lower_.startswith("@")):
+  rtoken = right_token(token)
+  if rtoken and (rtoken.lower_ in {"at", "intern", "student"} or rtoken.text.startswith("@")):
     return True
-  pt = prev_token(token)
-  if pt and (pt.lower_ in {"junior", "middle", "senior", "principal"}):
+  ltoken = left_token(token)
+  if ltoken and (ltoken.lower_ in {"junior", "middle", "senior", "principal"}):
     return True
   return False
 

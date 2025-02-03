@@ -1,6 +1,6 @@
 from ...xpatterns import IN, LOWER, OP, propn, ver1
 from ..tag import Skill, Tech
-from ..utils import dis_context, dis_neighbours
+from ..utils import dis_incontext, dis_namelike, dis_nounlike, dis_verblike
 from .adobe import SKILLS as ADOBE_SKILLS
 from .amazon import SKILLS as AMAZON_SKILLS
 from .apache import SKILLS as APACHE_SKILLS
@@ -131,8 +131,8 @@ SKILLS: list[Skill] = [
   Tech("ShowFlake", ["snowflake"]), # ~ MS Databricks, ~ AWS Redshift
   Tech("Spacy", ["spacy"]),
   Tech("Stan", ["stan"], disambiguate=[
-    dis_neighbours(),
-    dis_context("r", "python")
+    dis_incontext("r", "python"),
+    dis_namelike(),
   ]),
   Tech("Stata", ["stata"]),
   Tech("TensorRT", ["tensorrt"]), # NVidia
@@ -210,7 +210,8 @@ SKILLS: list[Skill] = [
   Tech("Materialize", ["materialize"]),
   Tech("NgRx", ["ngrx"], "Reactive state management for Angular apps inspired by Redux"),
   Tech("Pinia", ["pinia"]),
-  Tech("React", ["react.=js", "react"]),
+  Tech("React", ["react.=js"]),
+  Tech("React", ["react"], disambiguate=dis_verblike()),
   Tech("Redux", ["redux.=js", "redux"]),
   Tech("Remix", ["remix.=js", "remix"]),
   Tech("RiotJS", ["riot.=js"]),
@@ -244,8 +245,8 @@ SKILLS: list[Skill] = [
   Tech("Ktor", ["ktor"]), # fullstack framework in Kotlin
   Tech("NextJS", ["next.=js"]), # , propn("next")
   Tech("NextJS", ["next"], disambiguate=[
-    dis_neighbours(),
-    dis_context("framework", "nuxt", "react")
+    dis_incontext("framework", "nuxt", "react"),
+    dis_nounlike(),
   ]),
   Tech("NuxtJS", ["nuxt.=js", propn("nuxt")]),
   Tech("NodeJS", ["node.=js", propn("node")]),
@@ -309,14 +310,14 @@ SKILLS: list[Skill] = [
   Tech("Cucumber", ["cucumber"]),
   Tech("Cypress", ["cypress", "cypress.=js"]),
   Tech("Jasmine", ["jasmine"], disambiguate=[
-    dis_neighbours(),
-    dis_context("Jest", "Karma", "QA")
+    dis_incontext("Jest", "Karma", "QA"),
+    dis_namelike(),
   ]),
   Tech("Jest", ["jest"]),
   Tech("JUnit", ["junit"]),
   Tech("Karma", ["karma"], disambiguate=[
-    dis_neighbours(),
-    dis_context("Jasmine", "Jest", "QA")
+    dis_incontext("Jasmine", "Jest", "QA"),
+    dis_nounlike(),
   ]),
   Tech("PHPUnit", ["php=unit"]),
   Tech("Playwright", ["playwright"]),
@@ -398,8 +399,8 @@ SKILLS: list[Skill] = [
   Tech("ASIC", ["asic"]), # ASICs are custom-designed circuits for specific applications, offering high performance and efficiency
   Tech("ARC", [propn("ARC")], "CPU family"),
   Tech("ARC", ["arc"], disambiguate=[
-    dis_neighbours(),
-    dis_context("cpu", "arm", "processor(s)")
+    dis_incontext("cpu", "arm", "processor(s)"),
+    dis_nounlike(),
   ]),
   Tech("AutoCAD", ["autocad"]),
   Tech("AVR", ["avr"], "Controller family"),
@@ -423,8 +424,8 @@ SKILLS: list[Skill] = [
   Tech("Autodesk-Fusion", ["autodesk-fusion", "fusion=360"]), # tool
   Tech("Autodesk-Eagle", ["autodesk-eagle"]), # tool
   Tech("Autodesk-Eagle", ["eagle"], disambiguate=[
-    dis_neighbours(),
-    dis_context("Autodesk", "AutoCAD")
+    dis_incontext("Autodesk", "AutoCAD"),
+    dis_nounlike(),
   ]),
   Tech("Touchdesigner", ["touchdesigner"], "Visual development platform"), #
   Tech("Solidworks", ["solidworks-pcb", "solidworks"], "CB design tool"),

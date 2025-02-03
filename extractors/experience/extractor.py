@@ -3,9 +3,10 @@ from spacy.tokens import Doc, Token
 from typing import Generator, Sequence
 from ..extractor import BaseExtractor, TMatch
 from ..markers import is_future, is_negated, is_past
-from ..utils import is_numeric_token, next_token, prev_token
 from .experience import is_OtherExperienceKind
 from .experience import Experience
+from ..spacyhelpers import left_token, right_token
+from ..utils import is_numeric_token
 
 class ExperienceExtractor(BaseExtractor):
   def extract_many(self, text_or_docs: Sequence[str | Doc]) -> list[Experience | None]:
@@ -62,7 +63,7 @@ class ExperienceExtractor(BaseExtractor):
           yield exp
       else:
         tm = tmatches[k + 1] if k < len(tmatches) - 1 else None
-        rt1 = next_token(tmatch.maintoken)
+        rt1 = right_token(tmatch.maintoken)
         if (
           rt1 and rt1.text in {"/", "-", "->", ",", "."} and
           tm and tm.maintoken.i == tmatch.maintoken.i + 2 and tm.name not in {"MOE", "YOE"}
@@ -88,7 +89,7 @@ class ExperienceExtractor(BaseExtractor):
     sent = tokens[0].sent
     # Search for `over`
     over = any(
-      tok.lower_ == "+" and is_numeric_token(prev_token(tok)) or
+      tok.lower_ == "+" and is_numeric_token(left_token(tok)) or
       tok.lower_ in {"more", "over"}
       for tok in sent
       if tok not in tokens
@@ -122,7 +123,7 @@ class ExperienceExtractor(BaseExtractor):
     sent = tokens[0].sent
     # Search for `over`
     over = any(
-      tok.lower_ == "+" and is_numeric_token(prev_token(tok))
+      tok.lower_ == "+" and is_numeric_token(left_token(tok))
       for tok in sent
       if tok not in tokens
       if tok.head in tokens or tok.head.head in tokens
@@ -130,10 +131,10 @@ class ExperienceExtractor(BaseExtractor):
       "+" in tok.text for tok in tokens
     )
     # if not over:
-    #   lt1 = prev_token(tokens[0])
-    #   lt2 = prev_token(lt1)
-    #   rt1 = next_token(tokens[-1])
-    #   rt2 = next_token(rt1)
+    #   lt1 = left_token(tokens[0])
+    #   lt2 = left_token(lt1)
+    #   rt1 = right_token(tokens[-1])
+    #   rt2 = right_token(rt1)
     #   if lt1.text in {"-", "/", "->"} and rt1.text not in {"-", "/", "->"}:
     #     # and lt2.lower_ in {"junior", "intermediate", "middle", "senior"}
     #     print("???")

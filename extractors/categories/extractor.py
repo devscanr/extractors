@@ -2,7 +2,7 @@ from spacy.tokens import Doc, Token
 from typing import cast, Literal, Sequence
 from ..extractor import BaseExtractor, TMatch
 from ..markers import is_future, is_hashtagged, is_negated, is_past
-from ..spacyhelpers import ancestors, left_lowerwords
+from ..spacyhelpers import ancestors, is_word, left_tokens
 from .categorized import Categorized, CategorizedRole
 from .data import CANCELING_TAGS
 from ..utils import includes
@@ -97,7 +97,7 @@ class CategoryExtractor(BaseExtractor):
       j = cast(int, token._.i)
       if j < sent.end and sent[j + 1].lower_ in {"@", "at", "of"}:
         return "Nondev"
-      lwords = left_lowerwords(token)
+      lwords = [tok.lower_ for tok in left_tokens(token) if is_word(tok)]
       if any(word in HEAD_MARKERS for word in lwords):
         return "Nondev"
       return None

@@ -1,7 +1,5 @@
 from ..tag import Company, Skill, Tech
-from ..utils import dis_context, dis_neighbours
-
-dis_ctx = dis_context("google")
+from ..utils import dis_incontext, dis_namelike, dis_nounlike
 
 SKILLS: list[Skill] = [
   Company("Google", ["(@)google"], "Company"),
@@ -9,8 +7,8 @@ SKILLS: list[Skill] = [
   Tech("Flax", ["flax"], "NN for Jax"),
   Tech("JAX", ["JAX"], "TensorFlow alternative"),
   Tech("JAX", ["jax"], disambiguate=[
-    dis_neighbours(),
-    dis_context("google", "flax", "tensorflow"),
+    dis_incontext("google", "flax", "tensorflow"),
+    dis_namelike(),
   ]),
   Tech("TensorFlow", ["tensorflow"]),
 
@@ -20,8 +18,8 @@ SKILLS: list[Skill] = [
   Tech("Google-BigQuery", ["google-bigquery", "bigquery"]), # EE data warehouse
   Tech("Google-Cloud", ["google=cloud", "gcp"]),
   Tech("Google-Cloud", ["gc"], disambiguate=[
-    dis_neighbours(),
-    dis_context("aws", "azure"),
+    dis_incontext("aws", "azure"),
+    dis_nounlike(),
   ]),
   Tech("Google-Firebase", ["google=firebase", "firebase"]),
   Tech("Google-CloudStorage", ["google-cloud=storage", "gcs"]),

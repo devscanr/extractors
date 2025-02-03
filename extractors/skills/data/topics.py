@@ -1,4 +1,4 @@
-from ...skills.utils import dis_context, dis_neighbours
+from ...skills.utils import dis_incontext, dis_nounlike
 from ...xpatterns import noun
 from ..tag import Skill, Topic
 
@@ -72,8 +72,8 @@ SKILLS: list[Skill] = [
     "REST",
   ]),
   Topic("REST", ["rest"], disambiguate=[
-    dis_neighbours(),
-    dis_context("api", "graphql", "rpc", "framework", "#go", "php")
+    dis_incontext("api", "graphql", "rpc", "framework", "#go", "php"),
+    dis_nounlike(),
   ]),
   Topic("-REST", [
     "rest=in=peace"
@@ -137,8 +137,8 @@ SKILLS: list[Skill] = [
   Topic("CPU", ["cpu", "central-processing-unit"]),  # also SYSTEMS
   Topic("CPU", ["micro=processor(s)"]),
   Topic("CPU", ["processor(s)"], disambiguate=[
-    dis_neighbours(),
-    dis_context("amd", "intel", "arm", "arc", "risc", "x86", "x32", "x64")
+    dis_incontext("amd", "intel", "arm", "arc", "risc", "x86", "x32", "x64"),
+    dis_nounlike(),
   ]),
   Topic("Embedded", ["embedded"]),
   Topic("Firmware", ["firmware"]),

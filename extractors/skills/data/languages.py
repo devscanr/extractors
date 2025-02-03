@@ -1,16 +1,6 @@
-from spacy.tokens import Token
-from ...xpatterns import propn, ver1
+from ...xpatterns import ver1
 from ..tag import Language, Skill
-from ..utils import Disambiguate, dis_context, dis_letter
-
-def dis_julia() -> Disambiguate:
-  # dis_seq = dis_sequence()
-  def disambiguate(token: Token) -> bool:
-    for tok in token.sent:
-      if tok.lower_ in {"am", "'m", "is", "'s", "name"}:
-        return False
-    return True
-  return disambiguate
+from ..utils import dis_incontext, dis_letterlike, dis_namelike, dis_verblike
 
 SKILLS: list[Skill] = [
   # QUERY LANGUAGES
@@ -22,7 +12,7 @@ SKILLS: list[Skill] = [
   Language("Apex", ["apex"]),
   Language("Assembly", ["assembly", "asm"], "An umbrella term for low-level languages where instructions in the language are basically CPU instructions"),
   Language("C", ["c-lang"]),
-  Language("C", ["c(.)"], disambiguate=dis_letter()), # disambiguate from "c." like in "c. 1, c. 2" (chapter)
+  Language("C", ["c(.)"], disambiguate=dis_letterlike()), # disambiguate from "c." like in "c. 1, c. 2" (chapter)
   Language("C++", ["c++", "cpp", "c=plus=plus"]),
   Language("C#", ["c#", "csharp"]),
   Language("Clojure", ["clojure", "clojurian"]),
@@ -30,7 +20,7 @@ SKILLS: list[Skill] = [
   Language("Cobol", ["cobol"]),
   Language("Crystal", ["crystal-lang", "crystal"]),
   Language("D", ["d=lang"]),
-  Language("D", ["d"], disambiguate=dis_letter()),
+  Language("D", ["d"], disambiguate=dis_letterlike()),
   Language("Dart", ["dart"]),
   Language("Delphi", ["delphi"]),
   Language("Elixir", ["elixir"]),
@@ -39,12 +29,13 @@ SKILLS: list[Skill] = [
   Language("Fortran", ["fortran"]),
   Language("F#", ["f#", "f=lang", "fsharp"]),
   Language("Gleam", ["gleam"]),
-  Language("Go", ["golang", "gopher", propn("go")]),
+  Language("Go", ["golang", "gopher"]),
+  Language("Go", ["go"], disambiguate=dis_verblike()),
   Language("Groovy", ["groovy"]),
   Language("Haskell", ["haskell"]),
   Language("Java", [ver1("java"), "java-se"]),
   Language("JavaScript", ["java=script", "js"]),
-  Language("Julia", ["julia"], disambiguate=dis_julia()),
+  Language("Julia", ["julia"], disambiguate=dis_namelike()),
   Language("Kotlin", ["kotlin"]),
   Language("Lisp", ["lisp"]),
   Language("Lua", ["lua"]),
@@ -61,14 +52,14 @@ SKILLS: list[Skill] = [
   Language("Prolog", ["prolog"]),
   Language("Python", [ver1("python"), "py", "pythonist(a)"]),
   Language("R", ["r=lang"], "Programming language for statistical computing and data visualization"),
-  Language("R", ["r"], disambiguate=dis_letter()),
+  Language("R", ["r"], disambiguate=dis_letterlike()),
   Language("Ruby", ["ruby=lang", "ruby", "rubyist", "rubist"]),
   Language("Rust", ["rust", "rustacean"]),
   Language("Scala", ["scala"]),
   Language("TypeScript", ["type=script", "ts"]),
   Language("Shell", ["shell", "bash", "zsh"]),
   Language("V", ["vlang"]),
-  Language("V", ["v"], disambiguate=dis_letter()),
+  Language("V", ["v"], disambiguate=dis_letterlike()),
   Language("Vala", ["vala"]),
   Language("Visual-Basic", ["visual=basic", "vb(a)", "vb.net"]),
   Language("Zig", ["zig"]),
@@ -85,7 +76,7 @@ SKILLS: list[Skill] = [
   Language("HTML", [ver1("html")]),
   Language("JSON", ["json", "json5"]),
   Language("LESS", ["LESS"]),
-  Language("LESS", ["less"], disambiguate=dis_context("sass", "scss")),
+  Language("LESS", ["less"], disambiguate=dis_incontext("sass", "scss")),
   Language("Makefile", ["makefile"]),
   Language("Markdown", ["markdown", "md"]),
   Language("SASS", ["sass", "scss"]),
