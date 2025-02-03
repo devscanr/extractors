@@ -247,7 +247,7 @@ SKILLS: list[Skill] = [
   Topic("Geometry", ["geometry", "geometer"]),
   Topic("Statistics", [
     "statistic(s)", "statistician", "statistical",
-    "correlation", "confidence interval(s)", "hypothesis",
+    "correlation", "confidence interval(s)", "hypothesis", "hypotheses",
     "probability", "regression", "classification", "clustering",
   ]),
   # TODO more terms: calculus, theories, etc.

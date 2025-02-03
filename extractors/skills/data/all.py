@@ -82,7 +82,6 @@ SKILLS: list[Skill] = [
   # DATABASE, DWH
   Tech("CouchBase", ["couchbase"]),
   Tech("CouchDB", ["couch=db"]),
-  Tech("DynamoDB", ["dynamo=db"]),
   Tech("Elasticsearch", ["elastic=search"]),
   Tech("Greenplum", ["greenplum"]),
   Tech("MariaDB", ["maria=db"]),

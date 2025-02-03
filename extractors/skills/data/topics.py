@@ -5,7 +5,6 @@ from ..tag import Skill, Topic
 SKILLS: list[Skill] = [
   # ANALYSIS >
   Topic("AB-Testing", ["a/b-test(s)", "a/b-testing", "ab-test(s)", "ab-testing"]),
-  Topic("Hypothesis", ["hypothesis", "hypotheses"]),
 
   # ENGINEERING / ARCHITECTURE >
   Topic("Accessibility", ["accessibility", "accessible"]),
