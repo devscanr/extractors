@@ -55,6 +55,7 @@ def right_ancestors(token: Token) -> list[Token]:
 def token_level(token: Token) -> int:
   level = 0
   while token != token.sent.root:
+    print(token)
     level += 1
     token = token.head
   return level

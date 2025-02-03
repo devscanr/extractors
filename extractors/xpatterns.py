@@ -1,8 +1,8 @@
 import re
 from typing import Any
 
-(DEP, HEAD, IN, IS_PUNCT, IS_SENT_START, LOWER, NOT_IN, OP, ORTH, POS, REGEX, TAG, TEXT) = (
-  "DEP", "HEAD", "IN", "IS_PUNCT", "IS_SENT_START", "LOWER", "NOT_IN", "OP", "ORTH", "POS",
+(DEP, IN, IS_PUNCT, IS_SENT_START, LOWER, NOT_IN, OP, ORTH, POS, REGEX, TAG, TEXT) = (
+  "DEP", "IN", "IS_PUNCT", "IS_SENT_START", "LOWER", "NOT_IN", "OP", "ORTH", "POS",
   "REGEX", "TAG", "TEXT"
 )
 

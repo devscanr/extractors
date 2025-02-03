@@ -7,7 +7,7 @@ from spacy import Language
 from spacy.lang.tokenizer_exceptions import URL_PATTERN
 from spacy.tokens import Doc, Token
 from typing import Any, Callable, cast, Iterable
-from .xpatterns import DEP, HEAD, IN, IS_PUNCT, IS_SENT_START, LOWER, OP, ORTH, TAG, tag_jj, tag_nn, tag_nnp
+from .xpatterns import IN, IS_PUNCT, IS_SENT_START, LOWER, ORTH, TAG, tag_jj, tag_nnp
 
 URL_PATTERN = re.compile(URL_PATTERN)
 I_PATTERN = re.compile("^i[A-Z]")
@@ -231,38 +231,6 @@ def add_dev_exceptions(nlp: Language) -> None:
     [{LOWER: "react"}, {ORTH: "-"}, {LOWER: "native"}]
   ], tag_nnp, index=2)
 
-def add_nnp_exceptions(nlp: Language, items: list[str]) -> None:
-  # NN: Noun, singular or mass
-  # NNP: Proper noun, singular Phrase
-  # NNS: Noun, plural
-  # NNPS: Proper noun, plural
-  ruler = cast(Any, nlp.get_pipe("attribute_ruler"))
-  for item in items:
-    spacecount = item.count(" ")
-    if spacecount >= 2:
-      raise ValueError("NNP items with >= 2 spaces are not supported yet")
-    elif spacecount == 1:
-      for caseditem in [item.lower(), item.upper(), item.title()]:
-        w1, w2 = caseditem.split(" ")
-        if caseditem.islower():
-          patts = [[
-            {LOWER: w1.lower()}, {ORTH: "-", OP: "?"}, {LOWER: w2.lower()},
-          ]]
-          ruler.add(patts, tag_nn | {HEAD: 1, DEP: "compound"}, index=0)
-          ruler.add(patts, tag_nn, index=1)
-        else:
-          patts = [[
-            {ORTH: w1.lower()}, {ORTH: "-", OP: "?"}, {ORTH: w2.lower()},
-          ]]
-          ruler.add(patts, tag_nnp | {HEAD: 1, DEP: "compound"}, index=0)
-          ruler.add(patts, tag_nnp, index=1)
-    else:
-      for caseditem in [item.lower(), item.upper(), item.title()]:
-        if caseditem.islower():
-          ruler.add([[{LOWER: item.lower()}]], tag_nn)
-        else:
-          ruler.add([[{LOWER: item.lower()}]], tag_nnp)
-
 def add_jj_exceptions(nlp: Language, items: list[str]) -> None:
   ruler = cast(Any, nlp.get_pipe("attribute_ruler"))
   for item in items:
@@ -284,19 +252,6 @@ def add_jj_exceptions2(nlp: Language, items: list[str]) -> None:
       ruler.add([[
         {TAG: {IN: ["VBG"]}}, {LOWER: item.lower()},
       ]], tag_jj, index=1)
-
-def add_new_exceptions(nlp: Language) -> None:
-  # Note: swapping HEAD does not change ROOT and can lead to dead-locks @_@
-  pass
-  # ruler = cast(Any, nlp.get_pipe("attribute_ruler"))
-  # ruler.add([[
-  #   {LOWER: "computer"}, {ORTH: "/"}, {LOWER: "data"},
-  #   {LOWER: "science"},
-  # ]], {HEAD: 3, DEP: "nmod"}, index=0)
-  # ruler.add([[
-  #   {LOWER: "data"}, {ORTH: "/"}, {LOWER: "computer"},
-  #   {LOWER: "science"},
-  # ]], {HEAD: 3, DEP: "nmod"}, index=0)
 
 def get_nlp(name: str | Path = "en_core_web_sm") -> Language:
   nlp = spacy.load(name, exclude=["lemmatizer", "ner"])
@@ -357,13 +312,13 @@ def get_nlp(name: str | Path = "en_core_web_sm") -> Language:
 
   # Make the following PROPER NOUNs
   add_dev_exceptions(nlp)
-  add_nnp_exceptions(nlp, [
-    "computer science", # fixing POS, TAG, DEP, HEAD
-    "deep learning",
-    "data science",
-    "machine learning",
-    "software engineer",
-  ])
+  # add_nnp_exceptions(nlp, [
+  #   "computer science", # fixing POS, TAG, DEP, HEAD
+  #   "deep learning",
+  #   "data science",
+  #   "machine learning",
+  #   "software engineer",
+  # ])
   add_jj_exceptions(nlp, [
     # Make the following ADJECTIVEs if before NOUNs
     "graduate", "graduated",
@@ -374,7 +329,6 @@ def get_nlp(name: str | Path = "en_core_web_sm") -> Language:
     # Make the following ADJECTIVEs if after VERBs
     "leading",
   ])
-  add_new_exceptions(nlp)
   return nlp
 
 @Language.factory("index_tokens_by_sents")
