@@ -1,6 +1,7 @@
 from ...skills.utils import dis_incontext, dis_nounlike
 from ...xpatterns import noun
 from ..tag import Skill, Topic
+from ..utils import dis_precisely
 
 SKILLS: list[Skill] = [
   # ANALYSIS >
@@ -22,16 +23,16 @@ SKILLS: list[Skill] = [
 
   # SOFTWARE >
   Topic("Agile", ["agile", "kanban", "scrum"]),
-  Topic("APIs", ["api(s)"]),
+  Topic("API", ["api(s)"], publicname="APIs"),
   Topic("Client-Server", ["client", "server(s)"]), # FPs for "clients"
   Topic("BDD", ["bdd"]),
   Topic("DDD", ["ddd"]),
   Topic("TDD", ["tdd"]),
   # YAGNI, DRY, KISS
   # (software) design patterns
-  Topic("Algorithms", ["algorithm(s)", "algorithmic"]),
+  Topic("Algorithm", ["algorithm(s)", "algorithmic"], publicname="Algorithms"),
   Topic("Big-O", ["big-o"]),
-  Topic("Data-Structures", ["data=structure(s)", "data=type(s)", "data=class(es)"]),
+  Topic("Data-Structure", ["data=structure(s)", "data=type(s)", "data=class(es)"], publicname="Data-Structures"),
   Topic("Debugging", ["debugging", "debugger"]),
   Topic("FP", ["functional=programming", "fp", "фп"]),
   Topic("I18n", ["i18n", "l10n"]),
@@ -62,16 +63,14 @@ SKILLS: list[Skill] = [
   Topic("Authentication", ["authentication", "auth", "sign=in", "sign=out"]), # also SECURITY
   Topic("Authorization", ["authorization"]), # also SECURITY
   Topic("BaaS", ["baas", "mbaas"]),
-  Topic("Microservices", ["micro=service(s)"]),
-  Topic("Middlewares", ["middleware(s)"]),
+  Topic("Microservice", ["micro=service(s)"], publicname="Microservices"),
+  Topic("Middleware", ["middleware(s)"], publicname="Middlewares"),
   Topic("OAuth", ["oauth", "oauth1", "oauth2"]), # also SECURITY
   Topic("OpenID", ["openid"]), # also SECURITY
   Topic("OpenAPI", ["openapi"]), # TODO more like this
-  Topic("REST", [
-    "rest=api", "restful",
-    "REST",
-  ]),
+  Topic("REST", ["rest=api", "restful"]),
   Topic("REST", ["rest"], disambiguate=[
+    dis_precisely("REST"),
     dis_incontext("api", "graphql", "rpc", "framework", "#go", "php"),
     dis_nounlike(),
   ]),
@@ -87,10 +86,10 @@ SKILLS: list[Skill] = [
 
   # BLOCKCHAINS >
   Topic("Crypto", ["crypto"]),
-  Topic("dApps", ["decentralized-application(s)", "dapp(s)"]),
+  Topic("dApp", ["decentralized-application(s)", "dapp(s)"], publicname="dApps"),
   Topic("DeFi", ["decentralized-finance", "de=fi"]),
   Topic("P2P", ["peer=2=peer", "peer=to=peer", "p2p"]), # also NETWORKS
-  Topic("Smart-Contracts", ["smart=contract(s)"]),
+  Topic("Smart-Contract", ["smart=contract(s)"], publicname="Smart-Contracts"),
   Topic("Web3", ["web3"]),
 
   # DATA >
@@ -100,10 +99,10 @@ SKILLS: list[Skill] = [
   Topic("ETL", ["etl(s)", "elt"]),
 
   # DATABASES >
-  Topic("Datalakes", ["data=lake(s)"]),
+  Topic("Datalake", ["data=lake(s)"], publicname="Datalakes"),
   Topic("ORM", ["orm"]),
   Topic("NoSQL", ["nosql"]),
-  Topic("Warehouses", ["warehouse(s)"]),
+  Topic("Warehouse", ["warehouse(s)"], publicname="Warehouses"),
 
   # FRONTEND
   Topic("Frontend", [
@@ -113,7 +112,7 @@ SKILLS: list[Skill] = [
   # BEM, БЭМ
   Topic("Browser", ["browser"]),
   Topic("Canvas", ["canvas"]),
-  Topic("DevTools", ["dev=tools"]),
+  Topic("DevTool", ["dev=tool(s)"], publicname="DevTools"),
   Topic("DOM", ["dom"]),
   Topic("Flexbox", ["flex=box"]),
   Topic("MPA", ["mpa"]),
@@ -121,16 +120,16 @@ SKILLS: list[Skill] = [
   Topic("-SPA", ["med spa", "medical spa"]),
   Topic("Markup", ["markup"]),
   Topic("WebGL", ["webgl"]),
-  Topic("Web-Components", ["web=component(s)"]),
+  Topic("Web-Component", ["web=component(s)"], publicname="Web-Components"),
 
   # GAMES >
   # Topic("Pixel", ["pixel(s)"]),
   # Topic("-Pixel", ["google=pixel"]),
   # Topic("Voxel", ["voxel(s)"]),
   # Polygon -- disambig.
-  Topic("Shaders", ["shader(s)"]),
-  Topic("Sprites", ["sprite(s)"]),
-  Topic("Textures", ["texture(s)"]),
+  Topic("Shader", ["shader(s)"], publicname="Shaders"),
+  Topic("Sprite", ["sprite(s)"], publicname="Sprites"),
+  Topic("Texture", ["texture(s)"], publicname="Textures"),
   # TODO add game-specific non-graphic topics
 
   # HARDWARE >
@@ -146,7 +145,7 @@ SKILLS: list[Skill] = [
   Topic("HDD", ["hdd", "hmdd"]), # also SYSTEMS
   Topic("IoT", ["iot", "internet-of-things"]),
   Topic("Kernel", ["kernel"]), # also SYSTEMS
-  Topic("Motherboard", ["motherboards"]),
+  Topic("Motherboard", ["motherboard(s)"], publicname="Motherboards"),
   Topic("PCB", ["pcb"]),
   Topic("PCI", ["pci"]), # also SYSTEMS
   Topic("RAM", ["RAM"]), # also SYSTEMS
@@ -162,32 +161,32 @@ SKILLS: list[Skill] = [
   # MACHINE-LEARNING >
   Topic("AI", ["ai", "artificial-intelligence"]),
   Topic("Deep-Learning", ["deep=learning", "deep=reinforcement=learning", "dl"]), # not sure about FPs for "dl"
-  Topic("Large-Language-Models", [
+  Topic("Large-Language-Model", [
     "large-language-model(s)", "llm(s)",
     "multimodal-large-language-model(s)", "mllm(s)"
-  ]),
+  ], publicname="Large-Language-Models"),
   Topic("Natural-Language-Processing", ["natural=language=processing", "nlp"]),
-  Topic("Neural-Networks", ["(deep=)neural-networks", "nn", "dnn"]), # not sure about FPs
+  Topic("Neural-Network", ["(deep=)neural-networks", "nn", "dnn"], publicname="Neural-Networks"), # not sure about FPs
   # Signal Processing, Face Detection
 
   # MOBILE >
   Topic("Cross-Platform", ["cross=platform"]), # also SYSTEMS
   Topic("Desktop", ["desktop"]),
-  Topic("Devices", ["device(s)"]),
+  Topic("Device", ["device(s)"], publicname="Devices"),
   # TODO more topics
 
   # NETWORKS >
   Topic("Bluetooth", ["bluetooth"]), # also EMBEDDED
   Topic("CDN", ["cdn(s)"]),
   Topic("DNS", ["dns"]),
-  Topic("Firewalls", ["firewall(s)"]), # also SECURITY
+  Topic("Firewall", ["firewall(s)"], publicname="Firewalls"), # also SECURITY
   Topic("FTP", ["ftp"]),
   Topic("SFTP", ["sftp"]), # also SECURITY
   Topic("HighLoad", ["high=load"]),
   Topic("HTTP", ["http"]),   # also BACKEND and more
   Topic("HTTPS", ["https"]), # also SECURITY
   Topic("IP", ["ip", "ip(v)4", "ip(v)6"]),
-  Topic("Proxies", ["proxy", "proxies"]),
+  Topic("Proxy", ["proxy", "proxies"], publicname="Proxies"),
   Topic("SMTP", ["smtp"]),
   Topic("SOCKS", ["socks", "socks4", "socks5"]),
   Topic("SSL", ["ssl"]),
@@ -209,20 +208,20 @@ SKILLS: list[Skill] = [
   Topic("IaaS", ["iaas", "caas", "haas"]),
   Topic("PaaS", ["paas"]),
   Topic("IAC", ["iac", "infrastructure=as=code"]),
-  Topic("Monorepos", ["mono=repo(s)", "mono=repository", "mono=repositories"]),
+  Topic("Monorepo", ["mono=repo(s)", "mono=repository", "mono=repositories"], publicname="Monorepos"),
   Topic("Containerization", ["containerization", "containerized"]), # TODO container with disambig.
-  Topic("Integrations", ["integration(s)"]),
+  Topic("Integration", ["integration(s)"], publicname="Integrations"),
   Topic("Orchestration", ["orchestration"]),
   Topic("Provisioning", ["provisioning"]),
   Topic("Virtualization", ["virtualization", "virtual=machine(s)", "vm(s)"]),
-  Topic("VPCs", ["vpc(s)"]),
+  Topic("VPC", ["vpc(s)"], publicname="VPCs"),
   # blue green deployments
 
   # ROBOTICS >
   Topic("Computer-Vision", ["computer=vision"]),
   Topic("RTOS", ["rtos"]),
   Topic("GPOS", ["gpos"]),
-  Topic("Sensors", ["sensor(s)"]),
+  Topic("Sensor", ["sensor(s)"], publicname="Sensors"),
   # Motion-Prediction
   # Sensor-Fusion
   # Radar, lidar, Quadro-Copters
@@ -240,7 +239,7 @@ SKILLS: list[Skill] = [
     "it=security", "it=sec",
   ]),
   # Identity and Access management
-  Topic("Antiviruses", ["anti=virus(es)"]),
+  Topic("Antivirus", ["anti=virus(es)"], publicname="Antiviruses"),
   Topic("Bruteforce", ["bruteforce"]),
   Topic("DDOS", ["ddos"]), # also NETWORKs
   Topic("Encryption", ["encryption"]), # also NETWORKs
@@ -262,9 +261,9 @@ SKILLS: list[Skill] = [
   # "Privacy"
 
   # SYSTEMS
-  Topic("Systems", ["system(s)"]), # TODO many FPs e.g. "information systems"
+  Topic("System", ["system(s)"], publicname="Systems"), # TODO many FPs e.g. "information systems"
   Topic("ASTs", ["ast(s)"]),
-  Topic("Compilers", ["compiler(s)", "compiling", "compilation", "compile-time", "run=time"]),
+  Topic("Compiler", ["compiler(s)", "compiling", "compilation", "compile-time", "run=time"], publicname="Compilers"),
   Topic("CLI", ["cli", "stdin", "stdout", "stderr", "command=line", "terminal"]),
   Topic("GUI", ["gui"]),
   Topic("Cron", ["cron(s)", "crond", "cronjob(s)"]),
@@ -272,12 +271,12 @@ SKILLS: list[Skill] = [
   Topic("Distributed", ["distributed"]),
   Topic("Logging", ["logging"]),       # also OPERATIONS
   Topic("Monitoring", ["monitoring"]), # also OPERATIONS
-  Topic("Parsers", ["parser(s)", "parsing"]),
-  Topic("Processes", ["process(es)", "processing", "multi=processing"]),
+  Topic("Parser", ["parser(s)", "parsing"], publicname="Parsers"),
+  Topic("Process", ["process(es)", "processing", "multi=processing"], publicname="Processes"),
   Topic("SSH", ["ssh"]), # also OPERATIONS
-  Topic("Sockets", ["socket(s)"]),
-  Topic("Streams", ["stream(s)"]),
-  Topic("Threads", ["thread(s)", "threading", "multi=threading"]),
+  Topic("Socket", ["socket(s)"], publicname="Sockets"),
+  Topic("Stream", ["stream(s)"], publicname="Streams"),
+  Topic("Thread", ["thread(s)", "threading", "multi=threading"], publicname="Threads"),
   # Computer(s) (computing) (from CS)
   # Scheduler / Scheduling
 
@@ -292,7 +291,7 @@ SKILLS: list[Skill] = [
 
   # WEB >
   Topic("CORS", ["cors"]), # also SECURITY
-  Topic("WebSockets", ["websocket(s)", "ws"]), # also NETWORKS
+  Topic("WebSocket", ["websocket(s)", "ws"], publicname="WebSockets"), # also NETWORKS
 
   # UNSORTED
   Topic("AR/VR", [
@@ -304,7 +303,7 @@ SKILLS: list[Skill] = [
   Topic("Scraping", ["scraping", "webscraping"]),
   Topic("Videography", ["videography", "videographer", "video(s)"]),
   # Audio, Sound, Image(s), Video(s)
-  Topic("Visualizations", ["visualization", "visualizer"]),
+  Topic("Visualization", ["visualization", "visualizer"], publicname="Visualizations"),
   # Bot(s)
 
   # Topic("2D", ["2d"]), -- too widespread
@@ -314,12 +313,12 @@ SKILLS: list[Skill] = [
   # Topic("Entity-Component-System", ["entity-component-system", "ecs"]), -- conflicts with AWS-ECS
 
   # COMBINED ---------------------------------------------------------------------------------------
-  Topic("Data-Warehouses", ["data=warehouse(s)", "dwh"], resolve=["Data", "Warehouses"]),
+  Topic("Data-Warehouse", ["data=warehouse(s)", "dwh"], resolve=["Data", "Warehouse"]),
   Topic("Fullstack", ["full=stack(er)"], resolve=["Backend", "Frontend"]),
   Topic("SDET", ["sdet"], resolve=["Software", "Engineering", "Testing"]),
   Topic("SDLC", ["sdlc"], resolve=["Software", "Engineering", "Testing", "Deployment"]),
   Topic("SRE", ["SRE"], resolve=["Reliability", "Engineering"]),
-  Topic("Web-APIs", ["webapi(s)"], resolve=["Web", "APIs"]),
+  Topic("Web-API", ["webapi(s)"], resolve=["Web", "API"]),
 ]
 
 # TODO phpdeveloper, webarchitect, phpcoder, dbadmin, rubydev

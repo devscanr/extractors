@@ -1,6 +1,6 @@
 from spacy.tokens import Doc, Token
 from typing import cast, Literal, Sequence
-from ..extractor import BaseExtractor, TMatch
+from ..extractor import BaseExtractor, UMatch
 from ..markers import is_future, is_hashtagged, is_negated, is_past
 from ..spacyhelpers import ancestors, is_word, left_tokens
 from .categorized import Categorized, CategorizedRole
@@ -25,24 +25,24 @@ class CategoryExtractor(BaseExtractor):
     #   for tok in doc if not tok.is_punct
     # ])
 
-    tmatches, _ = self.find_tmatches(doc)
+    umatches, _ = self.find_umatches(doc)
 
     # Cancel certain roles by mathed ancestor roles
-    tmatches2: list[TMatch] = []
-    for tmatch in tmatches:
-      cancelingset = next((CANCELING_TAGS[uname] for uname in unfold_names(tmatch.name) if uname in CANCELING_TAGS), set())
-      ancs = set(ancestors(tmatch.maintoken))
+    umatches2: list[UMatch] = []
+    for umatch in umatches:
+      cancelingset = next((CANCELING_TAGS[uname] for uname in unfold_names(umatch.name) if uname in CANCELING_TAGS), set())
+      ancs = set(ancestors(umatch.maintoken))
       if not any(
-        maintok in ancs and set(unfold_names(nm)) & cancelingset and not is_distant(tmatch.maintoken, maintok)
-        for nm, _, maintok in tmatches
+        maintok in ancs and set(unfold_names(nm)) & cancelingset and not is_distant(umatch.maintoken, maintok)
+        for nm, _, maintok in umatches
       ):
-        tmatches2.append(tmatch)
-    # print("tmatches2:", tmatches2)
+        umatches2.append(umatch)
+    # print("umatches2:", umatches2)
 
     # Extract roles
     role: CategorizedRole | None = None
     is_freelancer, is_lead, is_remote, is_hireable = None, None, None, None
-    for name, _, maintoken in tmatches2:
+    for name, _, maintoken in umatches2:
       if role is None:
         if name == "Dev" or name.startswith("Dev:"):
           role = self.check_dev(maintoken)

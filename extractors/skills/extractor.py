@@ -14,6 +14,7 @@ class SkillExtractor(BaseExtractor):
   def __init__(self, nlp: Language, skills: Sequence[Skill]):
     super().__init__(nlp, skills)
     self.groups: dict[str, str] = {}
+    self.publicnames: dict[str, str] = {}
     self.resolvers: dict[str, Resolve] = {}
     self.init_matchers2(skills)
 
@@ -22,6 +23,10 @@ class SkillExtractor(BaseExtractor):
       # Update groups
       if skill.name not in self.groups:
         self.groups[skill.name] = skill.group
+      # Update publicnames
+      if skill.publicname is not None:
+        assert skill.name not in self.publicnames, f"duplicate `publicname` at {skill.name!r}"
+        self.publicnames[skill.name] = skill.publicname
       # Update resolve fns
       if skill.resolve is not None:
         assert skill.name not in self.resolvers, f"duplicate `resolve` at {skill.name!r}"
@@ -40,13 +45,21 @@ class SkillExtractor(BaseExtractor):
     # pprint([{
     #   "token": tok, "pos": tok.pos_, "dep": tok.dep_, "head": tok.head} for tok in doc
     # ]) # if not tok.is_punct
-    tmatches, _ = self.find_tmatches(doc)
+    umatches, _ = self.find_umatches(doc)
     # Resolve skills
     skills: list[str] = []
-    for name, _, maintoken in tmatches:
+    for name, _, maintoken in umatches:
       if name in self.resolvers:
         skills += self.resolvers[name](maintoken)
       else:
         skills.append(name)
-    # Uniquelize skills
-    return uniq(skills)
+    # Uniquelize and dealias skills
+    return [
+      self.to_publicname(s)
+      for s in uniq(skills)
+    ]
+
+  def to_publicname(self, name: str) -> str:
+    if name in self.publicnames:
+      return self.publicnames[name]
+    return name

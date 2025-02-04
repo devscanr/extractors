@@ -1,6 +1,6 @@
 from ...xpatterns import ver1
 from ..tag import Language, Skill
-from ..utils import dis_incontext, dis_letterlike, dis_namelike, dis_verblike
+from ..utils import dis_incontext, dis_letterlike, dis_namelike, dis_nounlike, dis_precisely, dis_verblike
 
 SKILLS: list[Skill] = [
   # QUERY LANGUAGES
@@ -75,8 +75,11 @@ SKILLS: list[Skill] = [
   Language("GQL", ["gql"]), # TODO Cypher
   Language("HTML", [ver1("html")]),
   Language("JSON", ["json", "json5"]),
-  Language("LESS", ["LESS"]),
-  Language("LESS", ["less"], disambiguate=dis_incontext("sass", "scss")),
+  Language("LESS", ["less"], disambiguate=[
+    dis_precisely("LESS"),
+    dis_incontext("sass", "scss"),
+    dis_nounlike(),
+  ]),
   Language("Makefile", ["makefile"]),
   Language("Markdown", ["markdown", "md"]),
   Language("SASS", ["sass", "scss"]),

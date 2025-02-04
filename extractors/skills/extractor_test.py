@@ -35,7 +35,7 @@ class Test_SkillExtractor:
     assert extract("objective-c") == ["Objective-C"]
     assert extract("foo") == []
     # TOPICS
-    assert extract("computer") == ["Computer"]
+    assert extract("computer") == ["Computers"]
     assert extract("Science") == ["Science"]
     assert extract("computer science") == ["Computer-Science"]
     assert extract("foo") == []
@@ -57,7 +57,7 @@ class Test_SkillExtractor:
 
   # ADHOC
   def test_extract_adhoc1(self, extractset) -> None:
-    assert extractset("computer") == {"Computer"}
+    assert extractset("computer") == {"Computers"}
     assert extractset("data") == {"Data"}
     assert extractset("my user data") == set()
     assert extractset("data science") == {"Data-Science"}
@@ -79,11 +79,11 @@ class Test_SkillExtractor:
 
   def test_extract_adhoc2(self, extractset) -> None:
     assert extractset("programming") == {"Software"}
-    assert extractset("computer programming") == {"Computer", "Software"}
+    assert extractset("computer programming") == {"Computers", "Software"}
     assert extractset("web programming") == {"Web", "Software"}
     assert extractset("php programming") == {"PHP", "Software"}
     assert extractset("programming with PHP") == {"Software", "PHP"}
-    assert extractset("just programming on computers") == {"Software", "Computer"}
+    assert extractset("just programming on computers") == {"Software", "Computers"}
 
   def test_extract_adhoc3(self, extractset) -> None:
     assert extractset("software engineering") == {"Software", "Engineering"}
@@ -186,6 +186,10 @@ class Test_SkillExtractor:
     assert extractset("using Lit for fun and profit") == {"Lit"}
     assert extractset("react") == {"React"}
     assert extractset("go.") == {"Go"}
+
+  def test_extract_adhoc16(self, extractset) -> None:
+    assert extractset("AWS-VPC") == {"AWS-VPC"}
+    assert extractset("AWS something something VPC") == {"AWS", "AWS-VPC"}
 
   # BIOS
   def test_extract_bios1(self, extractset) -> None:
@@ -346,7 +350,7 @@ class Test_SkillExtractor:
     assert extractset("Hi, my name is Arm") == set()
     assert extractset("My left arm is stronger than my right arm") == set()
     assert extractset("I’m doing high-performance computing work on CPU, including x86, arm.") == {
-      "Performance", "Computer", "CPU", "x86", "ARM"
+      "Performance", "Computers", "CPU", "x86", "ARM"
     }
     assert extractset("Embrace AI-IoT | RISC-V | ARM | ARC") == {"AI", "IoT", "RISC", "ARM", "ARC"}
     assert extractset("PERN afficianado") == {"PostgreSQL", "Express", "React", "NodeJS"}
@@ -354,7 +358,7 @@ class Test_SkillExtractor:
   def test_extract_bios13(self, extractset) -> None:
      assert extractset("My favorite language is Jax") == set()
      assert extractset("My name is Jax") == set()
-     assert extractset("Hi, I'm Jax, an avid computer sorcerer") == {"Computer"}
+     assert extractset("Hi, I'm Jax, an avid computer sorcerer") == {"Computers"}
      assert extractset("CUDA C++ , Pytorch RT, JAX(JIT,Haiku enjoyer, FLAX Flexer)") == {"CUDA", "C++", "PyTorch", "JAX", "Flax"}
      assert extractset("JAX @NVIDIA") == {"JAX", "NVidia"}
      assert extractset("Scientist @ JAX") == {"Science", "JAX"}

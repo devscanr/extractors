@@ -1,5 +1,4 @@
 from itertools import dropwhile
-from pprint import pprint
 import re
 from spacy.tokens import Doc, Span, Token
 from typing import Literal, Sequence
@@ -21,13 +20,15 @@ class TitleExtractor(BaseExtractor):
     # pprint(list(self.nlp.tokenizer.explain(text_or_doc)))
     # pprint([{"token": tok, "pos": tok.pos_, "dep": tok.dep_, "head": tok.head} for tok in doc if not tok.is_punct])
 
-    tmatches, tunmatches = self.find_tmatches(doc)
-    ignore_tokens = [tok for _, tokens, _ in tunmatches for tok in tokens]
+    umatches, unmatches = self.find_umatches(doc)
+    ignore_tokens = [tok for _, tokens, _ in unmatches for tok in tokens]
+    # print("umatches:", umatches)
+    # print("ignore_tokens:", ignore_tokens)
 
-    # Filter tmatches additionally (TODO apply the same role canceling we do in `CategoryExtractor`)
-    tmatches2 = [
+    # Filter umatches additionally (TODO apply the same role canceling we do in `CategoryExtractor`)
+    umatches2 = [
       (name, tokens, maintoken)
-      for name, tokens, maintoken in tmatches
+      for name, tokens, maintoken in umatches
       if (name == tagfilter or name.startswith(tagfilter + ":")) and (
         maintoken.head.text.startswith("@") or
         maintoken.dep_ not in {"amod", "compound", "dobj", "pobj"} or
@@ -35,10 +36,11 @@ class TitleExtractor(BaseExtractor):
         # ^ TODO maybe analize a verb instead
       )
     ]
+    # print("umatches2:", umatches2)
 
     # Extract spans
     spans: list[Span] = []
-    for _, _, maintoken in tmatches2:
+    for _, _, maintoken in umatches2:
       span = find_noun_span(maintoken, [list(span) for span in spans] + [ignore_tokens])
       if is_hashtagged(span.root):
         spans.append(span)
@@ -89,7 +91,6 @@ def find_noun_span(token: Token, acc_spans: list[list[Token]]) -> Span:
         toks.append(tok)
       elif tok.head.head == token and tok.i > token.i and tok.head.lower_ in {"at", "of"}:
         toks.append(tok)
-  # print("toks:", toks)
   toks = list(dropwhile(is_hanging, toks))
   toks = list(dropwhile(is_hanging, reversed(toks)))
   toks = list(reversed(toks))

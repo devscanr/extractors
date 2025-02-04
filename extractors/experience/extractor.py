@@ -1,7 +1,7 @@
 import re
 from spacy.tokens import Doc, Token
 from typing import Generator, Sequence
-from ..extractor import BaseExtractor, TMatch
+from ..extractor import BaseExtractor, UMatch
 from ..markers import is_future, is_negated, is_past
 from .experience import is_OtherExperienceKind
 from .experience import Experience
@@ -23,17 +23,17 @@ class ExperienceExtractor(BaseExtractor):
     #   "token": tok, "pos": tok.pos_, "dep": tok.dep_, "head": tok.head}
     #   for tok in doc # if not tok.is_punct
     # ])
-    tmatches, _ = self.find_tmatches(doc)
-    # print("tmatches:", tmatches)
+    umatches, _ = self.find_umatches(doc)
+    # print("umatches:", umatches)
 
     # Filter negated and future matches
-    tmatches = [
-      tmatch for tmatch in tmatches
-      if not any(pred(tmatch.maintoken) for pred in [is_negated, is_future, is_past])
+    umatches2 = [
+      umatch for umatch in umatches
+      if not any(pred(umatch.maintoken) for pred in [is_negated, is_future, is_past])
     ]
-    # print("tmatches':", tmatches)
+    # print("umatches2:", umatches2)
 
-    experiences = list(self.parse_experiences(tmatches))
+    experiences = list(self.parse_experiences(umatches2))
     # print("experiences:", experiences)
     match len(experiences):
       case 0: return None
@@ -50,25 +50,25 @@ class ExperienceExtractor(BaseExtractor):
           return e1 # "exact, other" -> exact
       case _: return None
 
-  def parse_experiences(self, tmatches: list[TMatch]) -> Generator[Experience, None, None]:
+  def parse_experiences(self, umatches: list[UMatch]) -> Generator[Experience, None, None]:
     # experiences: list[Experience] = []
     # Note: all 'Other' matches are single token wide (phantoms are dropped by this point)
     skips: set[int] = set()
-    for k, tmatch in enumerate(tmatches):
+    for k, umatch in enumerate(umatches):
       if k in skips:
         continue
-      if tmatch.name in {"MOE", "YOE"}:
-        exp = self.parse_ee(tmatch.name, tmatch.tokens)
+      if umatch.name in {"MOE", "YOE"}:
+        exp = self.parse_ee(umatch.name, umatch.tokens)
         if exp:
           yield exp
       else:
-        tm = tmatches[k + 1] if k < len(tmatches) - 1 else None
-        rt1 = right_token(tmatch.maintoken)
+        next_umatch = umatches[k + 1] if k < len(umatches) - 1 else None
+        rtoken = right_token(umatch.maintoken)
         if (
-          rt1 and rt1.text in {"/", "-", "->", ",", "."} and
-          tm and tm.maintoken.i == tmatch.maintoken.i + 2 and tm.name not in {"MOE", "YOE"}
+          rtoken and rtoken.text in {"/", "-", "->", ",", "."} and
+          next_umatch and next_umatch.maintoken.i == umatch.maintoken.i + 2 and next_umatch.name not in {"MOE", "YOE"}
         ):
-          match (tmatch.name, tm.name):
+          match (umatch.name, next_umatch.name):
             case "Junior", "Middle":
               yield Experience("Junior", over=True)
               skips.add(k + 1)
@@ -81,9 +81,9 @@ class ExperienceExtractor(BaseExtractor):
               yield Experience("Senior", over=True)
               skips.add(k + 1)
               continue
-        exp = self.parse_oe(tmatch.name, tmatch.tokens)
-        if exp:
-          yield exp
+        experience = self.parse_oe(umatch.name, umatch.tokens)
+        if experience:
+          yield experience
 
   def parse_ee(self, tagname: str, tokens: list[Token]) -> Experience | None:
     sent = tokens[0].sent

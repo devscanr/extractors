@@ -7,9 +7,9 @@ SKILLS: list[Skill] = [
   Topic("Administration.Databases", [
     "databaseadministration", "databaseadministrator", "dba"
   ], resolve=["Administration", "Databases"]),
-  Topic("Administration.Systems", [
+  Topic("Administration.System", [
     "systemadministration", "systemadministrator", "sysadmin"
-  ], resolve=["Administration", "Systems"]),
+  ], resolve=["Administration", "System"]),
 
   Topic("Analysis", ["analysis", "analytics", "analytical", "analyst"]),
   Topic("Analysis.Business", [
@@ -26,14 +26,14 @@ SKILLS: list[Skill] = [
   Topic("Architecture", ["architecture", "architect"]),
   Topic("Architecture.Cloud", ["cloudarchitecture", "cloudarchitect"], resolve=["Architecture", "Cloud"]),
   Topic("Architecture.Data", ["dataarchitecture", "dataarchitect"], resolve=["Architecture", "Data"]),
-  Topic("Architecture.Games", ["gamearchitecture", "gamearchitect"], resolve=["Architecture", "Games"]),
+  Topic("Architecture.Game", ["gamearchitecture", "gamearchitect"], resolve=["Architecture", "Game"]),
   Topic("Architecture.Security", ["securityarchitecture", "securityarchitect"], resolve=["Architecture", "Security"]),
-  Topic("Architecture.Solutions", [
+  Topic("Architecture.Solution", [
     "solution=architecture", "solution=architect"
   ], resolve=["Architecture", "Software", "Business"]),
-  Topic("Architecture.Systems", [
+  Topic("Architecture.System", [
     "systemarchitecture", "systemarchitect"
-  ], resolve=["Architecture", "Systems"]),
+  ], resolve=["Architecture", "System"]),
   # UI Architect
   Topic("Architecture.Web", ["webarchitecture", "webarchitect"], resolve=["Architecture", "Web"]),
 
@@ -47,7 +47,7 @@ SKILLS: list[Skill] = [
     "b2b", "b2c", "b2b2c",
   ]),
   Topic("Commerce", ["(e=)commerce"]),
-  Topic("Startups", ["startup(s)", "startuper"]),
+  Topic("Startup", ["startup(s)", "startuper"], publicname="Startups"),
 
   Topic("Design", [
     "font<~design", "font<~designer",
@@ -55,12 +55,12 @@ SKILLS: list[Skill] = [
     "motion<~design", "motion<~designer",
     "visual<~design", "visual<~designer",
   ]),
-  Topic("Design.Games", [
+  Topic("Design.Game", [
     "game(s)<~design", "game(s)<~designer",
-  ], resolve=["Design", "Games"]),
-  Topic("Design.Graphics", [
+  ], resolve=["Design", "Game"]),
+  Topic("Design.Graphic", [
     "graphic(s)<~design", "graphic(s)<~designer",
-  ], resolve=["Graphics", "Design"]),
+  ], resolve=["Graphic", "Design"]),
   Topic("Design.UI/UX", [
     "ui<~design", "ui<~designer",
     "ux<~design", "ux<~designer",
@@ -97,11 +97,11 @@ SKILLS: list[Skill] = [
   Topic("Engineering.Embedded", [
     "embeddedengineer", "embeddedprogramming", "embeddeddev",
   ], resolve=["Engineering", "Embedded"]),
-  Topic("Engineering.Games", [
+  Topic("Engineering.Game", [
     "gameengineering", "gameengineer",
     "gameprogramming", "gameprogrammer",
     "gamedeveloper", "gamedev",
-  ], resolve=["Engineering", "Games"]),
+  ], resolve=["Engineering", "Game"]),
   Topic("Engineering.Hardware", [
     "hardware<~architecture", "hardware<~architect",
     "hardware<~design", "hardware<~designer",
@@ -111,7 +111,7 @@ SKILLS: list[Skill] = [
   ], resolve=["Engineering", "Hardware"]),
   Topic("Engineering.Machine-Learning", ["ml=engineer(ing)"], resolve=["Engineering", "Machine-Learning"]),
   Topic("Engineering.Mobile", ["mobiledev", "mobiledeveloper", "mobileengineer"], resolve=["Engineering", "Mobile"]),
-  Topic("Engineering.Networks", ["network(s)dev", "network(s)developer", "network(s)engineer"], resolve=["Engineering", "Networks"]),
+  Topic("Engineering.Network", ["network(s)dev", "network(s)developer", "network(s)engineer"], resolve=["Engineering", "Network"]),
   Topic("Engineering.Operations", ["devop(s)"], resolve=["Engineering", "Operations"]),
   Topic("Engineering.Security.Operations", [
     "dev/sec-ops", "sec/dev-ops",
@@ -125,11 +125,11 @@ SKILLS: list[Skill] = [
     "SDE", "SWE", # sometimes SE @_@
     "software<~design", "software<~designer",
   ], resolve=["Engineering", "Software"]),
-  Topic("Engineering.Systems", [
+  Topic("Engineering.System", [
     "systemengineering", "systemengineer",
     "systemprogramming",
     "systemdeveloper", "systemdev",
-  ], resolve=["Engineering", "Systems"]),
+  ], resolve=["Engineering", "System"]),
   Topic("Engineering.Web", [
     "webengineering", "webengineer",
     "webprogramming", "webprogrammer",
@@ -160,9 +160,9 @@ SKILLS: list[Skill] = [
   Topic("Management.Operations", [
     "operations<~management", "operations<~manager",
   ], resolve=["Management", "Operations"]),
-  Topic("Management.Warehouses", [
+  Topic("Management.Warehouse", [
     "warehouse<~management", "warehouse<~manager",
-  ], resolve=["Management", "Warehouses"]),
+  ], resolve=["Management", "Warehouse"]),
 
   Topic("Marketing", [
     "marketing", "marketer",
@@ -180,9 +180,9 @@ SKILLS: list[Skill] = [
   Topic("Operations", ["operations", "ops"]),
   Topic("Operations.Data", ["dataoperations", "dataop(s)"], resolve=["Operations", "Data"]),
   Topic("Operations.Machine-Learning", ["mlop(s)", "mldevop(s)", "ai=op(s)"], resolve=["Operations", "Machine-Learning"]),
-  Topic("Operations.Networks", ["network(s)operations", "networkop(s)", "netop(s)"], resolve=["Operations", "Networks"]),
+  Topic("Operations.Network", ["network(s)operations", "networkop(s)", "netop(s)"], resolve=["Operations", "Network"]),
   Topic("Operations.Security", ["securityoperations", "secop(s)"], resolve=["Operations", "Security"]),
-  Topic("Operations.Systems", ["system(s)operations", "sysop(s)"], resolve=["Operations", "Systems"]),
+  Topic("Operations.System", ["system(s)operations", "sysop(s)"], resolve=["Operations", "System"]),
 
   Topic("Research", ["research", "reseacher"]),
 
@@ -195,9 +195,9 @@ SKILLS: list[Skill] = [
     "suite", "suites", "unit", "write", "writing"
   )),
   Topic("-Testing", ["battle-tested", "tested to"]),
-  Topic("Games-Testing", [
+  Topic("Game-Testing", [
     "playtest(s)",
-  ], resolve=["Games", "Testing"]),
+  ], resolve=["Game", "Testing"]),
   Topic("UI/UX-Testing", [
     "uitesting", "uitester",
     "uxtesting", "uxtesting",
@@ -313,7 +313,7 @@ SKILLS: list[Skill] = [
   ]),
   # Topic("Security", ["sec"], disambiguate=neighbour(2)),
   Topic("Security.Data", ["datasecurity", "data=sec", "data=protection"], resolve=["Security", "Data"]),
-  Topic("Security.Networks", ["networksecurity", "netsecurity", "net=sec"], resolve=["Security", "Networks"]),
+  Topic("Security.Network", ["networksecurity", "netsecurity", "net=sec"], resolve=["Security", "Network"]),
   Topic("Security.Web", ["websecurity", "web=sec"], resolve=["Security", "Web"]),
 
   Topic("Sport", [
@@ -334,22 +334,13 @@ SKILLS: list[Skill] = [
   Topic("Travel", ["travel(s)"]),
 
   # BROAD TOPICS
-  Topic("Blockchains", [
+  Topic("Blockchain", [
     "blockchain(s)",
     "on-chain", "off-chain",
     "litecoin",
-  ]),
+  ], publicname="Blockchains"),
 
-  Topic("Computer", ["computer(s)", "computing"]),
-  # Note: to be able to name this "Computer" and still be captured by "Computer-Science"
-  # we have to split dpattern rules like:
-  # == probably applies only to <~ and more complex patterns ==
-  # Computer-Science {LOWER: computerscience}
-  # Computer-Science {LOWER: computer}<-{LOWER: science}
-  # Computer-Science:1 {LOWER: computer}<-{NOUN} {CONJ} {science} omit offsets [1, 2]
-  # Computer-Science:2 -- other complex rule -- omit some offsets
-  # Then, perhaps in a separate step after match, drop those "omit offsets"
-  # If we do this, we might not need exclusive/inclusive differentiation at all
+  Topic("Computer", ["computer(s)", "computing"], publicname="Computers"),
 
   Topic("Data", ["data"]), # maybe a whitelist will work better here
   Topic("-Data", [
@@ -364,14 +355,14 @@ SKILLS: list[Skill] = [
 
   Topic("Electronics", ["electronic(s)", "electronical"]),
 
-  Topic("Games", [
+  Topic("Game", [
     "game(s)", "gamer", "gameplay",
     "arcanoid", "minecraft", "tetris", "tictactoe",
     "single=player", "multi-player",
-  ]),
-  Topic("-Games", ["game=theory"]), # oversimplified, will update later
+  ], publicname="Games"),
+  Topic("-Game", ["game=theory"]), # oversimplified, will update later
 
-  Topic("Graphics", ["graphic(s)"]),
+  Topic("Graphic", ["graphic(s)"], publicname="Graphics"),
 
   Topic("Hardware", ["hardware"]), # "HW"
 
@@ -379,7 +370,7 @@ SKILLS: list[Skill] = [
 
   Topic("Machine-Learning", ["machine-learning", "ml"]),
 
-  Topic("Networks", ["networking", "network(s)"]),
+  Topic("Network", ["networking", "network(s)"], publicname="Networks"),
 
   Topic("Internet", ["internet", "www"]),
 

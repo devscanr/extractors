@@ -6,7 +6,7 @@ from spacy.tokens import Doc, Token
 from typing import Any, Callable, NamedTuple, Sequence, cast
 from .ppatterns import to_ppatterns
 from .spacyhelpers import token_level
-from .utils import hash_skillname, uniq3
+from .utils import hash_skillname, uniq2
 from .dpatterns import DPattern, separate_dphantoms, separate_xphantoms, to_dpatterns2
 from .xpatterns import XPattern, literal
 
@@ -15,6 +15,10 @@ class OMatch(NamedTuple):
   offsets: list[int]
 
 class TMatch(NamedTuple):
+  name: str
+  tokens: list[Token]
+
+class UMatch(NamedTuple):
   name: str
   tokens: list[Token]
   maintoken: Token
@@ -116,18 +120,18 @@ class BaseExtractor:
             else:
               self.xmatcher.add(mname, [xpattern])
 
-  def find_raw_omatches(self, doc: Doc) -> list[OMatch]:
+  def find_omatches(self, doc: Doc) -> list[OMatch]:
     """
-    Find raw omatches deriving them from xmatches, pmatches, and dmatches
+    Find offset-based matches (a union-set of xmatches, pmatches, dmatches)
     """
-    raw_omatches: list[OMatch] = []
+    omatches: list[OMatch] = []
     xmatches = self.xmatcher(doc) if len(self.xmatcher) else []
     pmatches = self.pmatcher(doc) if len(self.pmatcher) else []
     dmatches = self.dmatcher(doc) if len(self.dmatcher) else []
     for pmatch in pmatches:
       [match_id, start, end] = pmatch
       mname = self.nlp.vocab.strings[match_id]
-      raw_omatches.append(OMatch(mname, list(range(start, end))))
+      omatches.append(OMatch(mname, list(range(start, end))))
     for xmatch in xmatches:
       [match_id, start, end] = xmatch
       offsets = list(range(start, end)) # global offsets
@@ -135,60 +139,25 @@ class BaseExtractor:
       if pname in self.phantoms:
         offsets = [offs for o, offs in enumerate(offsets) if o not in self.phantoms[pname]]
       mname = detach_phantom(pname) # Can still contain ":maybe"...
-      raw_omatches.append(OMatch(mname, offsets))
+      omatches.append(OMatch(mname, offsets))
     for dmatch in dmatches:
       [match_id, offsets] = dmatch # global offsets
       pname = self.nlp.vocab.strings[match_id]
       if pname in self.phantoms:
         offsets = [offs for o, offs in enumerate(offsets) if o not in self.phantoms[pname]]
       mname = detach_phantom(pname) # Can still contain ":maybe"...
-      raw_omatches.append(OMatch(mname, offsets))
+      omatches.append(OMatch(mname, offsets))
     # DMatcher often produces duplicates (graph-based pattern)
-    raw_omatches = uniq3(raw_omatches)
-    # print("raw_omatches:", raw_omatches)
-    return raw_omatches
-
-  def find_omatches(self, doc: Doc) -> list[OMatch]:
-    """
-    Reduce omatches to min. necessary, sort offsets
-    == Algorithm to merge non-collapsible overlaps ==
-    'Senior Frontend Developer' can match 'Senior Frontend' and 'Senior Developer' in which case
-    we want to merge them and deal with a single match. It concerns only matching tagnames, of course.
-    In case any of overlapping patterns is certain (non-maybe) – their union becomes certain.
-    """
-    raw_omatches = self.find_raw_omatches(doc)
-    omatches: list[OMatch] = []
-    for omatch in raw_omatches:
-      name = detach_maybe(omatch)
-      other_omatches: list[OMatch] = []
-      for om in raw_omatches:
-        if om.offsets == omatch.offsets and detach_maybe(om) != name:
-          raise ValueError(f"tags {omatch.mname!r} and {om.mname!r} overlap at {omatch.offsets!r}")
-        elif omatch != om: # (mname == mnam and offsets == ofs):
-          other_omatches.append(om)
-      if not any(self.should_ignore(omatch, other_omatch) for other_omatch in other_omatches):
-        omatches.append(omatch)
+    omatches = uniq2(omatches)
     # print("omatches:", omatches)
-    # Merge overlapping and neighboring sets of offsets (for the same tagname)
-    _omatches = merge_overlapping([
-      (omatch.mname, set(omatch.offsets))
-      for omatch in omatches
-    ])
-    # Restore matches & sort their offsets
-    omatches = [
-      OMatch(mname, sorted(offsets))
-      for mname, offsets in _omatches
-    ]
-    # print("omatches':", omatches)
     return omatches
 
-  def find_tmatches(self, doc: Doc) -> tuple[list[TMatch], list[TMatch]]:
+  def find_tmatches(self, doc: Doc) -> list[TMatch]:
     """
-    Convert omatches to tokens, disambiguate, split into tmatches & tunmatches, sort the results
+    Find token-based matches, preserving only unambiguous
     """
     omatches = self.find_omatches(doc)
     tmatches: list[TMatch] = []
-    tunmatches: list[TMatch] = []
     for omatch in omatches:
       tokens = [doc[offset] for offset in omatch.offsets]
       maintoken = (
@@ -198,38 +167,68 @@ class BaseExtractor:
       )
       name = detach_maybe(omatch)
       if name == omatch.mname:
-        if omatch.mname.startswith("-"):
-          tunmatches.append(TMatch(name, tokens, maintoken))
-        else:
-          tmatches.append(TMatch(name, tokens, maintoken))
+        tmatches.append(TMatch(name, tokens))
       else:
         if name.startswith("-"):
           raise ValueError("disambiguation for negations is not supported yet")
-        assert omatch.mname in self.disambiguates # TEMP
         if any(disambiguate(maintoken) for disambiguate in self.disambiguates[omatch.mname]):
-          tmatches.append(TMatch(name, tokens, maintoken))
-    # Sort matches and unmatches
-    tmatches.sort(key=lambda tm: tm.maintoken.i)
-    tunmatches.sort(key=lambda tm: tm.maintoken.i)
-    # print("tmatches:", tmatches)
-    # print("tunmatches:", tunmatches)
-    return tmatches, tunmatches
+          tmatches.append(TMatch(name, tokens))
+    tmatches = uniq2(tmatches)
+    # Discard canceled matches
+    tmatches2: list[TMatch] = []
+    for tmatch in tmatches:
+      other_tmatches = [tmat for tmat in tmatches if tmatch != tmat]
+      if not any([self.is_canceled_by(tmatch, other_tm) for other_tm in other_tmatches]):
+        tmatches2.append(tmatch)
+    # print("tmatches2:", tmatches2)
+    return tmatches2
 
-  def should_ignore(self, match: OMatch, other_match: OMatch) -> bool:
-    mname, offsets = match
-    other_mname, other_offsets = other_match
-    name, other_name = detach_maybe(mname), detach_maybe(other_mname)
-    exclusive, other_exclusive = self.exclusives[name], self.exclusives[other_name]
-    if set(offsets) & set(other_offsets):
-      if other_mname in {"-", "-" + name}:
-        # Ignore because of an overlapping canceling match
-        return True
-      if is_maybe(mname) and not is_maybe(other_mname):
-        # Ignore because of an overlapping non-maybe match
-        return True
-      if set(offsets) < set(other_offsets):
-        # Ignore an exclusive match in case of another & wider exclusive match. Unless the reverse comparison is ignored
-        return exclusive and other_exclusive and not(is_maybe(other_mname) and not is_maybe(mname))
+  def find_umatches(self, doc: Doc) -> tuple[list[UMatch], list[UMatch]]:
+    """
+    Find unique matches by merging overlapping and/or neighboring matches
+    """
+    tmatches = self.find_tmatches(doc)
+    # Merge overlapping and neighboring sets of offsets (for the same tagname)
+    _matches = merge_overlapping([
+      (tmatch.name, set([tok.i for tok in tmatch.tokens]))
+      for tmatch in tmatches
+    ])
+    # print("_matches:", _matches)
+    # Derive umatches with properly sorted tokens from tmatches
+    umatches: list[UMatch] = []
+    unmatches: list[UMatch] = []
+    for name, offsets in _matches:
+      tokens = [doc[i] for i in sorted(offsets)]
+      maintoken = (
+        tokens[-1]
+        if all([token_level(t) == token_level(tokens[0]) for t in tokens])
+        else min(tokens, key=lambda t: token_level(t))
+      )
+      if name.startswith("-"):
+        unmatches.append(UMatch(name, tokens, maintoken))
+      else:
+        umatches.append(UMatch(name, tokens, maintoken))
+    # Sort umatches and unmatches by their maintokens' indexes
+    umatches.sort(key=lambda umat: umat.maintoken.i)
+    unmatches.sort(key=lambda umat: umat.maintoken.i)
+    # print("umatches:", umatches)
+    # print("unmatches:", unmatches)
+    return umatches, unmatches
+
+  def is_canceled_by(self, match: TMatch, other_match: TMatch) -> bool:
+    exclusive = self.exclusives[match.name]
+    other_exclusive = self.exclusives[other_match.name]
+    soffsets = {tok.i for tok in match.tokens}
+    other_soffsets = {tok.i for tok in other_match.tokens}
+    if other_match.name in {"-", "-" + match.name}:
+      return bool(soffsets & other_soffsets)
+    # # TODO potentially prefer longer name (with more dashes) as more precisef
+    if soffsets < other_soffsets:
+      # Ignore an exclusive match in case of another, wider exclusive match
+      return exclusive and other_exclusive
+    elif soffsets == other_soffsets:
+      # For VPC and AWS-VPC matching "aws ... vpc" we prefer AWS-VPC as more specific
+      return exclusive and other_exclusive and match.name in other_match.name.split("-")
     return False
 
 def is_maybe(mname_or_omatch: str | OMatch) -> bool:
@@ -267,17 +266,15 @@ def merge_overlapping(matches: list[M]) -> list[M]:
   ]) == [("JS", {7}), ('Senior', {1, 2, 3}), ('SQL', {1}), ('PHP', {4})]
   """
   rs: list[M] = []
-  for k, (mname, offsets) in enumerate(matches):
-    name = detach_maybe(mname)
-    for l, (other_mname, other_offsets) in enumerate(matches):
+  for k, (name, offsets) in enumerate(matches):
+    for l, (other_name, other_offsets) in enumerate(matches):
       if k != l:
-        other_name = detach_maybe(other_mname)
         if name == other_name and (offsets & other_offsets or is_neighboring(offsets, other_offsets)):
           common_name = name if is_maybe(other_name) else other_name
           ms = [(common_name, offsets | other_offsets)]
           ms.extend(match for m, match in enumerate(matches) if m != k and m != l)
           return merge_overlapping(ms)
-    rs.append((mname, offsets))
+    rs.append((name, offsets))
   if rs == matches:
     return matches
   else:

@@ -7,6 +7,11 @@ from ..utils import lookslike
 
 dis_punct = {".", ",", ";", ":", "|", "/", ")"}
 
+def dis_precisely(*orths: str) -> Disambiguate:
+  def disambiguate(token: Token) -> bool:
+    return token.text in orths
+  return disambiguate
+
 def dis_incontext(*phrases: str) -> Disambiguate:
   # TODO use matchers to support multi-words combinations
   regmarkers = [

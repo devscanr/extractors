@@ -103,7 +103,6 @@ def sep_splitter(match: re.Match[str]) -> str:
     word + f" {sep} "
   )
 
-# TODO rename to `uniq2` and add set-based `uniq1`. No `uniq` version to not forget the related quirks.
 def uniq[T](itr: Iterable[T]) -> list[T]:
   """
   Order-preserving uniq. Does not support nested lists and other non-hashable item types.
@@ -115,9 +114,9 @@ def uniq[T](itr: Iterable[T]) -> list[T]:
   keys = cast(Iterable[T], d.keys()) # Looks like MyPy (or something) is improperly typing this
   return list(keys)
 
-def uniq3[T](itr: Iterable[T]) -> list[T]:
+def uniq2[T](itr: Iterable[T]) -> list[T]:
   """
-  Slower than the above. Supports nested lists and other non-hashable item types.
+  Order-preserving uniq. Supports nested lists and other non-hashable item types. Slower than the above.
   """
   arr = list(itr)
   return [x for i, x in enumerate(arr) if arr.index(x) == i]

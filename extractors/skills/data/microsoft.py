@@ -1,6 +1,6 @@
 from ...xpatterns import ver1, propn
 from ..tag import Company, Skill, Tech
-from ..utils import dis_incontext, dis_nounlike
+from ..utils import dis_incontext, dis_nounlike, dis_precisely
 
 SKILLS: list[Skill] = [
   Company("Microsoft", ["(@)microsoft"], "Company"),
@@ -76,6 +76,7 @@ SKILLS: list[Skill] = [
     "aarch64", "arm64",
   ], "CPU family"),
   Tech("ARM", ["arm"], disambiguate=[
+    dis_precisely("ARM"),
     dis_incontext("microsoft", "cpu", "x86", "x32", "x64", "risc", "arc", "processor(s)"),
     dis_nounlike(),
   ]),

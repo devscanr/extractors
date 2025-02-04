@@ -1,6 +1,6 @@
 from ...xpatterns import IN, LOWER, OP, propn, ver1
 from ..tag import Skill, Tech
-from ..utils import dis_incontext, dis_namelike, dis_nounlike, dis_verblike
+from ..utils import dis_incontext, dis_namelike, dis_nounlike, dis_precisely, dis_verblike
 from .adobe import SKILLS as ADOBE_SKILLS
 from .amazon import SKILLS as AMAZON_SKILLS
 from .apache import SKILLS as APACHE_SKILLS
@@ -124,7 +124,7 @@ SKILLS: list[Skill] = [
   Tech("Pandas", ["pandas"]),
   Tech("PyTorch", ["pytorch"]),
   Tech("Keras", ["keras"]),
-  Tech("RAPIDS", [propn("rapids")]), # also GAMEDEV (`https://rapids.ai/`)
+  Tech("RAPIDS", [propn("rapids")]), # also GAMES (`https://rapids.ai/`)
   Tech("Scikit-Learn", ["scikit=learn", "sklearn"]),
   Tech("SciPy", ["scipy"]),
   Tech("Seaborn", ["seaborn"]),
@@ -243,7 +243,7 @@ SKILLS: list[Skill] = [
   Tech("HTMX", ["htmx"]),
   Tech("Meteor", ["meteor", "meteor.=js"]),
   Tech("Ktor", ["ktor"]), # fullstack framework in Kotlin
-  Tech("NextJS", ["next.=js"]), # , propn("next")
+  Tech("NextJS", ["next.=js"]),
   Tech("NextJS", ["next"], disambiguate=[
     dis_incontext("framework", "nuxt", "react"),
     dis_nounlike(),
@@ -397,8 +397,8 @@ SKILLS: list[Skill] = [
   # Tech("HPC", ["hpc"], "High performance computing"),
   Tech("Arduino", ["arduino"], "Controller brand"),
   Tech("ASIC", ["asic"]), # ASICs are custom-designed circuits for specific applications, offering high performance and efficiency
-  Tech("ARC", [propn("ARC")], "CPU family"),
-  Tech("ARC", ["arc"], disambiguate=[
+  Tech("ARC", ["arc"], "CPU family", disambiguate=[
+    dis_precisely("ARC"),
     dis_incontext("cpu", "arm", "processor(s)"),
     dis_nounlike(),
   ]),
