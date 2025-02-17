@@ -7,10 +7,12 @@ from spacy import Language
 from spacy.lang.tokenizer_exceptions import URL_PATTERN
 from spacy.tokens import Doc, Token
 from typing import Any, Callable, cast, Iterable
+from .tokenizer import modify_tokenizer
 from .xpatterns import IN, IS_PUNCT, IS_SENT_START, LOWER, ORTH, TAG, tag_jj, tag_nnp
 
-URL_PATTERN = re.compile(URL_PATTERN)
-I_PATTERN = re.compile("^i[A-Z]")
+URL_RE = re.compile(URL_PATTERN)
+I_RE = re.compile("^i[A-Z]")
+DECORATION_RE = re.compile(r"[\u00A6\u00A9\u00AE\u00B0\u0482\u058D\u058E\u060E\u060F\u06DE\u06E9\u06FD\u06FE\u07F6\u09FA\u0B70\u0BF3-\u0BF8\u0BFA\u0C7F\u0D4F\u0D79\u0F01-\u0F03\u0F13\u0F15-\u0F17\u0F1A-\u0F1F\u0F34\u0F36\u0F38\u0FBE-\u0FC5\u0FC7-\u0FCC\u0FCE\u0FCF\u0FD5-\u0FD8\u109E\u109F\u1390-\u1399\u1940\u19DE-\u19FF\u1B61-\u1B6A\u1B74-\u1B7C\u2100\u2101\u2103-\u2106\u2108\u2109\u2114\u2116\u2117\u211E-\u2123\u2125\u2127\u2129\u212E\u213A\u213B\u214A\u214C\u214D\u214F\u218A\u218B\u2195-\u2199\u219C-\u219F\u21A1\u21A2\u21A4\u21A5\u21A7-\u21AD\u21AF-\u21CD\u21D0\u21D1\u21D3\u21D5-\u21F3\u2300-\u2307\u230C-\u231F\u2322-\u2328\u232B-\u237B\u237D-\u239A\u23B4-\u23DB\u23E2-\u2426\u2440-\u244A\u249C-\u24E9\u2500-\u25B6\u25B8-\u25C0\u25C2-\u25F7\u2600-\u266E\u2670-\u2767\u2794-\u27BF\u29BE-\u29BF\u2800-\u28FF\u2B00-\u2B2F\u2B45\u2B46\u2B4D-\u2B73\u2B76-\u2B95\u2B98-\u2BC8\u2BCA-\u2BFE\u2CE5-\u2CEA\u2E80-\u2E99\u2E9B-\u2EF3\u2F00-\u2FD5\u2FF0-\u2FFB\u3004\u3012\u3013\u3020\u3036\u3037\u303E\u303F\u3190\u3191\u3196-\u319F\u31C0-\u31E3\u3200-\u321E\u322A-\u3247\u3250\u3260-\u327F\u328A-\u32B0\u32C0-\u32FE\u3300-\u33FF\u4DC0-\u4DFF\uA490-\uA4C6\uA828-\uA82B\uA836\uA837\uA839\uAA77-\uAA79\uFDFD\uFFE4\uFFE8\uFFED\uFFEE\uFFFC\uFFFD\U00010137-\U0001013F\U00010179-\U00010189\U0001018C-\U0001018E\U00010190-\U0001019B\U000101A0\U000101D0-\U000101FC\U00010877\U00010878\U00010AC8\U0001173F\U00016B3C-\U00016B3F\U00016B45\U0001BC9C\U0001D000-\U0001D0F5\U0001D100-\U0001D126\U0001D129-\U0001D164\U0001D16A-\U0001D16C\U0001D183\U0001D184\U0001D18C-\U0001D1A9\U0001D1AE-\U0001D1E8\U0001D200-\U0001D241\U0001D245\U0001D300-\U0001D356\U0001D800-\U0001D9FF\U0001DA37-\U0001DA3A\U0001DA6D-\U0001DA74\U0001DA76-\U0001DA83\U0001DA85\U0001DA86\U0001ECAC\U0001F000-\U0001F02B\U0001F030-\U0001F093\U0001F0A0-\U0001F0AE\U0001F0B1-\U0001F0BF\U0001F0C1-\U0001F0CF\U0001F0D1-\U0001F0F5\U0001F110-\U0001F16B\U0001F170-\U0001F1AC\U0001F1E6-\U0001F202\U0001F210-\U0001F23B\U0001F240-\U0001F248\U0001F250\U0001F251\U0001F260-\U0001F265\U0001F300-\U0001F3FA\U0001F400-\U0001F6D4\U0001F6E0-\U0001F6EC\U0001F6F0-\U0001F6F9\U0001F700-\U0001F773\U0001F780-\U0001F7D8\U0001F800-\U0001F80B\U0001F810-\U0001F847\U0001F850-\U0001F859\U0001F860-\U0001F887\U0001F890-\U0001F8AD\U0001F900-\U0001F90B\U0001F910-\U0001F93E\U0001F940-\U0001F970\U0001F973-\U0001F976\U0001F97A\U0001F97C-\U0001F9A2\U0001F9B0-\U0001F9B9\U0001F9C0-\U0001F9C2\U0001F9D0-\U0001F9FF\U0001FA60-\U0001FA6D]")
 
 # RESOURCES
 # - https://stackoverflow.com/questions/15388831/what-are-all-possible-pos-tags-of-nltk
@@ -21,25 +23,22 @@ def clean_asian(text: str) -> str:
   text = text.replace("など", "")
   return text
 
-def clean_emojis(text: str) -> str:
-  # Handle emojis
-  text = replace_emoji(text, "!")
-  # Correct separators for grammar
-  text = text.replace("：", ": ")
-  # Phone indicators
-  text = re.sub(r"(📞|☎️|📱|☎)\s*:?\s*", "Phone: ", text, flags=re.UNICODE)
+def clean_unicode(text: str) -> str:
+  # Replace emojis and decoration
+  text = replace_emoji(text, "·")
+  text = re.sub(DECORATION_RE, "·", text)
   # Drop sudo-emojis like ":snowflake:" which might overlap with skills
   text = re.sub(r":[-\w]+:", "!", text)
   return text
 
-def normalize(text: str, pipechar: str = ".") -> str:
+def normalize(text: str) -> str:
   # Remove junk characters
   text = clean_asian(text)
-  text = clean_emojis(text)
+  text = clean_unicode(text)
+  # Normalize non-conventional separators
+  text = re.sub(r" ?[•·|][•·|\s]*", f" · ", text)
   # Normalize whitespace
   text = re.sub(r"[ \t]+", " ", text)
-  # Replace pipe chars with "." or ","
-  text = re.sub(r"(\s+|(?<=[\w!?]))([•|]+|/[/•|]+)(\s+|(?=[\w!?]))", f"{pipechar} ", text)
   # Workaround FPs for URLs – cases like "next.js/nuxt", look like URLs to NLP
   text = re.sub(r"(\.js)/(?=\w)", r"\1 / ", text, flags=re.IGNORECASE)
   # Workarounds for C# and C++ joined with separators
@@ -86,10 +85,10 @@ def decorate(line: str, sep: str) -> str:
       return line + sep
 
 def should_capitalize_first(token: str) -> bool:
-  return not re.search(URL_PATTERN, token) and not re.search(I_PATTERN, token)
+  return not re.search(URL_RE, token) and not re.search(I_RE, token)
 
 def should_gap_last(token: str) -> bool:
-  return bool(re.search(URL_PATTERN, token))
+  return bool(re.search(URL_RE, token))
 
 def trim(line: str) -> str:
   # Trim wrapping decorations and whitespace
@@ -170,6 +169,7 @@ GRAMMAR_FIXES: list[tuple[str, str | ReplaceFn, re.RegexFlag | int]] = [
   (r"(?<=[\w\s])/co-founder", r" / co-founder", re.IGNORECASE), # does not preserve casing yet
   (r"(?<=[\w\s])/co-owner", r" / co-owner", re.IGNORECASE), # does not preserve casing yet
   (r"(?<=[\w\s])/\.net", r" / .net", re.IGNORECASE),
+  (rf"{LB}w/{RB}", r"with", re.IGNORECASE),
 ]
 
 def fix_grammar(text: str) -> str:
@@ -253,62 +253,13 @@ def add_jj_exceptions2(nlp: Language, items: list[str]) -> None:
         {TAG: {IN: ["VBG"]}}, {LOWER: item.lower()},
       ]], tag_jj, index=1)
 
-def get_nlp(name: str | Path = "en_core_web_sm") -> Language:
+def get_nlp(name: str | Path="en_core_web_md") -> Language:
   nlp = spacy.load(name, exclude=["lemmatizer", "ner"])
 
   # Custom components
   nlp.add_pipe("index_tokens_by_sents", after="parser")
 
-  # Prefixes
-  prefixes = list(nlp.Defaults.prefixes or [])
-  prefixes.append(r"[-=/(](?=[a-zA-Z(])")
-  prefix_regex = spacy.util.compile_prefix_regex(prefixes)
-  nlp.tokenizer.prefix_search = prefix_regex.search # type: ignore
-
-  # Suffixes
-  suffixes = list(nlp.Defaults.suffixes or [])
-  suffixes.append(r"(?<=[a-zA-Z)])[-=/.)]")
-  suffixes = [
-    # Slice "#" when "#" if not preceded by r"[cC]" (except when it's like r"\w[cC]")
-    suffix if suffix != "#" else r"(?<!\W[cC])#"
-    # Note: r"^[cC]#" cases are covered separately, by token_match
-    for suffix in suffixes
-  ]
-  suffix_regex = spacy.util.compile_suffix_regex(suffixes)
-  nlp.tokenizer.suffix_search = suffix_regex.search # type: ignore
-
-  # Tokenizer exceptions (sometimes are applied after prefix/suffix, sometimes before – wtf)
-  def token_match(token: str) -> bool | None:
-    lower = token.lower()
-    # Preserve special cases
-    if lower in {"c+", "c++", "c#", ".net", "ph.d", "->", "ex."}:
-      return True
-    # Preserve tokens like "@foo-bar"
-    if lower[0] == "@" and lower[-1].isalnum():
-      return True
-    # Note: non- and ex- and not merged because there're too many combinations of them
-    # I would not merge "co-" as well if only Spacy would not fail miserably with it
-    # Preserve "co-" prefix (Spacy default models do not understand it adequately)
-    if lower.startswith("co-") and lower[-1].isalnum():
-      return True
-    # Preserve ".js"-like suffixes
-    if lower.endswith((".js", ".py", ".net")) and (lower.count(".") == 1) and ("/" not in lower):
-      return True
-    return False
-  nlp.tokenizer.token_match = token_match # type: ignore
-
-  # Infixes
-  infixes = list(nlp.Defaults.infixes or [])
-  infixes.append(r"(?<=[a-zA-Z)])[&+()/](?=[a-zA-Z(])")
-  infixes.append(r"(?<=\w\+)[/](?=\w)")
-  infixes.append(r"(?<=\w)->(?=\w)")
-  infix_finditer = spacy.util.compile_infix_regex(infixes)
-  nlp.tokenizer.infix_finditer = infix_finditer.finditer # type: ignore
-
-  # `add_special_case` is strictly case-sensitive :(
-  # for abbr in ["Eng.", "eng.", "Ex.", "ex."]:
-  #   nlp.tokenizer.add_special_case(abbr, [{ORTH: abbr}])
-  # Affects sentence boundaries, unlike `token_match`
+  modify_tokenizer(nlp)
 
   # Make the following PROPER NOUNs
   add_dev_exceptions(nlp)
@@ -324,6 +275,7 @@ def get_nlp(name: str | Path = "en_core_web_sm") -> Language:
     "graduate", "graduated",
     "undergraduate", "undergraduated",
     "learning", "aspiring",
+    "remote",
   ])
   add_jj_exceptions2(nlp, [
     # Make the following ADJECTIVEs if after VERBs

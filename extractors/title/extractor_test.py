@@ -21,7 +21,7 @@ class Test_TitleExtractor:
     assert extract("I'm a junior PHP coder") == "Junior PHP Coder"
     assert extract("developer, engineer") == "Developer | Engineer"
     assert extract("developer and engineer") == "Developer | Engineer"
-    assert extract("Developer | Engineer") == "Developer | Engineer"
+    assert extract("Developer | Engineer") == "Developer · Engineer"
 
   def test_extract_negation(self, extract) -> None:
     assert extract("not developer") == ""
@@ -174,7 +174,7 @@ class Test_TitleExtractor:
   def test_extract_bios12(self, extract) -> None:
     assert extract("""
       CS-sophomore | Game-dev (Unity & C#)
-    """) == "CS-Sophomore | Game-Dev"
+    """) == "CS-Sophomore · Game-Dev"
     assert extract("""
       Freelance Programmer | Not for Hire
     """) == "Freelance Programmer"
@@ -245,7 +245,7 @@ class Test_TitleExtractor:
     assert extract("""
       I am a data scientist with a passion for learning
     """) == "Data Scientist"
-    assert extract("Business Analyst | MBA Student") == "Business Analyst | MBA Student"
+    assert extract("Business Analyst | MBA Student") == "Business Analyst · MBA Student"
 
   def test_extract_bios17(self, extract) -> None:
     assert extract("""

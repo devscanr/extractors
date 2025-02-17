@@ -41,11 +41,11 @@ def ver1(word: str) -> XPattern:
     {LOWER: {REGEX: r"^" + word + r"[-\d.]{0,4}$"}}
   ]
 
-def noun(word: str | None = None) -> XPattern:
+def nounlike(word: str | None = None) -> XPattern:
   if not word:
     return [x_nounlike()]
   return [
-   x_orthlower(word) | x_nounlike()
+    x_orthlower(word) | x_nounlike()
   ]
 
 def propn(word: str | None = None) -> XPattern:

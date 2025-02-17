@@ -63,7 +63,7 @@ class Test_CategoryExtractor:
     assert extract("PHP & Laravel Developer. Open to remote.").is_remote is True
     assert extract("Remote Fullstack Software Engineer").is_remote is True
     assert extract("A list of semi to fully remote-friendly companies in tech").is_remote is True
-    assert extract("The future of tech is Remote.").is_remote is None
+    assert extract("The future of tech is Remote.").is_remote is True
 
   def test_extract_remote4(self, extract) -> None:
     assert extract("Remote Software Engineer @ Resilience").is_remote is True

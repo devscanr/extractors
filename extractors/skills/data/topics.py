@@ -1,5 +1,5 @@
 from ...skills.utils import dis_incontext, dis_nounlike
-from ...xpatterns import noun
+from ...xpatterns import nounlike
 from ..tag import Skill, Topic
 from ..utils import dis_precisely
 
@@ -57,7 +57,7 @@ SKILLS: list[Skill] = [
   # BACKEND
   Topic("Backend", [
     "back=end", "backender",
-     noun("BE")
+    nounlike("BE")
   ]), # not detected as PROPN, needs to be retrained
   Topic("Access-Control", ["rbac", "abac", "acl"]), # also SECURITY
   Topic("Authentication", ["authentication", "auth", "sign=in", "sign=out"]), # also SECURITY
@@ -107,7 +107,7 @@ SKILLS: list[Skill] = [
   # FRONTEND
   Topic("Frontend", [
     "front=end", "frontender",
-    noun("FE"),
+    nounlike("FE"),
   ]),
   # BEM, БЭМ
   Topic("Browser", ["browser"]),

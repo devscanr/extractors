@@ -1,7 +1,7 @@
 from spacy.tokens import Token
 from ..extractor import Tag
 from ..ppatterns import expand_parens
-from ..spacyhelpers import left_token, right_token
+from ..spacyhelpers import IN, POS, left_token, right_token
 from ..xpatterns import LOWER, verb
 from ..xpatterns import dep_root
 from .tag import CatTag
@@ -308,6 +308,7 @@ TAGS: list[Tag] = [
   # FLAGS ---
   CatTag("Remote", [
     [{LOWER: "remote"} | dep_root],
+    [{LOWER: "remote"} | {POS: {IN: ["NOUN", "PROPN"]}}],
     [{LOWER: "remotely"} | dep_root],
     "remote=friendly",
     "remote=only",

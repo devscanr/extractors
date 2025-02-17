@@ -2,7 +2,7 @@ from ..dpatterns import DPattern, DToken, LEFT_ID, PHANTOM, REL_OP, RIGHT_ATTRS,
 from ..extractor import Tag
 from .tag import ExpTag
 from ..ppatterns import expandlist_parens as expl
-from ..xpatterns import DEP, LOWER, XPattern, x_lower, x_nounlike, x_orth, x_orthlower, x_regex
+from ..xpatterns import DEP, IN, LOWER, XPattern, x_lower, x_nounlike, x_orth, x_orthlower, x_regex
 
 ROLES = expl([
   "administrator", "admin",
@@ -199,12 +199,25 @@ def init_sudorole_patterns(modifiers: list[str]) -> list[str | DPattern]:
     ]
   ]
 
+RANGE_SENIORITIES = expl([
+  "junior(+)", "junior-",
+  "middle(+)", "middle-",
+  "intermediate(+)", "intermediate-",
+  "senior(+)", "senior-",
+  "principal(+)", "principal-",
+])
+
 def init_sep_patterns(modifiers: list[str]) -> list[str | DPattern]:
   return [
     [
       x_lower(modifiers),
-      x_orth(["/", "-", "|", ",", "->"]) | P, # pipe is replaced with ',' or '.' as a part of normalization :(
-      x_nounlike() | P,
+      x_orth(["/", "-", "|", ",", "->"]) | P,
+      {LOWER: {IN: RANGE_SENIORITIES}} | P
+    ],
+    [
+      {LOWER: {IN: RANGE_SENIORITIES}} | P,
+      x_orth(["/", "-", "|", ",", "->"]) | P,
+      x_lower(modifiers),
     ]
   ]
 
@@ -217,7 +230,7 @@ def init_intern_patterns() -> list[str | DPattern]:
   ]
 
 def init_junior_patterns() -> list[str | DPattern]:
-  modifiers = expl(["junior(+)"])
+  modifiers = expl(["junior(+)", "junior-"])
   return [
     *init_root_patterns(modifiers),
     *init_role_patterns(modifiers),
@@ -226,7 +239,7 @@ def init_junior_patterns() -> list[str | DPattern]:
   ]
 
 def init_middle_patterns() -> list[str | DPattern]:
-  modifiers = expl(["middle(+)", "intermediate(+)"])
+  modifiers = expl(["middle(+)", "middle-", "intermediate(+)", "intermediate-"])
   return [
     *init_root_patterns(modifiers),
     *init_role_patterns(modifiers),
@@ -235,7 +248,7 @@ def init_middle_patterns() -> list[str | DPattern]:
   ]
 
 def init_senior_patterns() -> list[str | DPattern]:
-  modifiers = expl(["senior(+)"])
+  modifiers = expl(["senior(+)", "senior-"])
   return [
     *init_root_patterns(modifiers),
     *init_role_patterns(modifiers),
@@ -244,7 +257,7 @@ def init_senior_patterns() -> list[str | DPattern]:
   ]
 
 def init_principal_patterns() -> list[str | DPattern]:
-  modifiers = expl(["principal(+)"])
+  modifiers = expl(["principal(+)", "principal-"])
   return [
     *init_root_patterns(modifiers),
     *init_role_patterns(modifiers),

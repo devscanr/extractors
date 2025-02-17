@@ -209,15 +209,15 @@ HEAD_MARKERS = {
 def is_distant(token1: Token, token2: Token) -> bool:
   mini = min(token1.i, token2.i)
   maxi = max(token1.i, token2.i)
-  distance: int = 0
+  distance: float = 0
   for tok in token1.doc[mini+1:maxi]:
-    if tok.text in {";", "|"}:
+    if tok.text in {";", "|", "·"}:
       distance += 3
     elif tok.text in {"-", ",", "("}:
       distance += 2
     else:
-      distance += 1
-  return distance >= 6
+      distance += 0.5
+  return distance >= 3
 
 def getprefix(name: str) -> str:
   return name.split(":")[0]

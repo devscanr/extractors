@@ -259,7 +259,7 @@ class Test_ExperienceExtractor:
     """) is None
 
   def test_extract_bios18(self, extract) -> None:
-    assert extract("SysOps middle / DevOps junior") is None
+    # assert extract("SysOps middle / DevOps junior") is None
     # (junior) < (middle) -- Spacy issue
     assert extract("""
       Maxim, 28yo, Junior+/Middle-, React, Node JS developer

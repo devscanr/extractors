@@ -65,7 +65,7 @@ class ExperienceExtractor(BaseExtractor):
         next_umatch = umatches[k + 1] if k < len(umatches) - 1 else None
         rtoken = right_token(umatch.maintoken)
         if (
-          rtoken and rtoken.text in {"/", "-", "->", ",", "."} and
+          rtoken and rtoken.text in {"/", "-", "->", ",", "·"} and
           next_umatch and next_umatch.maintoken.i == umatch.maintoken.i + 2 and next_umatch.name not in {"MOE", "YOE"}
         ):
           match (umatch.name, next_umatch.name):
