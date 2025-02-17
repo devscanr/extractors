@@ -43,16 +43,10 @@ def is_hashtagged(token: Token) -> bool:
 def get_ancestors(token: Token) -> list[Token]:
   tok = token
   toks: list[Token] = []
-  while tok != tok.head and tok.dep_ != "dep":
-    i = tok.i
+  while tok != tok.head and tok.dep_ not in {"dep", "parataxis"}:
+    # TODO stop if there appears punctuation between both?!
     tok = tok.head
-    if (
-      tok.pos_ in {"AUX", "VERB"} or
-      tok.pos_ in {"ADJ", "NOUN", "PROPN", "DET"} and tok.i > i
-    ):
-      toks.append(tok)
-    else:
-      break
+    toks.append(tok)
   return toks
 
 # is_negated
