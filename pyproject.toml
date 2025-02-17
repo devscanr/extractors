@@ -1,29 +1,35 @@
-[tool.poetry]
-package-mode = true
+[project]
 name = "extractors"
 version = "0.54.0"
 description = ""
-authors = ["DevScanr team <info@devscanr.com>"]
+authors = [
+  {name = "DevScanr Team", email = "info@devscanr.com"}
+]
 readme = "README.md"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+  "markdown == 3.7.*",
+  "spacy == 3.8.*",
+  "lingua-language-detector == 2.0.*",
+  "urlextract == 1.9.*",
+  "beautifulsoup4 == 4.12.*",
+  "emoji == 2.14.*",
+  "poetry == 2.1.*",
+]
 
-[tool.poetry.dependencies]
-python = ">=3.12,<3.13"
-markdown = "^3.7"
-spacy = "^3.8.4"
-lingua-language-detector = "^2.0.2"
-urlextract = "^1.9.0"
-beautifulsoup4 = "^4.12.3"
-emoji = "^2.14.1"
- # spacy-universal-sentence-encoder = "^0.4.6"
+[project.optional-dependencies]
+mypy = ["mypy == 1.14.*"]
+pytest = ["pytest == 8.3.*"]
+ruff = ["ruff == 0.9.*"]
+types-beautifulsoup4 = ["types-beautifulsoup4 == 4.12.0.*"]
+types-markdown = ["types-markdown == 3.7.0.*"]
+# jupyterlab = ["jupyterlab == 4.2.*"]
+psutil = ["psutil == 6.1.*"]
 
-[tool.poetry.group.dev.dependencies]
-mypy = "^1.14.0"
-pytest = "^8.3.2"
-ruff = "^0.7.1"
-types-beautifulsoup4 = "^4.12.0.20240907"
-types-markdown = "^3.7.0.20240822"
-# jupyterlab = "^4.2.5"
-psutil = "^6.1.1"
+# spacy-universal-sentence-encoder = "^0.4.6"
+
+[tool.poetry]
+package-mode = true
 
 [tool.poe.env]
 PYTHONPATH = "."
@@ -35,7 +41,6 @@ test = "poetry run pytest --disable-warnings"
 lint = "poetry run ruff check"
 
 [tool.mypy]
-python_version = "3.12"
 strict = true
 disallow_untyped_calls = false
 no_implicit_reexport = false
@@ -45,7 +50,7 @@ exclude = [
 
 [tool.ruff.lint]
 select = ["F", "B", "UP", "RUF"]
-ignore = ["E701", "E711", "E712", "E731", "E741", "F541", "RUF001", "RUF002", "RUF003"]
+ignore = ["E701", "E711", "E712", "E731", "E741", "F541", "RUF001", "RUF002", "RUF003", "RUF021"]
 per-file-ignores = {"__init__.py" = ["F403"]}
 
 [tool.pytest.ini_options]

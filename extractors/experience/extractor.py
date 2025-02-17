@@ -1,6 +1,6 @@
+from collections.abc import Generator, Sequence
 import re
 from spacy.tokens import Doc, Token
-from typing import Generator, Sequence
 from ..extractor import BaseExtractor, UMatch
 from ..markers import is_future, is_negated, is_past
 from .experience import is_OtherExperienceKind

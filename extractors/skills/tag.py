@@ -1,6 +1,7 @@
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from spacy.tokens import Token
-from typing import Callable, Literal
+from typing import Literal
 from ..extractor import Disambiguate, Tag
 from ..dpatterns import DPattern
 from ..xpatterns import XPattern

@@ -1,3 +1,4 @@
+from collections.abc import Callable, Iterable
 from emoji import replace_emoji
 import hashlib
 from pathlib import Path
@@ -6,7 +7,7 @@ import spacy
 from spacy import Language
 from spacy.lang.tokenizer_exceptions import URL_PATTERN
 from spacy.tokens import Doc, Token
-from typing import Any, Callable, cast, Iterable
+from typing import Any, cast
 from .tokenizer import modify_tokenizer
 from .xpatterns import IN, IS_PUNCT, IS_SENT_START, LOWER, ORTH, TAG, tag_jj, tag_nnp
 

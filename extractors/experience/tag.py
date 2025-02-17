@@ -1,4 +1,4 @@
-from typing import Sequence
+from collections.abc import Sequence
 from ..extractor import Disambiguate, Tag
 from ..xpatterns import XPattern
 from ..dpatterns import DPattern

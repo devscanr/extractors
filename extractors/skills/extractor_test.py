@@ -1,7 +1,7 @@
 # mypy: disable-error-code=no-untyped-def
+from collections.abc import Callable
 import pytest
 from spacy import Language
-from typing import Callable
 from ..utils import fix_grammar, normalize
 from .data import SKILLS
 from .extractor import SkillExtractor

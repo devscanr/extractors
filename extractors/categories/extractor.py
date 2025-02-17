@@ -1,5 +1,6 @@
+from collections.abc import Sequence
 from spacy.tokens import Doc, Token
-from typing import cast, Literal, Sequence
+from typing import cast, Literal
 from ..extractor import BaseExtractor, UMatch
 from ..markers import is_future, is_hashtagged, is_negated, is_past
 from ..spacyhelpers import ancestors, is_word, left_tokens

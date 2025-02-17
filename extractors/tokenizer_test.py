@@ -6,7 +6,7 @@ from extractors.utils import get_nlp
 class Test_Tokenizer:
   @pytest.fixture(scope="class")
   def tokenize(self):
-    nlp = get_nlp("en_core_web_sm")
+    nlp = get_nlp("en_core_web_lg")
     modify_tokenizer(nlp)
     def do(text: str) -> list[str]:
       return [tok.text for tok in nlp(text)]
@@ -86,3 +86,24 @@ class Test_Tokenizer:
     assert tokenize("/foo/bar.com") == ["/", "foo", "/", "bar.com"] # the last token is captured by `match_url`
     assert tokenize("foo/bar.js") == ["foo", "/", "bar.js"]         # the last token is captured by `match_url`
     assert tokenize("foo.com/bar") == ["foo.com/bar"]               # full token is captured by `match_url`
+
+  # def test_split_ampersand(self, tokenize) -> None:
+  #   assert tokenize("&123") == ["/", "123"]
+  #   assert tokenize("123&") == ["123", "/"]
+  #   assert tokenize("123&45") == ["123", "/", "45"]
+  #   assert tokenize("&foo") == ["/", "foo"]
+  #   assert tokenize("foo&") == ["foo", "/"]
+  #   assert tokenize("foo&bar") == ["foo", "/", "bar"]
+  #   assert tokenize("&foo&bar.com") == ["/", "foo", "/", "bar.com"] # the last token is captured by `match_url`
+  #   assert tokenize("foo&bar.js") == ["foo", "/", "bar.js"]         # the last token is captured by `match_url`
+  #   assert tokenize("foo.com&bar") == ["foo.com/bar"]               # full token is captured by `match_url`
+  #
+  #   assert tokenize("&123") == ["/", "123"]
+  #   assert tokenize("123&") == ["123", "/"]
+  #   assert tokenize("123&45") == ["123", "/", "45"]
+  #   assert tokenize("&foo") == ["/", "foo"]
+  #   assert tokenize("foo&") == ["foo", "/"]
+  #   assert tokenize("foo&bar") == ["foo", "/", "bar"]
+  #   assert tokenize("&foo&bar.com") == ["/", "foo", "/", "bar.com"] # the last token is captured by `match_url`
+  #   assert tokenize("foo&bar.js") == ["foo", "/", "bar.js"]         # the last token is captured by `match_url`
+  #   assert tokenize("foo.com&bar") == ["foo.com/bar"]               # full token is captured by `match_url`

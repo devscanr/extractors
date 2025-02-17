@@ -1,7 +1,9 @@
+from collections.abc import Sequence
 from itertools import dropwhile
 import re
+from typing import Literal
+
 from spacy.tokens import Doc, Span, Token
-from typing import Literal, Sequence
 from ..categories.extractor import is_hashtagged
 from ..extractor import BaseExtractor
 from ..markers import is_future, is_negated, is_past

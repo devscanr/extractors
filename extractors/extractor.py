@@ -1,9 +1,10 @@
+from collections.abc import Callable, Sequence
 from dataclasses import dataclass
 import re
 from spacy import Language
 from spacy.matcher import DependencyMatcher, Matcher, PhraseMatcher
 from spacy.tokens import Doc, Token
-from typing import Any, Callable, NamedTuple, Sequence, cast
+from typing import Any, NamedTuple, cast
 from .ppatterns import to_ppatterns
 from .spacyhelpers import token_level
 from .utils import hash_skillname, uniq2

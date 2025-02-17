@@ -1,6 +1,6 @@
+from collections.abc import Callable, Sequence
 from spacy import Language
 from spacy.tokens import Doc, Token
-from typing import Callable, Sequence
 from ..extractor import BaseExtractor
 from ..utils import uniq
 from .tag import Skill
