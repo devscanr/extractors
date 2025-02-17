@@ -238,7 +238,8 @@ def add_jj_exceptions(nlp: Language, items: list[str]) -> None:
       raise ValueError("JJ items with >= 1 spaces are not supported")
     else:
       ruler.add([[
-        {LOWER: item.lower()}, {TAG: {IN: ["NN", "CD"]}}
+        {LOWER: item.lower(), TAG: {IN: ["NN", "NNP", "NNS", "NNPS"]}},
+        {TAG: {IN: ["NN", "NNP", "NNS", "NNPS", "CD"]}},
       ]], tag_jj)
 
 def add_jj_exceptions2(nlp: Language, items: list[str]) -> None:
